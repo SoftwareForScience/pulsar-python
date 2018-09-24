@@ -1,14 +1,18 @@
-language: python
-
-python:
-  - '3.6'
-
-os:
-  - linux
-  - osx
+matrix:
+  include:
+    - os: linux
+      language: python
+      python: 3.6
+      
+    - os: osx
+      language: generic
 
 before_install:
   - python --version
+
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+            brew update;
+            brew upgrade python;
 
 install: 
   - pip install pylint
