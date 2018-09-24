@@ -1,4 +1,5 @@
 # Pulsar IO
+[![Build Status](https://travis-ci.com/AUAS-Pulsar/io.svg?branch=master)](https://travis-ci.com/AUAS-Pulsar/io)
 
 ## Plan of action
 
