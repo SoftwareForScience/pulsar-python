@@ -1,0 +1,17 @@
+language: python
+
+python:
+  - '3.6'
+
+os:
+  - linux
+  - osx
+
+before_install:
+  - python --version
+
+install: 
+  - pip install pylint
+
+script:
+  - pylint *.py
