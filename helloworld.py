@@ -1,2 +1,3 @@
-def helloWorld():
-    return "hello world!"
+class HelloWorld():
+    def __init__(self):
+        self.message = "Hello World"
