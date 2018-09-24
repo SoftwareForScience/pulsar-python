@@ -2,7 +2,7 @@
 Define test case
 """
 import unittest
-from helloworld import HelloWorld
+import helloworld
 
 class TestCase(unittest.TestCase):
     """
@@ -12,8 +12,7 @@ class TestCase(unittest.TestCase):
         """
         Perform test
         """
-        helloworld = HelloWorld()
-        self.assertEqual(helloworld.message, "Hello World")
+        self.assertEqual(helloworld.hello_world(), "Hello World!")
 
 if __name__ == '__main__':
     unittest.main()
