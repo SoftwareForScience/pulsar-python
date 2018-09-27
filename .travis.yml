@@ -7,8 +7,8 @@ os:
 python: 3.6
 
 before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install python3; fi
   - python --version
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install python3.6; fi
 
 install: 
   - pip install pylint
