@@ -10,9 +10,7 @@ before_install:
   - python --version
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
     brew update;
-    brew install python3.6;
-    pip3 install codecov;
-    pip3 install --user -r requirements.txt;
+    brew install python3
     fi
 
 install: 
