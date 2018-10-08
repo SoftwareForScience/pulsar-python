@@ -1,31 +1,29 @@
 # Pulsar IO
 [![Build Status](https://travis-ci.com/AUAS-Pulsar/io.svg?branch=master)](https://travis-ci.com/AUAS-Pulsar/io)
 
-## Plan of action
 
-### Introduction
+## Introduction
 
 Creating a free and open source framework that contains the generic algorithms and file handling for astronomical data sets. This framework will be modular. Similar to OpenCV, wherein specific modules can be added and disabled depended on the needs of a project. This framework will be implemented in Python and C++.
 
-### Mission
+## Installation
 
-NA
+### Requirements
 
-## Requirements
-
-The requirements consists of two different categories. There are both functional and non-functional requirements.
-
-### Non-Functional
-
-* Support for MacOS High Sierra (x86_64), CentOS (x86_64), Raspbian(ARM x64)
-* Python 3.6
-* Must be modular
-
-### Functional
-
-* As user I want to read filterbank files in my program, so we can use the astronomical data in scientific programs.
-* As user I want to write filterbank files in my program, so we can write astronomical data in scientific program
-* As scientific programmer I want that my filterbank reader performs with very large datasets (+1TB of data), which is often the case in software
-* As scientific programmer I want that my filterbank writer performs with very large datasets(+1TB of data), which is often the case in software
+    * numpy
 
 
+## Documentation
+
+1. [Development](docs/Development.md)
+    1. [Plan of Action](docs/Development.md#1-plan-of-action)
+        1. [Introduction](docs/Development.md#11-introduction)
+        2. [Current situation](docs/Development.md#12-current-situation)
+        3. [Mission](docs/Development.md#13-mission)
+        4. [Monitoring performance](docs/Development.md#14-monitoring-performance)
+        5. [Risks](docs/Development.md#15-risks)
+2. [Technical Details](docs/Technical.md)
+    1. [Requirements](docs/Technical.md#2-requirements)
+        1. [Functional](docs/Technical.md#21-functional)
+        2. [Non-Functional](docs/Technical.md#22-non-functional)
+    
