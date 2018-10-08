@@ -1,5 +1,8 @@
+import os
 from struct import unpack
 import numpy as np
+import matplotlib.pyplot as plt
+
 
 header_keyword_types = {
     b'telescope_id' : b'<l',
@@ -68,20 +71,16 @@ def read_next_header_keyword(fh):
     Returns:
     """
     n_bytes = np.fromstring(fh.read(4), dtype='uint32')[0]
-    #print n_bytes
 
     if n_bytes > 255:
         n_bytes = 16
 
     keyword = fh.read(n_bytes)
 
-    #print keyword
-
     if keyword == b'HEADER_START' or keyword == b'HEADER_END':
         return keyword, 0, fh.tell()
     else:
         dtype = header_keyword_types[keyword]
-        #print dtype
         idx = fh.tell()
         if dtype == b'<l':
             val = unpack(dtype, fh.read(4))[0]
@@ -114,6 +113,173 @@ def fil_double_to_angle(angle):
 
       return dd
 
+def len_header(filename):
+    """ Return the length of the blimpy header, in bytes
+    Args:
+        filename (str): name of file to open
+    Returns:
+        idx_end (int): length of header, in bytes
+    """
+    with open(filename, 'rb') as f:
+        header_sub_count = 0
+        eoh_found = False
+        while not eoh_found:
+            header_sub = f.read(512)
+            header_sub_count += 1
+            if b'HEADER_END' in header_sub:
+                idx_end = header_sub.index(b'HEADER_END') + len(b'HEADER_END')
+                eoh_found = True
+                break
+        idx_end = (header_sub_count - 1) * 512 + idx_end
+    return idx_end
 
-value = read_header("../test-data/pspm_small.fil", True)
-print(value)
+
+def read_string(filename, header_len, stdout=False):
+    filfile = open(filename, 'rb')
+    strlen = unpack('i', filfile.read(4))[0]
+    strval = filfile.read(strlen)
+    if stdout:
+        print("  string = '%s'"%strval)
+    return strval
+
+
+def read_test(filename, header_len):
+    # f = open(filename, 'rb')
+    # f.seek(header_len, 1)
+    # data = f.read(128 * 4 * 4)
+
+    with open(filename, 'rb') as bin_file:
+        bin_file.seek(header_len, 1)
+        # data = np.fromfile(bin_file, dtype=b'float32')
+        # data = np.fromfile(bin_file)
+        str_bytes = bin_file.read(4)
+        data = unpack(b'<d', str_bytes)
+        # for i in range(0, 4 * 4):
+        # little endian?
+        # data = unpack(b'<f', bin_file.read(4))[0]
+        return data
+    # values = unpack('d', data)[0]
+    # np_data = np.fromfile(f, dtype='float32').reshape(15676, 128)
+    # data = np_data.reshape(128, 15679).transpose()
+    # int_values = [x for x in data]
+    # return data
+
+def read_advanced(filename, header_len, t_start, t_stop):
+    # Load binary data 
+    f = open(filename, 'rb')
+    f.seek(header_len)
+    
+    # Variables from header
+    n_bytes = 2
+    n_chans = 128
+    n_chans_selected = 1
+    n_ifs = 1
+    # n_bytes  = self.header['nbits'] / 8
+    # n_chans = self.header['nchans']
+    # n_chans_selected = self.freqs.shape[0]
+    # n_ifs   = self.header['nifs']
+
+    f_delt = -0.062
+    f0 = 433.968
+
+    # tstart = 50000.0
+    # tsamp = 80
+    # only read first integration of large file (for now, later more flexible)
+    filesize = os.path.getsize(filename)
+    n_bytes_data = filesize - header_len
+    n_ints_in_file = n_bytes_data / (n_bytes * n_chans * n_ifs)
+    
+    # now check to see how many integrations requested
+    ii_start, ii_stop = 0, n_ints_in_file
+    if t_start:
+        ii_start = t_start
+    if t_stop:
+        ii_stop = t_stop
+    n_ints = int(ii_stop - ii_start)
+
+    #
+    chan_start_idx, chan_stop_idx = 0, n_chans
+    if f_delt < 0:
+        chan_start_idx, chan_stop_idx = n_chans, 0
+        
+
+    freqs = np.arange(0, n_chans, 1, dtype='float64') * f_delt + f0
+    
+    if chan_start_idx > chan_stop_idx:
+        freqs    = freqs[chan_stop_idx:chan_start_idx]
+        freqs    = freqs[::-1]
+    else:
+        freqs    = freqs[chan_start_idx:chan_stop_idx]
+    
+    
+    # Set up indexes used in file read (taken out of loop for speed)
+    i0 = np.min((chan_start_idx, chan_stop_idx))
+    i1 = np.max((chan_start_idx, chan_stop_idx)) 
+
+    data = np.zeros((n_ints, n_ifs, n_chans_selected), dtype='float32')
+    
+    for ii in range(n_ints):
+        """d = f.read(n_bytes * n_chans * n_ifs)  
+        """
+        
+        for jj in range(n_ifs):
+            f.seek(n_bytes * i0, 1) # 1 = from current location
+            d = f.read(n_bytes * n_chans_selected)          
+            f.seek(n_bytes * (n_chans - i1), 1)
+        
+            if n_bytes == 4:
+                dd = np.fromstring(d, dtype='float32')
+            elif n_bytes == 2:
+                dd = np.fromstring(d, dtype='int16')
+            elif n_bytes == 1:
+                dd = np.fromstring(d, dtype='int8')
+            
+            # Reverse array if frequency axis is flipped
+            if f_delt < 0:
+                dd = dd[::-1]
+            
+            data[ii, jj] = dd        
+
+    return data
+
+
+# Reading bytes
+def reading_bytes(filename, header_len):
+    # read the filterbank file
+    fh = open(filename, 'rb')
+    # skip the header
+    fh.seek(header_len, 1)
+
+    # create a string of bytes
+    str_bytes = fh.read(128 * 4)
+    # str_bytes = b'\\xb7'
+
+    print(str_bytes)
+    print(len(str_bytes))
+
+    # bytes to actual value [uint8/16/32, float16/32]
+    values = np.fromstring(str_bytes, dtype='int32')
+    # values = unpack(b'<f', str_bytes)[0]
+
+    return values
+
+
+filename = '../test-data/pspm2.fil'
+length = len_header(filename)
+
+
+values = reading_bytes(filename, length)
+# values = read_string(filename, length)
+# values = read_test(filename, length)
+# values = read_advanced(filename, length, 9000.0, 10000.0)
+print(values)
+plt.plot(values)
+plt.show()
+
+
+# value = read_test(length, filename)
+# value = read_header(filename)
+# print(value[b'nbits'])
+# print(value)
+# plt.plot(value)
+# plt.show()
