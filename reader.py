@@ -95,23 +95,23 @@ def read_next_header_keyword(fh):
         return keyword, val, idx
 
 def fil_double_to_angle(angle):
-      """ Reads a little-endian double in ddmmss.s (or hhmmss.s) format and then
-      converts to Float degrees (or hours).  This is primarily used to read
-      src_raj and src_dej header values. """
+    """ Reads a little-endian double in ddmmss.s (or hhmmss.s) format and then
+    converts to Float degrees (or hours).  This is primarily used to read
+    src_raj and src_dej header values. """
 
-      negative = (angle < 0.0)
-      angle = np.abs(angle)
+    negative = (angle < 0.0)
+    angle = np.abs(angle)
 
-      dd = np.floor((angle / 10000))
-      angle -= 10000 * dd
-      mm = np.floor((angle / 100))
-      ss = angle - 100 * mm
-      dd += mm/60.0 + ss/3600.0
+    dd = np.floor((angle / 10000))
+    angle -= 10000 * dd
+    mm = np.floor((angle / 100))
+    ss = angle - 100 * mm
+    dd += mm/60.0 + ss/3600.0
 
-      if negative:
-          dd *= -1
+    if negative:
+        dd *= -1
 
-      return dd
+    return dd
 
 def len_header(filename):
     """ Return the length of the blimpy header, in bytes
@@ -258,13 +258,13 @@ def reading_bytes(filename, header_len):
     print(len(str_bytes))
 
     # bytes to actual value [uint8/16/32, float16/32]
-    values = np.fromstring(str_bytes, dtype='int32')
+    values = np.fromstring(str_bytes, dtype='int8')
     # values = unpack(b'<f', str_bytes)[0]
 
     return values
 
 
-filename = '../test-data/pspm2.fil'
+filename = './pspm_tiny.fil'
 length = len_header(filename)
 
 
@@ -272,13 +272,13 @@ values = reading_bytes(filename, length)
 # values = read_string(filename, length)
 # values = read_test(filename, length)
 # values = read_advanced(filename, length, 9000.0, 10000.0)
-print(values)
-plt.plot(values)
-plt.show()
+#print(values)
+#plt.plot(values)
+#plt.show()
 
 
 # value = read_test(length, filename)
-# value = read_header(filename)
+value = read_header(filename)
 # print(value[b'nbits'])
 # print(value)
 # plt.plot(value)
