@@ -1,5 +1,6 @@
 # Pulsar IO
 [![Build Status](https://travis-ci.com/AUAS-Pulsar/io.svg?branch=master)](https://travis-ci.com/AUAS-Pulsar/io)
+[![codecov](https://codecov.io/gh/AUAS-Pulsar/io/branch/master/graph/badge.svg)](https://codecov.io/gh/AUAS-Pulsar/io)
 
 
 ## Introduction
