@@ -268,7 +268,7 @@ filename = './pspm_tiny.fil'
 length = len_header(filename)
 
 
-values = reading_bytes(filename, length)
+# values = reading_bytes(filename, length)
 # values = read_string(filename, length)
 # values = read_test(filename, length)
 # values = read_advanced(filename, length, 9000.0, 10000.0)
@@ -280,6 +280,6 @@ values = reading_bytes(filename, length)
 # value = read_test(length, filename)
 value = read_header(filename)
 # print(value[b'nbits'])
-# print(value)
+print(value)
 # plt.plot(value)
 # plt.show()
