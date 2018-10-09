@@ -1,34 +1,35 @@
+"""Prototype module which enables reading of filterbank files. """
+
 import os
 from struct import unpack
 import numpy as np
-import matplotlib.pyplot as plt
 
-
-header_keyword_types = {
-    b'telescope_id' : b'<l',
-    b'machine_id'   : b'<l',
-    b'data_type'    : b'<l',
-    b'barycentric'  : b'<l',
+HEADER_KEYWORD_TYPES = {
+    b'telescope_id': b'<l',
+    b'machine_id': b'<l',
+    b'data_type': b'<l',
+    b'barycentric': b'<l',
     b'pulsarcentric': b'<l',
-    b'nbits'        : b'<l',
-    b'nsamples'     : b'<l',
-    b'nchans'       : b'<l',
-    b'nifs'         : b'<l',
-    b'nbeams'       : b'<l',
-    b'ibeam'        : b'<l',
-    b'rawdatafile'  : b'str',
-    b'source_name'  : b'str',
-    b'az_start'     : b'<d',
-    b'za_start'     : b'<d',
-    b'tstart'       : b'<d',
-    b'tsamp'        : b'<d',
-    b'fch1'         : b'<d',
-    b'foff'         : b'<d',
-    b'refdm'        : b'<d',
-    b'period'       : b'<d',
-    b'src_raj'      : b'angle',
-    b'src_dej'      : b'angle',
-    }
+    b'nbits': b'<l',
+    b'nsamples': b'<l',
+    b'nchans': b'<l',
+    b'nifs': b'<l',
+    b'nbeams': b'<l',
+    b'ibeam': b'<l',
+    b'rawdatafile': b'str',
+    b'source_name': b'str',
+    b'az_start': b'<d',
+    b'za_start': b'<d',
+    b'tstart': b'<d',
+    b'tsamp': b'<d',
+    b'fch1': b'<d',
+    b'foff': b'<d',
+    b'refdm': b'<d',
+    b'period': b'<d',
+    b'src_raj': b'angle',
+    b'src_dej': b'angle',
+}
+
 
 def read_header(filename, return_idxs=False):
     """ Read blimpy header and return a Python dictionary of key:value pairs
@@ -39,12 +40,12 @@ def read_header(filename, return_idxs=False):
                             for values
     returns
     """
-    with open(filename, 'rb') as fh:
+    with open(filename, 'rb') as file_header:
         header_dict = {}
         header_idxs = {}
 
         # Check this is a blimpy file
-        keyword, value, idx = read_next_header_keyword(fh)
+        keyword, value, idx = read_next_header_keyword(file_header)
 
         try:
             assert keyword == b'HEADER_START'
@@ -52,7 +53,7 @@ def read_header(filename, return_idxs=False):
             raise RuntimeError("Not a valid blimpy file.")
 
         while True:
-            keyword, value, idx = read_next_header_keyword(fh)
+            keyword, value, idx = read_next_header_keyword(file_header)
             if keyword == b'HEADER_END':
                 break
             else:
@@ -61,38 +62,40 @@ def read_header(filename, return_idxs=False):
 
     if return_idxs:
         return header_idxs
-    else:
-        return header_dict
 
-def read_next_header_keyword(fh):
+    return header_dict
+
+
+def read_next_header_keyword(file_header):
     """
     Args:
-        fh (file): file handler
+        file_header (file): file handler
     Returns:
     """
-    n_bytes = np.fromstring(fh.read(4), dtype='uint32')[0]
+    n_bytes = np.fromstring(file_header.read(4), dtype='uint32')[0]
 
     if n_bytes > 255:
         n_bytes = 16
 
-    keyword = fh.read(n_bytes)
+    keyword = file_header.read(n_bytes)
 
-    if keyword == b'HEADER_START' or keyword == b'HEADER_END':
-        return keyword, 0, fh.tell()
-    else:
-        dtype = header_keyword_types[keyword]
-        idx = fh.tell()
-        if dtype == b'<l':
-            val = unpack(dtype, fh.read(4))[0]
-        if dtype == b'<d':
-            val = unpack(dtype, fh.read(8))[0]
-        if dtype == b'str':
-            str_len = np.fromstring(fh.read(4), dtype='int32')[0]
-            val = fh.read(str_len)
-        if dtype == b'angle':
-            val = unpack('<d', fh.read(8))[0]
-            val = fil_double_to_angle(val)
-        return keyword, val, idx
+    if b'HEADER_START' in keyword or b'HEADER_END' in keyword:
+        return keyword, 0, file_header.tell()
+
+    dtype = HEADER_KEYWORD_TYPES[keyword]
+    idx = file_header.tell()
+    if dtype == b'<l':
+        val = unpack(dtype, file_header.read(4))[0]
+    if dtype == b'<d':
+        val = unpack(dtype, file_header.read(8))[0]
+    if dtype == b'str':
+        str_len = np.fromstring(file_header.read(4), dtype='int32')[0]
+        val = file_header.read(str_len)
+    if dtype == b'angle':
+        val = unpack('<d', file_header.read(8))[0]
+        val = fil_double_to_angle(val)
+    return keyword, val, idx
+
 
 def fil_double_to_angle(angle):
     """ Reads a little-endian double in ddmmss.s (or hhmmss.s) format and then
@@ -102,16 +105,17 @@ def fil_double_to_angle(angle):
     negative = (angle < 0.0)
     angle = np.abs(angle)
 
-    dd = np.floor((angle / 10000))
-    angle -= 10000 * dd
-    mm = np.floor((angle / 100))
-    ss = angle - 100 * mm
-    dd += mm/60.0 + ss/3600.0
+    data_matrix = np.floor((angle / 10000))
+    angle -= 10000 * data_matrix
+    time_minutes = np.floor((angle / 100))
+    time_seconds = angle - 100 * time_minutes
+    data_matrix += time_minutes / 60.0 + time_seconds / 3600.0
 
     if negative:
-        dd *= -1
+        data_matrix *= -1
 
-    return dd
+    return data_matrix
+
 
 def len_header(filename):
     """ Return the length of the blimpy header, in bytes
@@ -120,11 +124,11 @@ def len_header(filename):
     Returns:
         idx_end (int): length of header, in bytes
     """
-    with open(filename, 'rb') as f:
+    with open(filename, 'rb') as file:
         header_sub_count = 0
         eoh_found = False
         while not eoh_found:
-            header_sub = f.read(512)
+            header_sub = file.read(512)
             header_sub_count += 1
             if b'HEADER_END' in header_sub:
                 idx_end = header_sub.index(b'HEADER_END') + len(b'HEADER_END')
@@ -134,16 +138,18 @@ def len_header(filename):
     return idx_end
 
 
-def read_string(filename, header_len, stdout=False):
+def read_string(filename, stdout=False):
+    """Return string from filterbank file. (INOP)"""
     filfile = open(filename, 'rb')
     strlen = unpack('i', filfile.read(4))[0]
     strval = filfile.read(strlen)
     if stdout:
-        print("  string = '%s'"%strval)
+        print("  string = '%s'" % strval)
     return strval
 
 
 def read_test(filename, header_len):
+    """Test for reading the header. ToDo Remove when not using for internal tests anymore. """
     # f = open(filename, 'rb')
     # f.seek(header_len, 1)
     # data = f.read(128 * 4 * 4)
@@ -164,11 +170,14 @@ def read_test(filename, header_len):
     # int_values = [x for x in data]
     # return data
 
+
 def read_advanced(filename, header_len, t_start, t_stop):
-    # Load binary data 
-    f = open(filename, 'rb')
-    f.seek(header_len)
-    
+    """Test for reading the header. ToDo Remove when not using for internal tests anymore. """
+    # pylint: disable-msg=R0914
+    # Load binary data
+    file = open(filename, 'rb')
+    file.seek(header_len)
+
     # Variables from header
     n_bytes = 2
     n_chans = 128
@@ -180,7 +189,7 @@ def read_advanced(filename, header_len, t_start, t_stop):
     # n_ifs   = self.header['nifs']
 
     f_delt = -0.062
-    f0 = 433.968
+    f_0 = 433.968
 
     # tstart = 50000.0
     # tsamp = 80
@@ -188,7 +197,7 @@ def read_advanced(filename, header_len, t_start, t_stop):
     filesize = os.path.getsize(filename)
     n_bytes_data = filesize - header_len
     n_ints_in_file = n_bytes_data / (n_bytes * n_chans * n_ifs)
-    
+
     # now check to see how many integrations requested
     ii_start, ii_stop = 0, n_ints_in_file
     if t_start:
@@ -201,57 +210,55 @@ def read_advanced(filename, header_len, t_start, t_stop):
     chan_start_idx, chan_stop_idx = 0, n_chans
     if f_delt < 0:
         chan_start_idx, chan_stop_idx = n_chans, 0
-        
 
-    freqs = np.arange(0, n_chans, 1, dtype='float64') * f_delt + f0
-    
+    freqs = np.arange(0, n_chans, 1, dtype='float64') * f_delt + f_0
+
     if chan_start_idx > chan_stop_idx:
-        freqs    = freqs[chan_stop_idx:chan_start_idx]
-        freqs    = freqs[::-1]
+        freqs = freqs[chan_stop_idx:chan_start_idx]
+        freqs = freqs[::-1]
     else:
-        freqs    = freqs[chan_start_idx:chan_stop_idx]
-    
-    
+        freqs = freqs[chan_start_idx:chan_stop_idx]
+
     # Set up indexes used in file read (taken out of loop for speed)
-    i0 = np.min((chan_start_idx, chan_stop_idx))
-    i1 = np.max((chan_start_idx, chan_stop_idx)) 
+    i_0 = np.min((chan_start_idx, chan_stop_idx))
+    i_1 = np.max((chan_start_idx, chan_stop_idx))
 
     data = np.zeros((n_ints, n_ifs, n_chans_selected), dtype='float32')
-    
-    for ii in range(n_ints):
-        """d = f.read(n_bytes * n_chans * n_ifs)  
-        """
-        
-        for jj in range(n_ifs):
-            f.seek(n_bytes * i0, 1) # 1 = from current location
-            d = f.read(n_bytes * n_chans_selected)          
-            f.seek(n_bytes * (n_chans - i1), 1)
-        
+
+    for item in range(n_ints):
+
+        for j_j in range(n_ifs):
+            file.seek(n_bytes * i_0, 1)  # 1 = from current location
+            data = file.read(n_bytes * n_chans_selected)
+            file.seek(n_bytes * (n_chans - i_1), 1)
+
             if n_bytes == 4:
-                dd = np.fromstring(d, dtype='float32')
+                data_set = np.fromstring(data, dtype='float32')
             elif n_bytes == 2:
-                dd = np.fromstring(d, dtype='int16')
+                data_set = np.fromstring(data, dtype='int16')
             elif n_bytes == 1:
-                dd = np.fromstring(d, dtype='int8')
-            
+                data_set = np.fromstring(data, dtype='int8')
+
             # Reverse array if frequency axis is flipped
             if f_delt < 0:
-                dd = dd[::-1]
-            
-            data[ii, jj] = dd        
+                data_set = data_set[::-1]
+
+            data[item, j_j] = data_set
 
     return data
 
 
 # Reading bytes
 def reading_bytes(filename, header_len):
+    """Attempt of reading bytes from filterbank file. """
+
     # read the filterbank file
-    fh = open(filename, 'rb')
+    file_header = open(filename, 'rb')
     # skip the header
-    fh.seek(header_len, 1)
+    file_header.seek(header_len, 1)
 
     # create a string of bytes
-    str_bytes = fh.read(128 * 4)
+    str_bytes = file_header.read(128 * 4)
     # str_bytes = b'\\xb7'
 
     print(str_bytes)
@@ -264,22 +271,21 @@ def reading_bytes(filename, header_len):
     return values
 
 
-filename = './pspm_tiny.fil'
-length = len_header(filename)
-
-
-# values = reading_bytes(filename, length)
-# values = read_string(filename, length)
-# values = read_test(filename, length)
-# values = read_advanced(filename, length, 9000.0, 10000.0)
-#print(values)
-#plt.plot(values)
-#plt.show()
-
-
-# value = read_test(length, filename)
-value = read_header(filename)
-# print(value[b'nbits'])
-print(value)
-# plt.plot(value)
-# plt.show()
+# filename = './pspm_tiny.fil'
+# length = len_header(filename)
+#
+# # values = reading_bytes(filename, length)
+# # values = read_string(filename, length)
+# # values = read_test(filename, length)
+# # values = read_advanced(filename, length, 9000.0, 10000.0)
+# # print(values)
+# # plt.plot(values)
+# # plt.show()
+#
+#
+# # value = read_test(length, filename)
+# value = read_header(filename)
+# # print(value[b'nbits'])
+# print(value)
+# # plt.plot(value)
+# # plt.show()
