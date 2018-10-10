@@ -14,7 +14,7 @@ install:
 
 script:
   - pylint *.py
-  - coverage run readertest.py
+  - coverage run test_header.py
 
 after_success:
   - codecov
