@@ -1,20 +1,20 @@
 """
-Reader.py unit tests
+    header.py unit tests
 """
 
 import unittest
-import reader
+from header import read_header
 
 class TestCase(unittest.TestCase):
     """
-    Class TestCase
+        Class TestCase
     """
     def test_reader(self):
         """
         Perform reader header test
         """
-        filename = "./pspm_tiny.fil"
-        header_dict = reader.read_header(filename)
+        filename = "./pspm8.fil"
+        header_dict = read_header(filename)
         self.assertEqual(header_dict[b'machine_id'], 10)
         self.assertEqual(header_dict[b'telescope_id'], 4)
         self.assertEqual(header_dict[b'data_type'], 1)
