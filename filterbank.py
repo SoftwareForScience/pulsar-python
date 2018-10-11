@@ -24,7 +24,7 @@ class Filterbank():
         """
         self.freqs = None
         self.timestamps = None
-        if filename and os.path.isfile(filename):
+        if os.path.isfile(filename):
             self.filename = filename
             self.header = read_header(filename)
             self.idx_data = len_header(filename)
@@ -32,6 +32,8 @@ class Filterbank():
             self.n_chans = self.header[b'nchans']
             self.n_ifs = self.header[b'nifs']
             self.read_filterbank(freq_range, time_range)
+        else:
+            raise FileNotFoundError(filename)
 
     def read_filterbank(self, freq_range=None, time_range=None):
         """
@@ -100,8 +102,8 @@ class Filterbank():
         """
             Calculate the time range
         """
-        t_0 = self.header[b'tstart']
         t_delt = self.header[b'tsamp']
+        t_0 = self.header[b'tstart']
 
         n_bytes_data = os.path.getsize(self.filename) - self.idx_data
         n_ints_data = int(n_bytes_data / (self.n_bytes * self.n_chans * self.n_ifs))
@@ -176,8 +178,8 @@ class Filterbank():
 
         plt.plot(plot_freq, plot_data)
         plt.xlim(plot_freq[0], plot_freq[-1])
-        plt.ylabel("Power")
-        plt.xlabel("Frequency")
+        plt.ylabel('Power')
+        plt.xlabel('Frequency')
         plt.show()
 
 def rebin(data, n_x, n_y=None):
@@ -198,5 +200,5 @@ def rebin(data, n_x, n_y=None):
         data = data.reshape((data.shape[0] // n_x, n_x))
         data = data.mean(axis=1)
     else:
-        raise RuntimeError("Only 2 dimensions supported")
+        raise RuntimeError('Only 2 dimensions supported')
     return data
