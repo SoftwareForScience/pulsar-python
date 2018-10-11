@@ -14,7 +14,7 @@ install:
 
 script:
   - pylint *.py
-  - coverage run test_.*.py
+  - coverage run 'test_.*.py'
 
 after_success:
   - codecov
