@@ -86,8 +86,7 @@ def read_next_header_keyword(file_header):
 def fil_double_to_angle(angle):
     """
         Reads a little-endian double in ddmmss.s (or hhmmss.s) format and then
-        converts to Float degrees (or hours).  This is primarily used to read
-        src_raj and src_dej header values.
+        converts to Float degrees (or hours).
     """
     negative = (angle < 0.0)
     angle = np.abs(angle)
