@@ -16,6 +16,7 @@ class TestFilterbank(unittest.TestCase):
         filename = './thispathdoesnotexist'
         with self.assertRaises(FileNotFoundError):
             Filterbank(filename)
+            print(filename)
 
     def test_select_frequency_range(self):
         """
