@@ -19,6 +19,7 @@ script:
   - pylint *.py
   - coverage run -a tests/test_filterbank.py
   - coverage run -a tests/test_header.py
+  - coverage run -a tests/test_fft.py
 
 after_success:
   - codecov
