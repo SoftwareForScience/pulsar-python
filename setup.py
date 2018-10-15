@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 """Setup configuration file. Used to describe the Asteria Package.  """
 
 from setuptools import setup, find_packages
@@ -13,6 +14,7 @@ setup(
     name='asteria',
     version='0.0.1',
     description='An open-source DSP library for pulsar detection.',
+
     long_description=README,
     author='Amsterdam University of Applied Sciences',
     author_email='',
