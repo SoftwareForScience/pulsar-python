@@ -12,6 +12,7 @@ Creating a free and open source framework that contains the generic algorithms a
 ### Requirements
 
     * numpy
+    * python 3.6
 
 
 ## Documentation
@@ -27,4 +28,11 @@ Creating a free and open source framework that contains the generic algorithms a
     1. [Requirements](docs/Technical.md#2-requirements)
         1. [Functional](docs/Technical.md#21-functional)
         2. [Non-Functional](docs/Technical.md#22-non-functional)
-    
+
+
+## How to use the filterbank reader
+
+# Read header data
+
+1. Specify the path to the filterbank file in the header.py file (line 124)
+2. Run the following command: `python header.py`
