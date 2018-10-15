@@ -3,7 +3,7 @@
 """
 
 import unittest
-from filterbank.header import read_header, len_header, fil_double_to_angle
+from .context.header import read_header, len_header, fil_double_to_angle
 
 
 class TestHeader(unittest.TestCase):

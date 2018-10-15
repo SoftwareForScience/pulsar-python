@@ -3,7 +3,7 @@
 """
 
 import unittest
-from filterbank.filterbank import Filterbank
+from .context.filterbank import Filterbank
 
 class TestFilterbank(unittest.TestCase):
     """
