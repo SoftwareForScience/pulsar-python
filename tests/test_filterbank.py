@@ -3,7 +3,7 @@
 """
 
 import unittest
-from filterbank.filterbank import Filterbank
+from context import filterbank
 
 class TestFilterbank(unittest.TestCase):
     """
@@ -15,7 +15,7 @@ class TestFilterbank(unittest.TestCase):
         """
         filename = './thispathdoesnotexist'
         with self.assertRaises(FileNotFoundError):
-            Filterbank(filename)
+            filterbank.Filterbank(filename)
 
 
 
@@ -25,7 +25,7 @@ class TestFilterbank(unittest.TestCase):
             and test if values are in frequency range
         """
         filename = './pspm8.fil'
-        fil = Filterbank(filename)
+        fil = filterbank.Filterbank(filename)
         data = fil.select_data(freq_start=431, freq_stop=432)
         self.assertTrue(all(430.5 < i < 432.4  for i in data[0]))
 
@@ -35,7 +35,7 @@ class TestFilterbank(unittest.TestCase):
             and test if values are in frequency range
         """
         filename = './pspm16.fil'
-        fil = Filterbank(filename)
+        fil = filterbank.Filterbank(filename)
         data = fil.select_data(freq_start=432, freq_stop=431)
         self.assertTrue(all(430.5 < i < 432.4  for i in data[0]))
 
@@ -47,7 +47,7 @@ class TestFilterbank(unittest.TestCase):
         filename = './pspm8.fil'
         time_range = (10, 30)
         time_delt = abs(time_range[0] - time_range[1])
-        fil = Filterbank(filename)
+        fil = filterbank.Filterbank(filename)
         data = fil.select_data(time_start=time_range[0], time_stop=time_range[1])
         self.assertEqual(len(data[1]), time_delt)
 
@@ -60,7 +60,7 @@ class TestFilterbank(unittest.TestCase):
         freq_range = (433, 435)
         time_range = (10, 20)
         time_delt = abs(time_range[0] - time_range[1])
-        fil = Filterbank(filename, freq_range=freq_range, time_range=time_range)
+        fil = filterbank.Filterbank(filename, freq_range=freq_range, time_range=time_range)
         data = fil.select_data()
         self.assertTrue(all(432.5 < i < 435.4  for i in data[0]))
         self.assertEqual(len(data[1]), time_delt)

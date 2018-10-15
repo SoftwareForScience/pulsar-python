@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 
-from .context import fourier
+from context import fourier
 
 def fft1(x):
     L = len(x)
