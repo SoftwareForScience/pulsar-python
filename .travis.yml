@@ -1,0 +1,24 @@
+language: python
+
+os: linux
+
+python: 3.6
+
+before_install:
+  - python --version
+  - wget https://git.dev.ti-more.net/uploads/-/system/personal_snippet/2/bc063035797e978034adfb6f2da75e70/pspm8.fil
+  - wget https://git.dev.ti-more.net/uploads/-/system/personal_snippet/2/3da35656df8f722441579847974a03cb/pspm16.fil
+  - wget https://git.dev.ti-more.net/uploads/-/system/personal_snippet/2/e6015ec024ad1f53d4c2f39511620db1/pspm32.fil
+
+install:
+  - pip install pylint
+  - pip install codecov
+  - pip install -f requirements.txt
+
+script:
+  - pylint *.py
+  - coverage run -a tests/test_filterbank.py
+  - coverage run -a tests/test_header.py
+
+after_success:
+  - codecov
