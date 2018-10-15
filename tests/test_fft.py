@@ -1,3 +1,7 @@
+"""
+    fourier.py test
+"""
+
 import unittest
 import numpy as np
 
