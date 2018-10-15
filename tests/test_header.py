@@ -3,7 +3,7 @@
 """
 
 import unittest
-from .context.header import read_header, len_header, fil_double_to_angle
+from context import header
 
 
 class TestHeader(unittest.TestCase):
@@ -17,7 +17,7 @@ class TestHeader(unittest.TestCase):
             header.py should return a dictionary
         """
         filename = './pspm8.fil'
-        header_dict = read_header(filename)
+        header_dict = header.read_header(filename)
         self.assertEqual(header_dict[b'machine_id'], 10)
         self.assertEqual(header_dict[b'telescope_id'], 4)
         self.assertEqual(header_dict[b'data_type'], 1)
@@ -30,7 +30,7 @@ class TestHeader(unittest.TestCase):
         """
         filename = './pspm8.fil'
         correct_header_length = 242
-        header_length = len_header(filename)
+        header_length = header.len_header(filename)
         self.assertEqual(header_length, correct_header_length)
 
     def test_fil_double_to_angle(self):
@@ -40,7 +40,7 @@ class TestHeader(unittest.TestCase):
         """
         double_value = 123000.0
         expect_angle = 12.5
-        angle = fil_double_to_angle(double_value)
+        angle = header.fil_double_to_angle(double_value)
         self.assertAlmostEqual(angle, expect_angle)
 
 
