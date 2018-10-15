@@ -3,7 +3,7 @@
 """
 
 import unittest
-from filterbank import Filterbank
+from filterbank.filterbank import Filterbank
 
 class TestFilterbank(unittest.TestCase):
     """
@@ -16,6 +16,8 @@ class TestFilterbank(unittest.TestCase):
         filename = './thispathdoesnotexist'
         with self.assertRaises(FileNotFoundError):
             Filterbank(filename)
+
+
 
     def test_select_frequency_range(self):
         """

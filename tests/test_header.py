@@ -3,12 +3,14 @@
 """
 
 import unittest
-from header import read_header, len_header, fil_double_to_angle
+from filterbank.header import read_header, len_header, fil_double_to_angle
+
 
 class TestHeader(unittest.TestCase):
     """
         Class for testing header.py
     """
+
     def test_reader(self):
         """
             When reading filterbank header
@@ -40,6 +42,7 @@ class TestHeader(unittest.TestCase):
         expect_angle = 12.5
         angle = fil_double_to_angle(double_value)
         self.assertAlmostEqual(angle, expect_angle)
+
 
 if __name__ == '__main__':
     unittest.main()
