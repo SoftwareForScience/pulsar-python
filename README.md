@@ -16,21 +16,9 @@ Creating a free and open source framework that contains the generic algorithms a
 
 
 ## Documentation
+Will be added later. 
 
-1. [Development](docs/Development.md)
-    1. [Plan of Action](docs/Development.md#1-plan-of-action)
-        1. [Introduction](docs/Development.md#11-introduction)
-        2. [Current situation](docs/Development.md#12-current-situation)
-        3. [Mission](docs/Development.md#13-mission)
-        4. [Monitoring performance](docs/Development.md#14-monitoring-performance)
-        5. [Risks](docs/Development.md#15-risks)
-2. [Technical Details](docs/Technical.md)
-    1. [Requirements](docs/Technical.md#2-requirements)
-        1. [Functional](docs/Technical.md#21-functional)
-        2. [Non-Functional](docs/Technical.md#22-non-functional)
-
-
-## How to use the filterbank reader
+## How to use this library
 
 ### Read header data
 
