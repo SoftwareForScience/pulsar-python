@@ -4,10 +4,10 @@
 
 import os
 import numpy as np
-import matplotlib.pyplot as plt
-from header import read_header, len_header
+from filterbank.header import read_header, len_header
 
-class Filterbank():
+
+class Filterbank:
     """
         Processing .fil files
     """
@@ -28,7 +28,7 @@ class Filterbank():
             self.filename = filename
             self.header = read_header(filename)
             self.idx_data = len_header(filename)
-            self.n_bytes = int(self.header[b'nbits']/8)
+            self.n_bytes = int(self.header[b'nbits'] / 8)
             self.n_chans = self.header[b'nchans']
             self.n_ifs = self.header[b'nifs']
             self.read_filterbank(freq_range, time_range)
@@ -118,7 +118,7 @@ class Filterbank():
 
         n_ints = ii_stop - ii_start
 
-        self.timestamps = np.arange(0, n_ints) * t_delt / 24./60./60. + t_0
+        self.timestamps = np.arange(0, n_ints) * t_delt / 24. / 60. / 60. + t_0
 
         return ii_start, n_ints
 
@@ -154,51 +154,3 @@ class Filterbank():
             fil_data = np.squeeze(self.data[time_start:time_stop, ..., i_1:i_0 + 1])
 
         return freq_data, fil_data
-
-    def plot_spectrum(self, i=0, freq_start=None, freq_stop=None):
-        """
-            Method for plotting the data and its shape
-
-            TO BE REPLACED
-        """
-        plot_freq, plot_data = self.select_data(freq_start, freq_stop)
-
-        # arrange frequency ascending
-        if self.header[b'foff'] < 0:
-            plot_data = plot_data[..., ::-1]
-            plot_freq = plot_freq[::-1]
-
-        # select iteration i
-        plot_data = plot_data[i]
-
-        dec_fac_x = 1
-
-        plot_data = rebin(plot_data, dec_fac_x, 1)
-        plot_freq = rebin(plot_freq, dec_fac_x, 1)
-
-        plt.plot(plot_freq, plot_data)
-        plt.xlim(plot_freq[0], plot_freq[-1])
-        plt.ylabel('Power')
-        plt.xlabel('Frequency')
-        plt.show()
-
-def rebin(data, n_x, n_y=None):
-    """
-        Put data in bins
-    """
-    if data.ndim == 2:
-        if n_y is None:
-            n_y = 1
-        if n_x is None:
-            n_x = 1
-        data = data[:int(data.shape[0] // n_x) * n_x, :int(data.shape[1] // n_y) * n_y]
-        data = data.reshape((data.shape[0] // n_x, n_x, data.shape[1] // n_y, n_y))
-        data = data.mean(axis=3)
-        data = data.mean(axis=1)
-    elif data.ndim == 1:
-        data = data[:int(data.shape[0] // n_x) * n_x]
-        data = data.reshape((data.shape[0] // n_x, n_x))
-        data = data.mean(axis=1)
-    else:
-        raise RuntimeError('Only 2 dimensions supported')
-    return data
