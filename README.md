@@ -32,7 +32,7 @@ Creating a free and open source framework that contains the generic algorithms a
 
 ## How to use the filterbank reader
 
-# Read header data
+### Read header data
 
 1. Specify the path to the filterbank file in the header.py file (line 124)
 2. Run the following command: `python header.py`
