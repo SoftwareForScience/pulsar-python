@@ -24,3 +24,5 @@ Will be added later.
 
 1. Specify the path to the filterbank file in the header.py file (line 124)
 2. Run the following command: `python header.py`
+
+# Asteria
