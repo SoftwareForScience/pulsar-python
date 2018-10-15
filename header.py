@@ -120,5 +120,4 @@ def len_header(filename):
                 break
         idx_end = int((header_sub_count - 1) * chunk_size + idx_end)
     return idx_end
-
-print(read_header('./pspm8.fil'))
+    
