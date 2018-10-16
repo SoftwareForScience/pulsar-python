@@ -7,7 +7,17 @@ import numpy as np
 
 def dft_slow(input_data):
     """
-        Compute the discrete Fourier Transform of the one-dimensional array x
+        Compute the discrete Fourier Transform of the one-dimensional array input_data
+
+        Parameters
+        ----------
+        input_data : ndarray
+            Array of length `n` containing the values to be transformed.
+        
+        Returns
+        -------
+        ndarray
+            Array of length `n` containing the transformed values.
     """
     input_data = np.asarray(input_data)
     data_length = input_data.shape[0]
@@ -20,6 +30,16 @@ def dft_slow(input_data):
 def fft_vectorized(input_data):
     """
         A vectorized, non-recursive version of the Cooley-Tukey FFT
+
+        Parameters
+        ----------
+        input_data : ndarray
+            Array of length `n` containing the values to be transformed.
+        
+        Returns
+        -------
+        ndarray
+            Array of length `n` containing the transformed values.
     """
     input_data = np.asarray(input_data)
     data_length = input_data.shape[0]
