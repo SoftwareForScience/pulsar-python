@@ -4,6 +4,11 @@
 import numpy as np
 from fourier import fourier
 
+# pylint: disable-msg=R0913
+# pylint: disable-msg=R0914
+# pylint: disable-msg=R0912
+
+
 def window_hanning(window):
     '''
     Return window times the hanning window of len(window).
@@ -180,9 +185,9 @@ def stride_windows(samples, sample_size, noverlap=None, axis=0):
         noverlap = 0
 
     if noverlap >= sample_size:
-        raise ValueError('noverlap must be less than n')
+        raise ValueError('noverlap must be less than sample_size')
     if sample_size < 1:
-        raise ValueError('n cannot be less than 1')
+        raise ValueError('sample_size cannot be less than 1')
 
     samples = np.asarray(samples)
 
@@ -245,7 +250,7 @@ def detrend_mean(sequence, axis=None):
     return sequence - sequence.mean(axis, keepdims=True)
 
 
-def detrend_none(samples, axis=None): # pylint: disable-msg=
+def detrend_none(samples, axis=None): # pylint: disable-msg=W0613
     '''
     Return samples: no detrending.
 
@@ -275,7 +280,7 @@ def detrend_none(samples, axis=None): # pylint: disable-msg=
     '''
     return samples
 
-
+# pylint: disable-msg=C0103
 def detrend_linear(y):
     '''
     Return x minus best fit line; 'linear' detrending.
@@ -322,18 +327,20 @@ def detrend_linear(y):
     a = y.mean() - b*x.mean()
     return y - (b*x + a)
 
-def apply_window(x, window, axis=0, return_window=None):
+# pylint: enable-msg=C0103
+
+def apply_window(samples, window, axis=0, return_window=None):
     '''
     Apply the given window to the given 1D or 2D array along the given axis.
 
     Parameters
     ----------
-    x : 1D or 2D array or sequence
+    samples : 1D or 2D array or sequence
         Array or sequence containing the data.
 
     window : function or array.
         Either a function to generate a window or an array with length
-        *x*.shape[*axis*]
+        *samples*.shape[*axis*]
 
     axis : integer
         The axis over which to do the repetition.
@@ -342,46 +349,46 @@ def apply_window(x, window, axis=0, return_window=None):
     return_window : bool
         If true, also return the 1D values of the window that was applied
     '''
-    x = np.asarray(x)
+    samples = np.asarray(samples)
 
-    if x.ndim < 1 or x.ndim > 2:
+    if samples.ndim < 1 or samples.ndim > 2:
         raise ValueError('only 1D or 2D arrays can be used')
-    if axis+1 > x.ndim:
+    if axis+1 > samples.ndim:
         raise ValueError('axis(=%s) out of bounds' % axis)
 
-    xshape = list(x.shape)
+    xshape = list(samples.shape)
     xshapetarg = xshape.pop(axis)
 
     # if cbook.iterable(window):
     #     print("CBOOK MANE")
     #     if len(window) != xshapetarg:
     #         raise ValueError('The len(window) must be the same as the shape '
-    #                          'of x for the chosen axis')
+    #                          'of samples for the chosen axis')
     #     window_vals = window
     # else:
-    window_vals = window(np.ones(xshapetarg, dtype=x.dtype))
+    window_vals = window(np.ones(xshapetarg, dtype=samples.dtype))
 
-    if x.ndim == 1:
-        if return_window:
-            return window_vals * x, window_vals
+    if samples.ndim == 1:
+        if return_window: # pylint: disable-msg=R1705
+            return window_vals * samples, window_vals
         else:
-            return window_vals * x
+            return window_vals * samples
 
     xshapeother = xshape.pop()
 
     otheraxis = (axis+1) % 2
 
-    window_valsRep = stride_repeat(window_vals, xshapeother, axis=otheraxis)
+    window_vals_rep = stride_repeat(window_vals, xshapeother, axis=otheraxis)
 
-    if return_window:
-        return window_valsRep * x, window_vals
+    if return_window: # pylint: disable-msg=R1705
+        return window_vals_rep * samples, window_vals
     else:
-        return window_valsRep * x
+        return window_vals_rep * samples
 
-def stride_repeat(x, n, axis=0):
+def stride_repeat(samples, sample_size, axis=0):
     '''
-    Repeat the values in an array in a memory-efficient manner.  Array x is
-    stacked vertically n times.
+    Repeat the values in an array in a memory-efficient manner.  Array samples is
+    stacked vertically sample_size times.
 
     .. warning::
 
@@ -391,10 +398,10 @@ def stride_repeat(x, n, axis=0):
 
     Parameters
     ----------
-    x : 1D array or sequence
+    samples : 1D array or sequence
         Array or sequence containing the data.
 
-    n : integer
+    sample_size : integer
         The number of time to repeat the array.
 
     axis : integer
@@ -407,27 +414,27 @@ def stride_repeat(x, n, axis=0):
     '''
     if axis not in [0, 1]:
         raise ValueError('axis must be 0 or 1')
-    x = np.asarray(x)
-    if x.ndim != 1:
+    samples = np.asarray(samples)
+    if samples.ndim != 1:
         raise ValueError('only 1-dimensional arrays can be used')
 
-    if n == 1:
-        if axis == 0:
-            return np.atleast_2d(x)
+    if sample_size == 1:
+        if axis == 0: # pylint: disable-msg=R1705
+            return np.atleast_2d(samples)
         else:
-            return np.atleast_2d(x).T
-    if n < 1:
-        raise ValueError('n cannot be less than 1')
+            return np.atleast_2d(samples).T
+    if sample_size < 1:
+        raise ValueError('sample_size cannot be less than 1')
 
     # np.lib.stride_tricks.as_strided easily leads to memory corruption for
-    # non integer shape and strides, i.e. n. See #3845.
-    n = int(n)
+    # non integer shape and strides, i.e. sample_size. See #3845.
+    sample_size = int(sample_size)
 
     if axis == 0:
-        shape = (n, x.size)
-        strides = (0, x.strides[0])
+        shape = (sample_size, samples.size)
+        strides = (0, samples.strides[0])
     else:
-        shape = (x.size, n)
-        strides = (x.strides[0], 0)
+        shape = (samples.size, sample_size)
+        strides = (samples.strides[0], 0)
 
-    return np.lib.stride_tricks.as_strided(x, shape=shape, strides=strides)
+    return np.lib.stride_tricks.as_strided(samples, shape=shape, strides=strides)

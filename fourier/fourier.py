@@ -44,7 +44,7 @@ def fft_vectorized(input_data):
         factor = np.exp(-1j * np.pi * np.arange(dot_product.shape[0])
                         / dot_product.shape[0])[:, None]
         dot_product = np.vstack([data_even + factor * data_odd,
-                                data_even - factor * data_odd])
+                                 data_even - factor * data_odd])
 
     return dot_product.ravel()
 
