@@ -1,38 +1,41 @@
+"""
+    Functions used to plot Power Spectral Density plots
+"""
 import numpy as np
-from fourier import fourier 
+from fourier import fourier
 
-def window_hanning(x): 
+def window_hanning(window):
     '''
-    Return x times the hanning window of len(x).
+    Return window times the hanning window of len(window).
 
     See Also
     --------
     :func:`window_none`
         :func:`window_none` is another window algorithm.
     '''
-    return np.hanning(len(x))*x
+    return np.hanning(len(window))*window
 
-def psd(x, NFFT=None, Fs=None, window=window_hanning, noverlap=None, detrend_func=None,
-    pad_to=None, scale_by_freq=None, sides=None):
+def psd(samples, nfft=None, sample_rate=None, window=window_hanning, noverlap=None, detrend_func=None,
+        pad_to=None, scale_by_freq=None, sides=None):
 
-    if Fs is None:
-        Fs = 2
+    if sample_rate is None:
+        sample_rate = 2
 
-    if NFFT is None:
-        NFFT = 256
+    if nfft is None:
+        nfft = 256
 
     if pad_to is None:
-        pad_to = NFFT
+        pad_to = nfft
 
     if noverlap is None:
         noverlap = 0
 
-    x = np.asarray(x)
+    samples = np.asarray(samples)
 
-    if len(x) < NFFT:
-        n = len(x)
-        x = np.resize(x, (NFFT,))
-        x[n:] = 0
+    if len(samples) < nfft:
+        n = len(samples)
+        samples = np.resize(samples, (nfft,))
+        samples[n:] = 0
 
     if sides == 'twosided':
         numFreqs = pad_to
@@ -48,36 +51,36 @@ def psd(x, NFFT=None, Fs=None, window=window_hanning, noverlap=None, detrend_fun
             numFreqs = pad_to//2 + 1
         scaling_factor = 2.
 
-    result = stride_windows(x, NFFT, noverlap, axis=0)
+    result = stride_windows(samples, nfft, noverlap, axis=0)
     result = detrend(result, detrend_func, axis=0)
     result, windowVals = apply_window(result, window, axis=0,
-                                        return_window=True)
+                                      return_window=True)
 
-    result = fourier.FFT_vectorized(x)
-    freqs = fourier.fftfreq(pad_to, 1/Fs)[:numFreqs]
+    result = fourier.fft_vectorized(samples)
+    freqs = fourier.fft_freq(pad_to, 1/sample_rate)[:numFreqs]
 
     result = np.conj(result) * result
 
-    if not NFFT % 2:
+    if not nfft % 2:
         slc = slice(1, -1, None)
-    
+
     else:
         slc = slice(1, None, None)
 
     result[slc] *= scaling_factor
 
     if scale_by_freq:
-        result /= Fs
+        result /= sample_rate
         result /= (np.abs(windowVals)**2).sum()
     else:
         result /= np.abs(windowVals).sum()**2
 
-    t = np.arange(NFFT/2, len(x) - NFFT/2 + 1, NFFT - noverlap)/Fs
+    t = np.arange(nfft/2, len(samples) - nfft/2 + 1, nfft - noverlap)/sample_rate
 
     if sides == 'twosided':
         freqs = np.concatenate((freqs[freqcenter:], freqs[:freqcenter]))
         result = np.concatenate((result[freqcenter:],
-                                result[:freqcenter]), 0)
+                                 result[:freqcenter]), 0)
 
     elif not pad_to % 2:
         freqs[-1] *= -1
@@ -86,9 +89,9 @@ def psd(x, NFFT=None, Fs=None, window=window_hanning, noverlap=None, detrend_fun
 
 
 
-def detrend(x, key=None, axis=None):
+def detrend(samples, key=None, axis=None):
     '''
-    Return x with its trend removed.
+    Return samples with its trend removed.
 
     Parameters
     ----------
@@ -118,11 +121,11 @@ def detrend(x, key=None, axis=None):
         :func:`detrend_none` implements the 'none' algorithm.
     '''
     if key is None or key in ['constant', 'mean', 'default']:
-        return detrend(x, key=detrend_mean, axis=axis)
+        return detrend(samples, key=detrend_mean, axis=axis)
     elif key == 'linear':
-        return detrend(x, key=detrend_linear, axis=axis)
+        return detrend(samples, key=detrend_linear, axis=axis)
     elif key == 'none':
-        return detrend(x, key=detrend_none, axis=axis)
+        return detrend(samples, key=detrend_none, axis=axis)
     elif isinstance(key, str):
         raise ValueError("Unknown value for key %s, must be one of: "
                          "'default', 'constant', 'mean', "
@@ -133,33 +136,33 @@ def detrend(x, key=None, axis=None):
                          "'default', 'constant', 'mean', "
                          "'linear', or a function" % key)
 
-    x = np.asarray(x)
+    samples = np.asarray(samples)
 
-    if axis is not None and axis+1 > x.ndim:
+    if axis is not None and axis+1 > samples.ndim:
         raise ValueError('axis(=%s) out of bounds' % axis)
 
-    if (axis is None and x.ndim == 0) or (not axis and x.ndim == 1):
-        return key(x)
+    if (axis is None and samples.ndim == 0) or (not axis and samples.ndim == 1):
+        return key(samples)
 
     # try to use the 'axis' argument if the function supports it,
     # otherwise use apply_along_axis to do it
     try:
-        return key(x, axis=axis)
+        return key(samples, axis=axis)
     except TypeError:
-        return np.apply_along_axis(key, axis=axis, arr=x)
+        return np.apply_along_axis(key, axis=axis, arr=samples)
 
 
-def stride_windows(x, n, noverlap=None, axis=0):
+def stride_windows(samples, sample_size, noverlap=None, axis=0):
     '''
-    Get all windows of x with length n as a single array, using strides
+    Get all windows of samples with length sample_size as a single array, using strides
     to avoid data duplication.
 
     Parameters
     ----------
-    x : 1D array or sequence
+    samples : 1D array or sequence
         Array or sequence containing the data.
 
-    n : integer
+    sample_size : integer
         The number of data points in each window.
 
     noverlap : integer
@@ -168,48 +171,48 @@ def stride_windows(x, n, noverlap=None, axis=0):
 
     axis : integer
         The axis along which the windows will run.
-   
+
     '''
 
     if noverlap is None:
         noverlap = 0
-    
-    if noverlap >= n:
+
+    if noverlap >= sample_size:
         raise ValueError('noverlap must be less than n')
-    if n < 1:
+    if sample_size < 1:
         raise ValueError('n cannot be less than 1')
 
-    x = np.asarray(x)
+    samples = np.asarray(samples)
 
-    if x.ndim != 1:
+    if samples.ndim != 1:
         raise ValueError('Only 1-dimensional arrays can be used')
-    if n == 1 and noverlap == 0:
+    if sample_size == 1 and noverlap == 0:
         if axis == 0:
-            return x[np.newaxis]
+            return samples[np.newaxis]
         else:
-            return x[np.newaxis].transpose()
-    if n > len(x):
-        raise ValueError('n cannot be greater than the length of x')
+            return samples[np.newaxis].transpose()
+    if sample_size > len(samples):
+        raise ValueError('sample_size cannot be greater than the length of samples')
 
     noverlap = int(noverlap)
-    n = int(n)
+    sample_size = int(sample_size)
 
-    step = n - noverlap
+    step = sample_size - noverlap
     if axis == 0:
-        shape = (n, (x.shape[-1]-noverlap)//step)
-        strides = (x.strides[0], step*x.strides[0])
+        shape = (sample_size, (samples.shape[-1]-noverlap)//step)
+        strides = (samples.strides[0], step*samples.strides[0])
     else:
-        shape = ((x.shape[-1]-noverlap)//step, n)
-        strides = (step*x.strides[0], x.strides[0])
-    return np.lib.stride_tricks.as_strided(x, shape=shape, strides=strides)
+        shape = ((samples.shape[-1]-noverlap)//step, sample_size)
+        strides = (step*samples.strides[0], samples.strides[0])
+    return np.lib.stride_tricks.as_strided(samples, shape=shape, strides=strides)
 
-def detrend_mean(x, axis=None):
+def detrend_mean(sequence, axis=None):
     '''
-    Return x minus the mean(x).
+    Return sequence minus the mean(sequence).
 
     Parameters
     ----------
-    x : array or sequence
+    sequence : array or sequence
         Array or sequence containing the data
         Can have any dimensionality
 
@@ -232,12 +235,12 @@ def detrend_mean(x, axis=None):
     :func:`detrend`
         :func:`detrend` is a wrapper around all the detrend algorithms.
     '''
-    x = np.asarray(x)
+    sequence = np.asarray(sequence)
 
-    if axis is not None and axis+1 > x.ndim:
+    if axis is not None and axis+1 > sequence.ndim:
         raise ValueError('axis(=%s) out of bounds' % axis)
 
-    return x - x.mean(axis, keepdims=True)
+    return sequence - sequence.mean(axis, keepdims=True)
 
 
 def detrend_none(x, axis=None):
