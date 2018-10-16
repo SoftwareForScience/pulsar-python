@@ -13,7 +13,7 @@ def dft_slow(input_data):
         ----------
         input_data : ndarray
             Array of length `n` containing the values to be transformed.
-        
+
         Returns
         -------
         ndarray
@@ -35,7 +35,7 @@ def fft_vectorized(input_data):
         ----------
         input_data : ndarray
             Array of length `n` containing the values to be transformed.
-        
+
         Returns
         -------
         ndarray
