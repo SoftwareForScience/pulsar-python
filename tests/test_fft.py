@@ -50,7 +50,7 @@ class TestFft(unittest.TestCase):
             fourier.fft_vectorized(test_input)
 
 
-    def test_fftfreq(self):
+    def test_fft_freq(self):
         """
             Test for fftfreq function
         """
