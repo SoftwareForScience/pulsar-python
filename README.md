@@ -14,4 +14,10 @@ Creating a free and open source framework that contains the generic algorithms a
 
 # Table of contents
 1. [Getting started](docs/gettingstarted.md)
+    1. [Example filterbank files](docs/gettingstarted.md#11-example-filterbank-files)
+    2. [Import](docs/gettingstarted.md#12-import)
 2. [Filterbank tutorial](docs/filterbank.md)
+    1. [Create filterbank object](docs/filterbank.md#21-create-filterbank-object)
+    2. [Read header from filterbank data](docs/filterbank.md#22-read-header-from-filterbank-data)
+    3. [Read filterbank file to 3d numpy array](docs/filterbank.md#23-read-filterbank-file-to-3d-numpy-array)
+    4. [Select a range of data from the filterbank file](docs/filterbank.md#24-select-a-range-of-data-from-the-filterbank-file)
