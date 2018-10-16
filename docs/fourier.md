@@ -5,6 +5,7 @@ The dft_slow function is a plain implementation of discrete Fourier transformati
 The fft_vectorized function depends on this function.
 
 Parameters:
+
 | Parameter | Description |
 | --- | --- |
 | input_data | Array containing the values to be transformed. |
@@ -24,6 +25,7 @@ The fft_vectorized function is a vectorized, non-recursive version of the Cooley
 Gives the same result as dft_slow but is many times faster. 
 
 Parameters:
+
 | Parameter | Description |
 | --- | --- |
 | input_data | Array containing the values to be transformed. |
