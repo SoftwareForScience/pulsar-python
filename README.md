@@ -7,6 +7,8 @@
 
 Creating a free and open source framework that contains the generic algorithms and file handling for astronomical data sets. This framework will be modular. Similar to OpenCV, wherein specific modules can be added and disabled depended on the needs of a project. This framework will be implemented in Python and C++.
 
+[Usage documentation.](docs/README.md)
+
 ## Installation
 
 ### Requirements
