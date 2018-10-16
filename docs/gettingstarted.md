@@ -1,4 +1,4 @@
-# Getting started
+# 1. Getting started
 
 ## Example filterbank files
 ### Use one of the following filterbank files as an example:
@@ -7,4 +7,6 @@
 * <a href="https://git.dev.ti-more.net/uploads/-/system/personal_snippet/2/e6015ec024ad1f53d4c2f39511620db1/pspm32.fil">32 bit</a>
 
 ## Import
-> ```from filterbank.filterbank import *```
+```
+from filterbank.filterbank import *
+```
