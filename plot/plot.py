@@ -13,76 +13,76 @@ def window_hanning(x):
     return np.hanning(len(x))*x
 
 def psd(x, NFFT=None, Fs=None, window=window_hanning, noverlap=None, detrend_func=None,
-        pad_to=None, scale_by_freq=None, sides=None):
+    pad_to=None, scale_by_freq=None, sides=None):
 
-        if Fs is None:
-            Fs = 2
-        
-        if NFFT is None:
-            NFFT = 256
-        
-        if pad_to is None:
-            pad_to = NFFT
+    if Fs is None:
+        Fs = 2
 
-        if noverlap is None:
-            noverlap = 0
+    if NFFT is None:
+        NFFT = 256
 
-        x = np.asarray(x)
+    if pad_to is None:
+        pad_to = NFFT
 
-        if len(x) < NFFT:
-            n = len(x)
-            x = np.resize(x, (NFFT,))
-            x[n:] = 0
+    if noverlap is None:
+        noverlap = 0
 
-        if sides == 'twosided':
-            numFreqs = pad_to
-            if pad_to % 2:
-                freqcenter = (pad_to - 1)//2 + 1
-            else:
-                freqcenter = pad_to//2
-            scaling_factor = 1.
-        elif sides == 'onesided':
-            if pad_to % 2:
-                numFreqs = (pad_to + 1)//2
-            else:
-                numFreqs = pad_to//2 + 1
-            scaling_factor = 2.
+    x = np.asarray(x)
 
-        result = stride_windows(x, NFFT, noverlap, axis=0)
-        result = detrend(result, detrend_func, axis=0)
-        result, windowVals = apply_window(result, window, axis=0,
-                                          return_window=True)
+    if len(x) < NFFT:
+        n = len(x)
+        x = np.resize(x, (NFFT,))
+        x[n:] = 0
 
-        result = fourier.FFT_vectorized(x)
-        freqs = fourier.fftfreq(pad_to, 1/Fs)[:numFreqs]
-
-        result = np.conj(result) * result
-
-        if not NFFT % 2:
-            slc = slice(1, -1, None)
-        
+    if sides == 'twosided':
+        numFreqs = pad_to
+        if pad_to % 2:
+            freqcenter = (pad_to - 1)//2 + 1
         else:
-            slc = slice(1, None, None)
-
-        result[slc] *= scaling_factor
-
-        if scale_by_freq:
-            result /= Fs
-            result /= (np.abs(windowVals)**2).sum()
+            freqcenter = pad_to//2
+        scaling_factor = 1.
+    elif sides == 'onesided':
+        if pad_to % 2:
+            numFreqs = (pad_to + 1)//2
         else:
-            result /= np.abs(windowVals).sum()**2
+            numFreqs = pad_to//2 + 1
+        scaling_factor = 2.
 
-        t = np.arange(NFFT/2, len(x) - NFFT/2 + 1, NFFT - noverlap)/Fs
+    result = stride_windows(x, NFFT, noverlap, axis=0)
+    result = detrend(result, detrend_func, axis=0)
+    result, windowVals = apply_window(result, window, axis=0,
+                                        return_window=True)
 
-        if sides == 'twosided':
-            freqs = np.concatenate((freqs[freqcenter:], freqs[:freqcenter]))
-            result = np.concatenate((result[freqcenter:],
-                                    result[:freqcenter]), 0)
+    result = fourier.FFT_vectorized(x)
+    freqs = fourier.fftfreq(pad_to, 1/Fs)[:numFreqs]
 
-        elif not pad_to % 2:
-            freqs[-1] *= -1
+    result = np.conj(result) * result
 
-        return result, freqs, t
+    if not NFFT % 2:
+        slc = slice(1, -1, None)
+    
+    else:
+        slc = slice(1, None, None)
+
+    result[slc] *= scaling_factor
+
+    if scale_by_freq:
+        result /= Fs
+        result /= (np.abs(windowVals)**2).sum()
+    else:
+        result /= np.abs(windowVals).sum()**2
+
+    t = np.arange(NFFT/2, len(x) - NFFT/2 + 1, NFFT - noverlap)/Fs
+
+    if sides == 'twosided':
+        freqs = np.concatenate((freqs[freqcenter:], freqs[:freqcenter]))
+        result = np.concatenate((result[freqcenter:],
+                                result[:freqcenter]), 0)
+
+    elif not pad_to % 2:
+        freqs[-1] *= -1
+
+    return result, freqs, t
 
 
 
