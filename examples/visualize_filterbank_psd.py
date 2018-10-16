@@ -29,7 +29,7 @@ center_freq = header[b'fch1'] + float(header[b'nchans']) * header[b'foff'] / 2.0
 
 print(center_freq)
 # Get the powerlevels and the frequencies
-PXX, freqs, _ = psd(samples, nfft=1024, sample_rate=80,
+PXX, freqs = psd(samples, nfft=1024, sample_rate=80,
                     scale_by_freq=True, sides='twosided')
 
 # Calculate the powerlevel dB's
