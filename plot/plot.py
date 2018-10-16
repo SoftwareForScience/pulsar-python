@@ -56,7 +56,7 @@ def psd(samples, nfft=None, sample_rate=None, window=window_hanning, noverlap=No
     result = stride_windows(samples, nfft, noverlap, axis=0)
     result = detrend(result, detrend_func, axis=0)
     result, window_vals = apply_window(result, window, axis=0,
-                                      return_window=True)
+                                       return_window=True)
 
     result = fourier.fft_vectorized(samples)
     freqs = fourier.fft_freq(pad_to, 1/sample_rate)[:num_freqs]
@@ -77,7 +77,7 @@ def psd(samples, nfft=None, sample_rate=None, window=window_hanning, noverlap=No
     else:
         result /= np.abs(window_vals).sum()**2
 
-    t = np.arange(nfft/2, len(samples) - nfft/2 + 1, nfft - noverlap)/sample_rate
+    time = np.arange(nfft/2, len(samples) - nfft/2 + 1, nfft - noverlap)/sample_rate
 
     if sides == 'twosided':
         freqs = np.concatenate((freqs[freqcenter:], freqs[:freqcenter]))
@@ -87,7 +87,7 @@ def psd(samples, nfft=None, sample_rate=None, window=window_hanning, noverlap=No
     elif not pad_to % 2:
         freqs[-1] *= -1
 
-    return result, freqs, t
+    return result, freqs, time
 
 
 
@@ -124,7 +124,7 @@ def detrend(samples, key=None, axis=None):
     '''
     if key is None or key in ['constant', 'mean', 'default']: # pylint: disable-msg=R1705
         return detrend(samples, key=detrend_mean, axis=axis)
-    elif key == 'linear': 
+    elif key == 'linear':
         return detrend(samples, key=detrend_linear, axis=axis)
     elif key == 'none':
         return detrend(samples, key=detrend_none, axis=axis)
