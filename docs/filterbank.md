@@ -15,5 +15,8 @@
 ### Calculate the time range
 > ``` filterbank.setup_time ```
 
-### Calculate the time range
-> ``` filterbank.setup_time ```
+### Calculate the channel range
+> ``` filterbank.setup_chans ```
+
+### Select a range of data from the filterbank file
+> ``` filterbank.select_data ```
