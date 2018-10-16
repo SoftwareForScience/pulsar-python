@@ -26,6 +26,7 @@ SAMPLES = SDR.read_samples(1024)
 # Close RTLSDR device connection
 SDR.close()
 
+print(SAMPLES[1:100])
 # Number of samples equals the length of samples
 N = SAMPLES.shape[0]
 
@@ -33,7 +34,7 @@ N = SAMPLES.shape[0]
 T = N/SDR.sample_rate
 
 # Get the powerlevels and the frequencies
-PXX, freqs, _ = psd(SAMPLES, nfft=1024, sample_rate=SDR.sample_rate/1e6, # pylint: disable-msg=C0103
+PXX, freqs = psd(SAMPLES, nfft=1024, sample_rate=SDR.sample_rate/1e6, # pylint: disable-msg=C0103
                     scale_by_freq=True, sides='twosided')
 
 # Calculate the powerlevel dB's

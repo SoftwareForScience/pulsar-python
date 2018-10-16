@@ -37,6 +37,9 @@ def psd(samples, nfft=None, sample_rate=None, window=window_hanning, noverlap=No
     if noverlap is None:
         noverlap = 0
 
+    if scale_by_freq is None:
+        scale_by_freq = True
+
     samples = np.asarray(samples)
 
     if len(samples) < nfft:
@@ -82,7 +85,7 @@ def psd(samples, nfft=None, sample_rate=None, window=window_hanning, noverlap=No
     else:
         result /= np.abs(window_vals).sum()**2
 
-    time = np.arange(nfft/2, len(samples) - nfft/2 + 1, nfft - noverlap)/sample_rate
+    # time = np.arange(nfft/2, len(samples) - nfft/2 + 1, nfft - noverlap)/sample_rate
 
     if sides == 'twosided':
         freqs = np.concatenate((freqs[freqcenter:], freqs[:freqcenter]))
@@ -92,7 +95,7 @@ def psd(samples, nfft=None, sample_rate=None, window=window_hanning, noverlap=No
     elif not pad_to % 2:
         freqs[-1] *= -1
 
-    return result, freqs, time
+    return result, freqs #, time
 
 
 

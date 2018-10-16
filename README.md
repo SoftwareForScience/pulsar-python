@@ -7,10 +7,18 @@
 
 Creating a free and open source framework that contains the generic algorithms and file handling for astronomical data sets. This framework will be modular. Similar to OpenCV, wherein specific modules can be added and disabled depended on the needs of a project. This framework will be implemented in Python and C++.
 
-## Requirements
+
+
+
+## Installation
+
+### Requirements
 
     * numpy
     * python 3.6
+
+## Documentation
+You can find the documentation [here.](docs/README.md)
 
 # Table of contents
 1. [Getting started](docs/gettingstarted.md)
