@@ -26,6 +26,7 @@ SAMPLES = SDR.read_samples(1024)
 # Close RTLSDR device connection
 SDR.close()
 
+print(SAMPLES[1:100])
 # Number of samples equals the length of samples
 N = SAMPLES.shape[0]
 
