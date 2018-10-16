@@ -14,6 +14,4 @@ Creating a free and open source framework that contains the generic algorithms a
 
 # Table of contents
 1. [Getting started](docs/gettingstarted.md)
-    1. [Example files](docs/gettinstarted.md#11-example-files)
-    2. [Import](docs/gettingstarted.md#12-import)
 2. [Filterbank tutorial](docs/filterbank.md)
