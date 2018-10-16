@@ -5,6 +5,7 @@
 from struct import unpack
 import numpy as np
 
+
 HEADER_KEYWORD_TYPES = {
     b'telescope_id': b'<l',
     b'machine_id': b'<l',
@@ -31,6 +32,7 @@ HEADER_KEYWORD_TYPES = {
     b'src_dej': b'angle',
 }
 
+
 def read_header(filename):
     """
         Read Filterbank header and return a dictionary of key-value pairs
@@ -53,6 +55,7 @@ def read_header(filename):
                 header_dict[keyword] = value
 
     return header_dict
+
 
 def read_next_header_keyword(file_header):
     """
@@ -83,6 +86,7 @@ def read_next_header_keyword(file_header):
 
     return keyword, val
 
+
 def fil_double_to_angle(angle):
     """
         Reads a little-endian double in ddmmss.s (or hhmmss.s) format and then
@@ -101,6 +105,7 @@ def fil_double_to_angle(angle):
         data_matrix *= -1
 
     return data_matrix
+
 
 def len_header(filename):
     """

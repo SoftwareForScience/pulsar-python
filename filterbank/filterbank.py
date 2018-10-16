@@ -35,6 +35,7 @@ class Filterbank:
         else:
             raise FileNotFoundError(filename)
 
+
     def read_filterbank(self, freq_range=None, time_range=None):
         """
             Read filterbank file to 3d numpy array
@@ -68,6 +69,7 @@ class Filterbank:
                 # search for start of next chunk
                 fil.seek(self.n_bytes * (self.n_chans - i_1), 1)
 
+
     def setup_freqs(self, freq_range=None):
         """
             Calculate the frequency range
@@ -98,6 +100,7 @@ class Filterbank:
 
         return chan_start_idx, chan_stop_idx
 
+
     def setup_time(self, time_range=None):
         """
             Calculate the time range
@@ -122,6 +125,7 @@ class Filterbank:
 
         return ii_start, n_ints
 
+
     def setup_chans(self, freq_range=None):
         """
             Calculate the channel range
@@ -132,6 +136,7 @@ class Filterbank:
         i_1 = np.max((chan_start_idx, chan_stop_idx))
 
         return i_0, i_1
+
 
     def select_data(self, freq_start=None, freq_stop=None, time_start=None, time_stop=None):
         """

@@ -43,10 +43,10 @@ def fft_vectorized(input_data):
         data_odd = dot_product[:, dot_product.shape[1] // 2:]
         factor = np.exp(-1j * np.pi * np.arange(dot_product.shape[0])
                         / dot_product.shape[0])[:, None]
-        data_stack = np.vstack([data_even + factor * data_odd,
+        dot_product = np.vstack([data_even + factor * data_odd,
                                 data_even - factor * data_odd])
 
-    return data_stack.ravel()
+    return dot_product.ravel()
 
 
 def fft_freq(window_len, spacing=1.0):
