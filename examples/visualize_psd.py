@@ -1,6 +1,7 @@
 """
     Example of plotting a Power Spectral Density plot, using RTLSDR data
 """
+# pylint: disable-all
 import os
 import sys
 import inspect

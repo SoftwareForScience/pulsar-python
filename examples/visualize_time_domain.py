@@ -1,6 +1,7 @@
 """
     Example using matplotlib to plot raw RTLSDR data
 """
+# pylint: disable-all
 from rtlsdr import RtlSdr
 import matplotlib.pyplot as plt
 import numpy as np
