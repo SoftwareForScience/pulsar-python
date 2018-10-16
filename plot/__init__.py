@@ -1,1 +1,4 @@
-from .plot import *
+"""
+    Initialize plot.py and make it importable
+"""
+from .plot import psd

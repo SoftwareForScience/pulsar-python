@@ -16,7 +16,7 @@ install:
   - pip install -f requirements.txt
 
 script:
-  - pylint *.py
+  - pylint */*.py
   - coverage run -a tests/test_filterbank.py
   - coverage run -a tests/test_header.py
   - coverage run -a tests/test_fft.py

@@ -1,47 +1,55 @@
-import numpy as np    
+"""
+    Fourier algorithm related utils
+"""
+
+import numpy as np
 
 
-def DFT_slow(x):
-    """ Compute the discrete Fourier Transform of the one-dimensional array x"""
-    x = np.asarray(x)
-    N = x.shape[0]
-    n = np.arange(N)
-    k = n.reshape((N, 1))
-    M = np.exp(-2j * np.pi * k * n / N)
-    return np.dot(M, x)
+def dft_slow(input_data):
+    """
+        Compute the discrete Fourier Transform of the one-dimensional array x
+    """
+    input_data = np.asarray(input_data)
+    data_length = input_data.shape[0]
+    data_sorted = np.arange(data_length)
+    data_array = data_sorted.reshape((data_length, 1))
+    exp_data = np.exp(-2j * np.pi * data_array * data_sorted / data_length)
+    return np.dot(exp_data, input_data)
 
 
-def FFT_vectorized(x):
-    """A vectorized, non-recursive version of the Cooley-Tukey FFT"""
-    x = np.asarray(x)
-    N = x.shape[0]
+def fft_vectorized(input_data):
+    """
+        A vectorized, non-recursive version of the Cooley-Tukey FFT
+    """
+    input_data = np.asarray(input_data)
+    data_length = input_data.shape[0]
 
-    if np.log2(N) % 1 > 0:
-        raise ValueError("size of x must be a power of 2")
+    if np.log2(data_length) % 1 > 0:
+        raise ValueError("size of input data must be a power of 2")
 
     # N_min here is equivalent to the stopping condition above,
     # and should be a power of 2
-    N_min = min(N, 32)
-    
-    # Perform an O[N^2] DFT on all length-N_min sub-problems at once
-    n = np.arange(N_min)
-    k = n[:, None]
-    M = np.exp(-2j * np.pi * n * k / N_min)
-    X = np.dot(M, x.reshape((N_min, -1)))
+    min_data = min(data_length, 32)
+
+    # Perform an O[N^2] DFT on all length-min_data sub-problems at once
+    data_sorted = np.arange(min_data)
+    data_matrix = data_sorted[:, None]
+    exp_data = np.exp(-2j * np.pi * data_sorted * data_matrix / min_data)
+    dot_product = np.dot(exp_data, input_data.reshape((min_data, -1)))
 
     # build-up each level of the recursive calculation all at once
-    while X.shape[0] < N:
-        X_even = X[:, :X.shape[1] // 2]
-        X_odd = X[:, X.shape[1] // 2:]
-        factor = np.exp(-1j * np.pi * np.arange(X.shape[0])
-                        / X.shape[0])[:, None]
-        X = np.vstack([X_even + factor * X_odd,
-                       X_even - factor * X_odd])
+    while dot_product.shape[0] < data_length:
+        data_even = dot_product[:, :dot_product.shape[1] // 2]
+        data_odd = dot_product[:, dot_product.shape[1] // 2:]
+        factor = np.exp(-1j * np.pi * np.arange(dot_product.shape[0])
+                        / dot_product.shape[0])[:, None]
+        dot_product = np.vstack([data_even + factor * data_odd,
+                                 data_even - factor * data_odd])
 
-    return X.ravel()
+    return dot_product.ravel()
 
 
-def fftfreq(n, d=1.0):
+def fft_freq(window_len, spacing=1.0):
     """
     Return the Discrete Fourier Transform sample frequencies.
 
@@ -75,14 +83,13 @@ def fftfreq(n, d=1.0):
     >>> freq = np.fft.fftfreq(n, d=timestep)
     >>> freq
     array([ 0.  ,  1.25,  2.5 ,  3.75, -5.  , -3.75, -2.5 , -1.25])
-
     """
-    
-    val = 1.0 / (n * d)
-    results = np.empty(n, int)
-    N = (n-1)//2 + 1
-    p1 = np.arange(0, N, dtype=int)
-    results[:N] = p1
-    p2 = np.arange(-(n//2), 0, dtype=int)
-    results[N:] = p2
+
+    val = 1.0 / (window_len * spacing)
+    results = np.empty(window_len, int)
+    window_half = (window_len-1)//2 + 1
+    window_p1 = np.arange(0, window_half, dtype=int)
+    results[:window_half] = window_p1
+    window_p2 = np.arange(-(window_len//2), 0, dtype=int)
+    results[window_half:] = window_p2
     return results * val

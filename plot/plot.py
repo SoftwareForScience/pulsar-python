@@ -1,94 +1,104 @@
+"""
+    Functions used to plot Power Spectral Density plots
+"""
 import numpy as np
-from fourier import fourier 
+from fourier import fourier
 
-def window_hanning(x): 
+# pylint: disable-msg=R0913
+# pylint: disable-msg=R0914
+# pylint: disable-msg=R0912
+
+
+def window_hanning(window):
     '''
-    Return x times the hanning window of len(x).
+    Return window times the hanning window of len(window).
 
     See Also
     --------
     :func:`window_none`
         :func:`window_none` is another window algorithm.
     '''
-    return np.hanning(len(x))*x
+    return np.hanning(len(window))*window
 
-def psd(x, NFFT=None, Fs=None, window=window_hanning, noverlap=None, detrend_func=None,
-        pad_to=None, scale_by_freq=None, sides=None):
+def psd(samples, nfft=None, sample_rate=None, window=window_hanning, noverlap=None,
+        detrend_func=None, pad_to=None, scale_by_freq=None, sides=None):
+    """
+        Plot the power spectral density.
+    """
+    if sample_rate is None:
+        sample_rate = 2
 
-        if Fs is None:
-            Fs = 2
-        
-        if NFFT is None:
-            NFFT = 256
-        
-        if pad_to is None:
-            pad_to = NFFT
+    if nfft is None:
+        nfft = 256
 
-        if noverlap is None:
-            noverlap = 0
+    if pad_to is None:
+        pad_to = nfft
 
-        x = np.asarray(x)
+    if noverlap is None:
+        noverlap = 0
 
-        if len(x) < NFFT:
-            n = len(x)
-            x = np.resize(x, (NFFT,))
-            x[n:] = 0
+    samples = np.asarray(samples)
 
-        if sides == 'twosided':
-            numFreqs = pad_to
-            if pad_to % 2:
-                freqcenter = (pad_to - 1)//2 + 1
-            else:
-                freqcenter = pad_to//2
-            scaling_factor = 1.
-        elif sides == 'onesided':
-            if pad_to % 2:
-                numFreqs = (pad_to + 1)//2
-            else:
-                numFreqs = pad_to//2 + 1
-            scaling_factor = 2.
+    if len(samples) < nfft:
+        sample_size = len(samples)
+        samples = np.resize(samples, (nfft,))
+        samples[sample_size:] = 0
 
-        result = stride_windows(x, NFFT, noverlap, axis=0)
-        result = detrend(result, detrend_func, axis=0)
-        result, windowVals = apply_window(result, window, axis=0,
-                                          return_window=True)
-
-        result = fourier.FFT_vectorized(x)
-        freqs = fourier.fftfreq(pad_to, 1/Fs)[:numFreqs]
-
-        result = np.conj(result) * result
-
-        if not NFFT % 2:
-            slc = slice(1, -1, None)
-        
+    if sides == 'twosided':
+        num_freqs = pad_to
+        if pad_to % 2:
+            freqcenter = (pad_to - 1)//2 + 1
         else:
-            slc = slice(1, None, None)
-
-        result[slc] *= scaling_factor
-
-        if scale_by_freq:
-            result /= Fs
-            result /= (np.abs(windowVals)**2).sum()
+            freqcenter = pad_to//2
+        scaling_factor = 1.
+    elif sides == 'onesided':
+        if pad_to % 2:
+            num_freqs = (pad_to + 1)//2
         else:
-            result /= np.abs(windowVals).sum()**2
+            num_freqs = pad_to//2 + 1
+        scaling_factor = 2.
 
-        t = np.arange(NFFT/2, len(x) - NFFT/2 + 1, NFFT - noverlap)/Fs
+    result = stride_windows(samples, nfft, noverlap, axis=0)
+    result = detrend(result, detrend_func, axis=0)
+    result, window_vals = apply_window(result, window, axis=0,
+                                       return_window=True)
 
-        if sides == 'twosided':
-            freqs = np.concatenate((freqs[freqcenter:], freqs[:freqcenter]))
-            result = np.concatenate((result[freqcenter:],
-                                    result[:freqcenter]), 0)
+    result = fourier.fft_vectorized(samples)
+    freqs = fourier.fft_freq(pad_to, 1/sample_rate)[:num_freqs]
 
-        elif not pad_to % 2:
-            freqs[-1] *= -1
+    result = np.conj(result) * result
 
-        return result, freqs, t
+    if not nfft % 2:
+        slc = slice(1, -1, None)
+
+    else:
+        slc = slice(1, None, None)
+
+    result[slc] *= scaling_factor
+
+    if scale_by_freq:
+        result /= sample_rate
+        result /= (np.abs(window_vals)**2).sum()
+    else:
+        result /= np.abs(window_vals).sum()**2
+
+    time = np.arange(nfft/2, len(samples) - nfft/2 + 1, nfft - noverlap)/sample_rate
+
+    if sides == 'twosided':
+        freqs = np.concatenate((freqs[freqcenter:], freqs[:freqcenter]))
+        result = np.concatenate((result[freqcenter:],
+                                 result[:freqcenter]), 0)
+
+    elif not pad_to % 2:
+        freqs[-1] *= -1
+
+    return result, freqs, time
 
 
 
-def detrend(x, key=None, axis=None):
+def detrend(samples, key=None, axis=None):
     '''
-    Return x with its trend removed.
+    Return samples with its trend removed.
 
     Parameters
     ----------
@@ -117,12 +127,12 @@ def detrend(x, key=None, axis=None):
     :func:`detrend_none`
         :func:`detrend_none` implements the 'none' algorithm.
     '''
-    if key is None or key in ['constant', 'mean', 'default']:
-        return detrend(x, key=detrend_mean, axis=axis)
+    if key is None or key in ['constant', 'mean', 'default']: # pylint: disable-msg=R1705
+        return detrend(samples, key=detrend_mean, axis=axis)
     elif key == 'linear':
-        return detrend(x, key=detrend_linear, axis=axis)
+        return detrend(samples, key=detrend_linear, axis=axis)
     elif key == 'none':
-        return detrend(x, key=detrend_none, axis=axis)
+        return detrend(samples, key=detrend_none, axis=axis)
     elif isinstance(key, str):
         raise ValueError("Unknown value for key %s, must be one of: "
                          "'default', 'constant', 'mean', "
@@ -133,33 +143,33 @@ def detrend(x, key=None, axis=None):
                          "'default', 'constant', 'mean', "
                          "'linear', or a function" % key)
 
-    x = np.asarray(x)
+    samples = np.asarray(samples)
 
-    if axis is not None and axis+1 > x.ndim:
+    if axis is not None and axis+1 > samples.ndim:
         raise ValueError('axis(=%s) out of bounds' % axis)
 
-    if (axis is None and x.ndim == 0) or (not axis and x.ndim == 1):
-        return key(x)
+    if (axis is None and samples.ndim == 0) or (not axis and samples.ndim == 1):
+        return key(samples)
 
     # try to use the 'axis' argument if the function supports it,
     # otherwise use apply_along_axis to do it
     try:
-        return key(x, axis=axis)
+        return key(samples, axis=axis)
     except TypeError:
-        return np.apply_along_axis(key, axis=axis, arr=x)
+        return np.apply_along_axis(key, axis=axis, arr=samples)
 
 
-def stride_windows(x, n, noverlap=None, axis=0):
+def stride_windows(samples, sample_size, noverlap=None, axis=0):
     '''
-    Get all windows of x with length n as a single array, using strides
+    Get all windows of samples with length sample_size as a single array, using strides
     to avoid data duplication.
 
     Parameters
     ----------
-    x : 1D array or sequence
+    samples : 1D array or sequence
         Array or sequence containing the data.
 
-    n : integer
+    sample_size : integer
         The number of data points in each window.
 
     noverlap : integer
@@ -168,48 +178,48 @@ def stride_windows(x, n, noverlap=None, axis=0):
 
     axis : integer
         The axis along which the windows will run.
-   
+
     '''
 
     if noverlap is None:
         noverlap = 0
-    
-    if noverlap >= n:
-        raise ValueError('noverlap must be less than n')
-    if n < 1:
-        raise ValueError('n cannot be less than 1')
 
-    x = np.asarray(x)
+    if noverlap >= sample_size:
+        raise ValueError('noverlap must be less than sample_size')
+    if sample_size < 1:
+        raise ValueError('sample_size cannot be less than 1')
 
-    if x.ndim != 1:
+    samples = np.asarray(samples)
+
+    if samples.ndim != 1:
         raise ValueError('Only 1-dimensional arrays can be used')
-    if n == 1 and noverlap == 0:
-        if axis == 0:
-            return x[np.newaxis]
+    if sample_size == 1 and noverlap == 0:
+        if axis == 0: # pylint: disable-msg=R1705
+            return samples[np.newaxis]
         else:
-            return x[np.newaxis].transpose()
-    if n > len(x):
-        raise ValueError('n cannot be greater than the length of x')
+            return samples[np.newaxis].transpose()
+    if sample_size > len(samples):
+        raise ValueError('sample_size cannot be greater than the length of samples')
 
     noverlap = int(noverlap)
-    n = int(n)
+    sample_size = int(sample_size)
 
-    step = n - noverlap
+    step = sample_size - noverlap
     if axis == 0:
-        shape = (n, (x.shape[-1]-noverlap)//step)
-        strides = (x.strides[0], step*x.strides[0])
+        shape = (sample_size, (samples.shape[-1]-noverlap)//step)
+        strides = (samples.strides[0], step*samples.strides[0])
     else:
-        shape = ((x.shape[-1]-noverlap)//step, n)
-        strides = (step*x.strides[0], x.strides[0])
-    return np.lib.stride_tricks.as_strided(x, shape=shape, strides=strides)
+        shape = ((samples.shape[-1]-noverlap)//step, sample_size)
+        strides = (step*samples.strides[0], samples.strides[0])
+    return np.lib.stride_tricks.as_strided(samples, shape=shape, strides=strides)
 
-def detrend_mean(x, axis=None):
+def detrend_mean(sequence, axis=None):
     '''
-    Return x minus the mean(x).
+    Return sequence minus the mean(sequence).
 
     Parameters
     ----------
-    x : array or sequence
+    sequence : array or sequence
         Array or sequence containing the data
         Can have any dimensionality
 
@@ -232,21 +242,21 @@ def detrend_mean(x, axis=None):
     :func:`detrend`
         :func:`detrend` is a wrapper around all the detrend algorithms.
     '''
-    x = np.asarray(x)
+    sequence = np.asarray(sequence)
 
-    if axis is not None and axis+1 > x.ndim:
+    if axis is not None and axis+1 > sequence.ndim:
         raise ValueError('axis(=%s) out of bounds' % axis)
 
-    return x - x.mean(axis, keepdims=True)
+    return sequence - sequence.mean(axis, keepdims=True)
 
 
-def detrend_none(x, axis=None):
+def detrend_none(samples, axis=None): # pylint: disable-msg=W0613
     '''
-    Return x: no detrending.
+    Return samples: no detrending.
 
     Parameters
     ----------
-    x : any object
+    samples : any object
         An object containing the data
 
     axis : integer
@@ -268,9 +278,9 @@ def detrend_none(x, axis=None):
     :func:`detrend`
         :func:`detrend` is a wrapper around all the detrend algorithms.
     '''
-    return x
+    return samples
 
-
+# pylint: disable-msg=C0103
 def detrend_linear(y):
     '''
     Return x minus best fit line; 'linear' detrending.
@@ -317,18 +327,20 @@ def detrend_linear(y):
     a = y.mean() - b*x.mean()
     return y - (b*x + a)
 
-def apply_window(x, window, axis=0, return_window=None):
+# pylint: enable-msg=C0103
+
+def apply_window(samples, window, axis=0, return_window=None):
     '''
     Apply the given window to the given 1D or 2D array along the given axis.
 
     Parameters
     ----------
-    x : 1D or 2D array or sequence
+    samples : 1D or 2D array or sequence
         Array or sequence containing the data.
 
     window : function or array.
         Either a function to generate a window or an array with length
-        *x*.shape[*axis*]
+        *samples*.shape[*axis*]
 
     axis : integer
         The axis over which to do the repetition.
@@ -337,46 +349,46 @@ def apply_window(x, window, axis=0, return_window=None):
     return_window : bool
         If true, also return the 1D values of the window that was applied
     '''
-    x = np.asarray(x)
+    samples = np.asarray(samples)
 
-    if x.ndim < 1 or x.ndim > 2:
+    if samples.ndim < 1 or samples.ndim > 2:
         raise ValueError('only 1D or 2D arrays can be used')
-    if axis+1 > x.ndim:
+    if axis+1 > samples.ndim:
         raise ValueError('axis(=%s) out of bounds' % axis)
 
-    xshape = list(x.shape)
+    xshape = list(samples.shape)
     xshapetarg = xshape.pop(axis)
 
     # if cbook.iterable(window):
     #     print("CBOOK MANE")
     #     if len(window) != xshapetarg:
     #         raise ValueError('The len(window) must be the same as the shape '
-    #                          'of x for the chosen axis')
-    #     windowVals = window
+    #                          'of samples for the chosen axis')
+    #     window_vals = window
     # else:
-    windowVals = window(np.ones(xshapetarg, dtype=x.dtype))
+    window_vals = window(np.ones(xshapetarg, dtype=samples.dtype))
 
-    if x.ndim == 1:
-        if return_window:
-            return windowVals * x, windowVals
+    if samples.ndim == 1:
+        if return_window: # pylint: disable-msg=R1705
+            return window_vals * samples, window_vals
         else:
-            return windowVals * x
+            return window_vals * samples
 
     xshapeother = xshape.pop()
 
     otheraxis = (axis+1) % 2
 
-    windowValsRep = stride_repeat(windowVals, xshapeother, axis=otheraxis)
+    window_vals_rep = stride_repeat(window_vals, xshapeother, axis=otheraxis)
 
-    if return_window:
-        return windowValsRep * x, windowVals
+    if return_window: # pylint: disable-msg=R1705
+        return window_vals_rep * samples, window_vals
     else:
-        return windowValsRep * x
+        return window_vals_rep * samples
 
-def stride_repeat(x, n, axis=0):
+def stride_repeat(samples, sample_size, axis=0):
     '''
-    Repeat the values in an array in a memory-efficient manner.  Array x is
-    stacked vertically n times.
+    Repeat the values in an array in a memory-efficient manner.  Array samples is
+    stacked vertically sample_size times.
 
     .. warning::
 
@@ -386,10 +398,10 @@ def stride_repeat(x, n, axis=0):
 
     Parameters
     ----------
-    x : 1D array or sequence
+    samples : 1D array or sequence
         Array or sequence containing the data.
 
-    n : integer
+    sample_size : integer
         The number of time to repeat the array.
 
     axis : integer
@@ -402,27 +414,27 @@ def stride_repeat(x, n, axis=0):
     '''
     if axis not in [0, 1]:
         raise ValueError('axis must be 0 or 1')
-    x = np.asarray(x)
-    if x.ndim != 1:
+    samples = np.asarray(samples)
+    if samples.ndim != 1:
         raise ValueError('only 1-dimensional arrays can be used')
 
-    if n == 1:
-        if axis == 0:
-            return np.atleast_2d(x)
+    if sample_size == 1:
+        if axis == 0: # pylint: disable-msg=R1705
+            return np.atleast_2d(samples)
         else:
-            return np.atleast_2d(x).T
-    if n < 1:
-        raise ValueError('n cannot be less than 1')
+            return np.atleast_2d(samples).T
+    if sample_size < 1:
+        raise ValueError('sample_size cannot be less than 1')
 
     # np.lib.stride_tricks.as_strided easily leads to memory corruption for
-    # non integer shape and strides, i.e. n. See #3845.
-    n = int(n)
+    # non integer shape and strides, i.e. sample_size. See #3845.
+    sample_size = int(sample_size)
 
     if axis == 0:
-        shape = (n, x.size)
-        strides = (0, x.strides[0])
+        shape = (sample_size, samples.size)
+        strides = (0, samples.strides[0])
     else:
-        shape = (x.size, n)
-        strides = (x.strides[0], 0)
+        shape = (samples.size, sample_size)
+        strides = (samples.strides[0], 0)
 
-    return np.lib.stride_tricks.as_strided(x, shape=shape, strides=strides)
+    return np.lib.stride_tricks.as_strided(samples, shape=shape, strides=strides)
