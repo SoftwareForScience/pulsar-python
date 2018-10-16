@@ -15,14 +15,30 @@ Creating a free and open source framework that contains the generic algorithms a
     * python 3.6
 
 
-## Documentation
-Will be added later. 
+# Getting started
 
-## How to use this library
+## Example filterbank files
+### Use one of the following filterbank files as an example:
+* <a href="https://git.dev.ti-more.net/uploads/-/system/personal_snippet/2/bc063035797e978034adfb6f2da75e70/pspm8.fil">8 bit</a>
+* <a href="https://git.dev.ti-more.net/uploads/-/system/personal_snippet/2/bc063035797e978034adfb6f2da75e70/pspm16.fil">16 bit</a>
+* <a href="https://git.dev.ti-more.net/uploads/-/system/personal_snippet/2/bc063035797e978034adfb6f2da75e70/pspm32.fil">32 bit</a>
 
-### Read header data
+## Import
+> ```from filterbank.filterbank import *```
 
-1. Specify the path to the filterbank file in the header.py file (line 124)
-2. Run the following command: `python header.py`
+# Tutorial
 
-# Asteria
+### Create a filterbank object
+> ``` filterbank = Filterbank(<PATH TO FILTERBANK FILE>) ```
+
+### Read the header from filterbank data
+> ``` filterbank.header ```
+
+### Read filterbank file to 3d numpy array
+> ``` filterbank.read_filterbank ```
+
+### Calculate the frequency range
+> ``` filterbank.setup_freqs ```
+
+### Calculate the time range
+> ``` filterbank.setup_freqs ```
