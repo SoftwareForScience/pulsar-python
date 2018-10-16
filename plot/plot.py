@@ -15,9 +15,11 @@ def window_hanning(window):
     '''
     return np.hanning(len(window))*window
 
-def psd(samples, nfft=None, sample_rate=None, window=window_hanning, noverlap=None, detrend_func=None,
-        pad_to=None, scale_by_freq=None, sides=None):
-
+def psd(samples, nfft=None, sample_rate=None, window=window_hanning, noverlap=None,
+        detrend_func=None, pad_to=None, scale_by_freq=None, sides=None):
+    """
+        Plot the power spectral density.
+    """
     if sample_rate is None:
         sample_rate = 2
 
@@ -33,12 +35,12 @@ def psd(samples, nfft=None, sample_rate=None, window=window_hanning, noverlap=No
     samples = np.asarray(samples)
 
     if len(samples) < nfft:
-        n = len(samples)
+        sample_size = len(samples)
         samples = np.resize(samples, (nfft,))
-        samples[n:] = 0
+        samples[sample_size:] = 0
 
     if sides == 'twosided':
-        numFreqs = pad_to
+        num_freqs = pad_to
         if pad_to % 2:
             freqcenter = (pad_to - 1)//2 + 1
         else:
@@ -46,18 +48,18 @@ def psd(samples, nfft=None, sample_rate=None, window=window_hanning, noverlap=No
         scaling_factor = 1.
     elif sides == 'onesided':
         if pad_to % 2:
-            numFreqs = (pad_to + 1)//2
+            num_freqs = (pad_to + 1)//2
         else:
-            numFreqs = pad_to//2 + 1
+            num_freqs = pad_to//2 + 1
         scaling_factor = 2.
 
     result = stride_windows(samples, nfft, noverlap, axis=0)
     result = detrend(result, detrend_func, axis=0)
-    result, windowVals = apply_window(result, window, axis=0,
+    result, window_vals = apply_window(result, window, axis=0,
                                       return_window=True)
 
     result = fourier.fft_vectorized(samples)
-    freqs = fourier.fft_freq(pad_to, 1/sample_rate)[:numFreqs]
+    freqs = fourier.fft_freq(pad_to, 1/sample_rate)[:num_freqs]
 
     result = np.conj(result) * result
 
@@ -71,9 +73,9 @@ def psd(samples, nfft=None, sample_rate=None, window=window_hanning, noverlap=No
 
     if scale_by_freq:
         result /= sample_rate
-        result /= (np.abs(windowVals)**2).sum()
+        result /= (np.abs(window_vals)**2).sum()
     else:
-        result /= np.abs(windowVals).sum()**2
+        result /= np.abs(window_vals).sum()**2
 
     t = np.arange(nfft/2, len(samples) - nfft/2 + 1, nfft - noverlap)/sample_rate
 
@@ -120,9 +122,9 @@ def detrend(samples, key=None, axis=None):
     :func:`detrend_none`
         :func:`detrend_none` implements the 'none' algorithm.
     '''
-    if key is None or key in ['constant', 'mean', 'default']:
+    if key is None or key in ['constant', 'mean', 'default']: # pylint: disable-msg=R1705
         return detrend(samples, key=detrend_mean, axis=axis)
-    elif key == 'linear':
+    elif key == 'linear': 
         return detrend(samples, key=detrend_linear, axis=axis)
     elif key == 'none':
         return detrend(samples, key=detrend_none, axis=axis)
@@ -187,7 +189,7 @@ def stride_windows(samples, sample_size, noverlap=None, axis=0):
     if samples.ndim != 1:
         raise ValueError('Only 1-dimensional arrays can be used')
     if sample_size == 1 and noverlap == 0:
-        if axis == 0:
+        if axis == 0: # pylint: disable-msg=R1705
             return samples[np.newaxis]
         else:
             return samples[np.newaxis].transpose()
@@ -243,13 +245,13 @@ def detrend_mean(sequence, axis=None):
     return sequence - sequence.mean(axis, keepdims=True)
 
 
-def detrend_none(x, axis=None):
+def detrend_none(samples, axis=None): # pylint: disable-msg=
     '''
-    Return x: no detrending.
+    Return samples: no detrending.
 
     Parameters
     ----------
-    x : any object
+    samples : any object
         An object containing the data
 
     axis : integer
@@ -271,7 +273,7 @@ def detrend_none(x, axis=None):
     :func:`detrend`
         :func:`detrend` is a wrapper around all the detrend algorithms.
     '''
-    return x
+    return samples
 
 
 def detrend_linear(y):
@@ -355,26 +357,26 @@ def apply_window(x, window, axis=0, return_window=None):
     #     if len(window) != xshapetarg:
     #         raise ValueError('The len(window) must be the same as the shape '
     #                          'of x for the chosen axis')
-    #     windowVals = window
+    #     window_vals = window
     # else:
-    windowVals = window(np.ones(xshapetarg, dtype=x.dtype))
+    window_vals = window(np.ones(xshapetarg, dtype=x.dtype))
 
     if x.ndim == 1:
         if return_window:
-            return windowVals * x, windowVals
+            return window_vals * x, window_vals
         else:
-            return windowVals * x
+            return window_vals * x
 
     xshapeother = xshape.pop()
 
     otheraxis = (axis+1) % 2
 
-    windowValsRep = stride_repeat(windowVals, xshapeother, axis=otheraxis)
+    window_valsRep = stride_repeat(window_vals, xshapeother, axis=otheraxis)
 
     if return_window:
-        return windowValsRep * x, windowVals
+        return window_valsRep * x, window_vals
     else:
-        return windowValsRep * x
+        return window_valsRep * x
 
 def stride_repeat(x, n, axis=0):
     '''
