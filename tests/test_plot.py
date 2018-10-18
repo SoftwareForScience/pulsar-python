@@ -4,7 +4,8 @@
 import unittest
 import numpy as np
 
-from tests.context import plot  # pylint: disable-msg=E0611
+# pylint: disable-msg=E0611
+from tests.context import plot
 
 
 class TestPlot(unittest.TestCase):
