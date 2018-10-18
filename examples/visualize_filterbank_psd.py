@@ -1,21 +1,20 @@
 """
     Example of plotting a Power Spectral Density plot, using filterbank data
 """
-
 # pylint: disable-all
-
 import os
 import sys
 import inspect
 import numpy as np
 import matplotlib.pyplot as plt
+
+CURRENT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+PARENT_DIR = os.path.dirname(CURRENT_DIR)
+sys.path.insert(0, PARENT_DIR)
+
 from plot import psd
 from filterbank.header import read_header
 from filterbank.filterbank import Filterbank
-
-currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(currentdir)
-sys.path.insert(0, parentdir)
 
 # Instatiate the filterbank reader and point to the filterbank file
 fb = Filterbank(filename='examples/pspm32.fil')
@@ -32,7 +31,6 @@ header = read_header('examples/pspm32.fil')
 # Calculate the center frequency with the data in the header
 center_freq = header[b'fch1'] + float(header[b'nchans']) * header[b'foff'] / 2.0
 
-print(center_freq)
 # Get the powerlevels and the frequencies
 PXX, freqs = psd(samples, nfft=1024, sample_rate=80,
                  scale_by_freq=True, sides='twosided')
