@@ -13,14 +13,13 @@ before_install:
 install:
   - pip install pylint
   - pip install codecov
+  - pip install pytest
+  - pip install pytest-cov
   - pip install -f requirements.txt
 
 script:
   - pylint */*.py
-  - coverage run -a tests/test_filterbank.py
-  - coverage run -a tests/test_header.py
-  - coverage run -a tests/test_fft.py
-  - coverage run -a tests/test_plot.py
+  - pytest --cov=./
 
 after_success:
   - codecov
