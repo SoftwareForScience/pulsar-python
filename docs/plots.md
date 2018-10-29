@@ -1,8 +1,9 @@
-# Plotting diagrams
-## PSD
+# 4. Plotting diagrams
+
+## 4.1 PSD
 The `plot.psd` function can be used to generate the data for a Power Spectral Density plot. 
 
-### Parameters
+### 4.1.1 Parameters
 
 | Parameter | Description |
 | --- | --- |
@@ -12,13 +13,13 @@ The `plot.psd` function can be used to generate the data for a Power Spectral De
 | window | Callable, optional. The window function to be used. Defaults to `plot.window_hanning`. |
 | sides | {'default', 'onesided', 'twosided'}. Specifies which sides of the spectrum to return. Default gives the default behavior, which returns one-sided for real data and both for complex data. 'onesided' forces the return of a one-sided spectrum, while 'twosided' forces two-sided. |
 
-### Returns
+### 4.1.2 Returns
 | Variable | Description |
 | --- | --- |
 | Pxx | 1-D array. The values for the power spectrum before scaling (real valued). |
 | freqs | 1-D array. The frequencies corresponding to the elements in `Pxx`. |
 
-### Example Usage
+### 4.1.3 Example Usage
 ```python
 from filterbank.filterbank import Filterbank
 import matplotlib.pyplot as plt
@@ -58,3 +59,5 @@ plt.ylabel('Intensity (dB)')
 plt.plot(freqs, power_levels)
 plt.show()
 ```
+
+[Back to table of contents](../README.md)

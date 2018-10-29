@@ -17,7 +17,7 @@ from filterbank.header import read_header
 from filterbank.filterbank import Filterbank
 
 # Instatiate the filterbank reader and point to the filterbank file
-fb = Filterbank(filename='examples/pspm32.fil')
+fb = Filterbank(filename='examples/pspm8.fil')
 
 # read the data in the filterbank file
 _, samples = fb.select_data()
@@ -26,7 +26,9 @@ _, samples = fb.select_data()
 samples = samples[0] + (samples[1] * 1j)
 
 # Read the header of the filterbank file
-header = read_header('examples/pspm32.fil')
+header = read_header('examples/pspm8.fil')
+
+print(header)
 
 # Calculate the center frequency with the data in the header
 center_freq = header[b'fch1'] + float(header[b'nchans']) * header[b'foff'] / 2.0
