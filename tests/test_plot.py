@@ -1,35 +1,36 @@
+# pylint: disable-msg=C0302
 """
     plot.py unit tests
 """
-import unittest
 import numpy as np
 from numpy.testing import assert_array_equal, assert_almost_equal, assert_allclose
-import pytest # pylint: disable-msg=E0401
-from .context import plot # pylint: disable-msg=E0611
+import pytest  # pylint: disable-msg=E0401
+from .context import plot  # pylint: disable-msg=E0611
 
-class TestWindowHanning(unittest.TestCase):
-    """
-        Testclass for testing the plotting functions
-    """
-    np.random.seed(0)
-    n = 1000
 
-    sig_rand = np.random.standard_normal(n) + 100.
-    sig_ones = np.ones(n)
-
-    Fs = 100
-
-    def test_window_hanning_rand(self):
-        """ Tests the hanning_window function with random numbers """
-        targ = np.hanning(len(self.sig_rand)) * self.sig_rand
-        res = plot.window_hanning(self.sig_rand)
-        self.assertAlmostEqual(targ.all(), res.all())
-
-    def test_window_hanning_ones(self):
-        """ Tests the hanning_window function with ones """
-        targ = np.hanning(len(self.sig_ones))
-        res = plot.window_hanning(self.sig_ones)
-        self.assertAlmostEqual(targ.all(), res.all())
+# class TestWindowHanning(unittest.TestCase):
+#     """
+#         Testclass for testing the plotting functions
+#     """
+#     np.random.seed(0)
+#     n = 1000
+#
+#     sig_rand = np.random.standard_normal(n) + 100.
+#     sig_ones = np.ones(n)
+#
+#     Fs = 100
+#
+#     def test_window_hanning_rand(self):
+#         """ Tests the hanning_window function with random numbers """
+#         targ = np.hanning(len(self.sig_rand)) * self.sig_rand
+#         res = plot.window_hanning(self.sig_rand)
+#         self.assertAlmostEqual(targ.all(), res.all())
+#
+#     def test_window_hanning_ones(self):
+#         """ Tests the hanning_window function with ones """
+#         targ = np.hanning(len(self.sig_ones))
+#         res = plot.window_hanning(self.sig_ones)
+#         self.assertAlmostEqual(targ.all(), res.all())
 
 
 class TestStride:
@@ -734,5 +735,286 @@ class TestDetrend():
         assert_allclose(res, targ, atol=self.atol)
 
 
-if __name__ == '__main__':
-    unittest.main()
+class TestWindow:
+    """
+        Testclass for testing all the required window plot functions.
+     """
+
+    def setup(self):
+        """Generates required mock data for testing. """
+        np.random.seed(0)
+        n_times = 1000
+
+        self.sig_rand = np.random.standard_normal(n_times) + 100. # pylint: disable=W0201
+        self.sig_ones = np.ones(n_times) # pylint: disable=W0201
+
+    @staticmethod
+    def check_window_apply_repeat(x_axis, window, bins_for_fft, noverlap):
+        '''This is an adaptation of the original window application
+        algorithm.  This is here to test to make sure the new implementation
+        has the same result'''
+        step = bins_for_fft - noverlap
+        ind = np.arange(0, len(x_axis) - bins_for_fft + 1, step)
+        n_times = len(ind)
+        result = np.zeros((bins_for_fft, n_times))
+
+        if np.iterable(window):
+            window_values = window
+        else:
+            window_values = window(np.ones((bins_for_fft,), x_axis.dtype))
+
+        # do the ffts of the slices
+        for i in range(n_times):
+            result[:, i] = window_values * x_axis[ind[i]:ind[i] + bins_for_fft]
+        return result
+
+    def test_window_hanning_rand(self):
+        """Test for random hanning window. """
+        targ = np.hanning(len(self.sig_rand)) * self.sig_rand
+        res = plot.window_hanning(self.sig_rand)
+
+        assert_allclose(targ, res, atol=1e-06)
+
+    def test_window_hanning_ones(self):
+        """Test for one_hanning_windows. """
+        targ = np.hanning(len(self.sig_ones))
+        res = plot.window_hanning(self.sig_ones)
+
+        assert_allclose(targ, res, atol=1e-06)
+
+    def test_apply_window_1d_axis1_value_error(self):
+        """
+        Test for apply_window on a single axis to check
+         if a value error is thrown is the wrong value is supplied.
+        """
+        x_axis = self.sig_rand
+        window = plot.window_hanning
+        with pytest.raises(ValueError):
+            plot.apply_window(x_axis, window, axis=1, return_window=False)
+
+    def test_apply_window_1d_els_wrong_size_value_error(self):
+        """Test for apply_window if a error is thrown when the wrong value is supplied. """
+        x_axis = self.sig_rand
+        window = plot.window_hanning(np.ones(x_axis.shape[0] - 1))
+        with pytest.raises(ValueError):
+            plot.apply_window(x_axis, window)
+
+    @staticmethod
+    def test_apply_window_0d_value_error():
+        """Test apply_window 0d if a error is thrown when a incorrect value is supplied. """
+        x_axis = np.array(0)
+        window = plot.window_hanning
+        with pytest.raises(ValueError):
+            plot.apply_window(x_axis, window, axis=1, return_window=False)
+
+    def test_apply_window_3d_value_error(self):
+        """Test apply window 3 dimensional error is thrown when a incorrect value is supplied. """
+        x_axis = self.sig_rand[np.newaxis][np.newaxis]
+        window = plot.window_hanning
+        with pytest.raises(ValueError):
+            plot.apply_window(x_axis, window, axis=1, return_window=False)
+
+    def test_apply_window_hanning_1d(self):
+        """Test for the apply_window function in one dimension"""
+        x_axis = self.sig_rand
+        window = plot.window_hanning
+        second_window = plot.window_hanning(np.ones(x_axis.shape[0]))
+        y_axis, window2 = plot.apply_window(x_axis, window, return_window=True)
+        y_time_steps = window(x_axis)
+        assert y_time_steps.shape == y_axis.shape
+        assert x_axis.shape == y_axis.shape
+        assert_allclose(y_time_steps, y_axis, atol=1e-06)
+        assert_array_equal(second_window, window2)
+
+    def test_apply_window_hanning_1d_axis0(self):
+        """Test for apply_window with a 1 dimensional axis. """
+        x_axis = self.sig_rand
+        window = plot.window_hanning
+        y_axis = plot.apply_window(x_axis, window, axis=0, return_window=False)
+        y_time_steps = window(x_axis)
+        assert y_time_steps.shape == y_axis.shape
+        assert x_axis.shape == y_axis.shape
+        assert_allclose(y_time_steps, y_axis, atol=1e-06)
+
+    def test_apply_window_hanning_els_1d_axis0(self):
+        """Test for apply_window_hanning_els 1 dimensional axis. """
+        x_axis = self.sig_rand
+        window = plot.window_hanning(np.ones(x_axis.shape[0]))
+        second_window = plot.window_hanning
+        y_axis = plot.apply_window(x_axis, window, axis=0, return_window=False)
+        y_time_steps = second_window(x_axis)
+        assert y_time_steps.shape == y_axis.shape
+        assert x_axis.shape == y_axis.shape
+        assert_allclose(y_time_steps, y_axis, atol=1e-06)
+
+    @staticmethod
+    def test_apply_window_hanning_2d_axis0():
+        """Test for apply_window with a two dimensional axis. """
+        x_axis = np.random.standard_normal([1000, 10]) + 100.
+        window = plot.window_hanning
+        y_axis = plot.apply_window(x_axis, window, axis=0, return_window=False)
+        y_time_steps = np.zeros_like(x_axis)
+        for i in range(x_axis.shape[1]):
+            y_time_steps[:, i] = window(x_axis[:, i])
+        assert y_time_steps.shape == y_axis.shape
+        assert x_axis.shape == y_axis.shape
+        assert_allclose(y_time_steps, y_axis, atol=1e-06)
+
+    @staticmethod
+    def test_apply_window_hanning_els1_2d_axis0():
+        """Test for apply_window els1 in 2 dimensions"""
+        x_axis = np.random.standard_normal([1000, 10]) + 100.
+        window = plot.window_hanning(np.ones(x_axis.shape[0]))
+        second_window = plot.window_hanning
+        y_axis = plot.apply_window(x_axis, window, axis=0, return_window=False)
+        y_time_steps = np.zeros_like(x_axis)
+        for i in range(x_axis.shape[1]):
+            y_time_steps[:, i] = second_window(x_axis[:, i])
+        assert y_time_steps.shape == y_axis.shape
+        assert x_axis.shape == y_axis.shape
+        assert_allclose(y_time_steps, y_axis, atol=1e-06)
+
+    @staticmethod
+    def test_apply_window_hanning_els2_2d_axis0():
+        """Test for function apply_window_hanning els in 2 dimensions"""
+        x_axis = np.random.standard_normal([1000, 10]) + 100.
+        window = plot.window_hanning
+        second_window = plot.window_hanning(np.ones(x_axis.shape[0]))
+        y_axis, third_window = plot.apply_window(x_axis, window, axis=0, return_window=True)
+        y_time_steps = np.zeros_like(x_axis)
+        for i in range(x_axis.shape[1]):
+            y_time_steps[:, i] = second_window * x_axis[:, i]
+        assert y_time_steps.shape == y_axis.shape
+        assert x_axis.shape == y_axis.shape
+        assert_allclose(y_time_steps, y_axis, atol=1e-06)
+        assert_array_equal(second_window, third_window)
+
+    @staticmethod
+    def test_apply_window_hanning_els3_2d_axis0():
+        """Test for apply_window_hanning_els3 in 2 dimensions. """
+        x_axis = np.random.standard_normal([1000, 10]) + 100.
+        window = plot.window_hanning
+        second_window = plot.window_hanning(np.ones(x_axis.shape[0]))
+        y_axis, third_window = plot.apply_window(x_axis, window, axis=0, return_window=True)
+        y_time_steps = plot.apply_window(x_axis, second_window, axis=0, return_window=False)
+        assert y_time_steps.shape == y_axis.shape
+        assert x_axis.shape == y_axis.shape
+        assert_allclose(y_time_steps, y_axis, atol=1e-06)
+        assert_array_equal(second_window, third_window)
+
+    @staticmethod
+    def test_apply_window_hanning_2d_axis1():
+        """Test for function apply_window_hanning in 2 dimensions. """
+        x_axis = np.random.standard_normal([10, 1000]) + 100.
+        window = plot.window_hanning
+        y_axis = plot.apply_window(x_axis, window, axis=1, return_window=False)
+        y_time_steps = np.zeros_like(x_axis)
+        for i in range(x_axis.shape[0]):
+            y_time_steps[i, :] = window(x_axis[i, :])
+        assert y_time_steps.shape == y_axis.shape
+        assert x_axis.shape == y_axis.shape
+        assert_allclose(y_time_steps, y_axis, atol=1e-06)
+
+    @staticmethod
+    def test_apply_window_hanning_2d__els1_axis1():
+        """Test apply_window_hanning in 2 dimensions els1_axis1"""
+        x_axis = np.random.standard_normal([10, 1000]) + 100.
+        window = plot.window_hanning(np.ones(x_axis.shape[1]))
+        second_window = plot.window_hanning
+        y_axis = plot.apply_window(x_axis, window, axis=1, return_window=False)
+        y_time_steps = np.zeros_like(x_axis)
+        for i in range(x_axis.shape[0]):
+            y_time_steps[i, :] = second_window(x_axis[i, :])
+        assert y_time_steps.shape == y_axis.shape
+        assert x_axis.shape == y_axis.shape
+        assert_allclose(y_time_steps, y_axis, atol=1e-06)
+
+    @staticmethod
+    def test_apply_window_hanning_2d_els2_axis1():
+        """Test apply_window_hanning function in 2dimensions els2_axis1"""
+        x_axis = np.random.standard_normal([10, 1000]) + 100.
+        window = plot.window_hanning
+        second_window = plot.window_hanning(np.ones(x_axis.shape[1]))
+        y_axis, third_window = plot.apply_window(x_axis, window, axis=1, return_window=True)
+        y_time_steps = np.zeros_like(x_axis)
+        for i in range(x_axis.shape[0]):
+            y_time_steps[i, :] = second_window * x_axis[i, :]
+        assert y_time_steps.shape == y_axis.shape
+        assert x_axis.shape == y_axis.shape
+        assert_allclose(y_time_steps, y_axis, atol=1e-06)
+        assert_array_equal(second_window, third_window)
+
+    @staticmethod
+    def test_apply_window_hanning_2d_els3_axis1():
+        """Test apply_window_hanning function in 2 dimensions. """
+        x_axis = np.random.standard_normal([10, 1000]) + 100.
+        window = plot.window_hanning
+        second_window = plot.window_hanning(np.ones(x_axis.shape[1]))
+        y_axis = plot.apply_window(x_axis, window, axis=1, return_window=False)
+        y_time_steps = plot.apply_window(x_axis, second_window, axis=1, return_window=False)
+        assert y_time_steps.shape == y_axis.shape
+        assert x_axis.shape == y_axis.shape
+        assert_allclose(y_time_steps, y_axis, atol=1e-06)
+
+    def test_apply_window_stride_windows_hanning_2d_n13_noverlapn3_axis0(self):
+        """Test for apply_window_stride_windows_hanning in 2d with no overlap. """
+        x_axis = self.sig_rand
+        window = plot.window_hanning
+        y_axis_i = plot.stride_windows(x_axis, sample_size=13, noverlap=2, axis=0)
+        y_axis = plot.apply_window(y_axis_i, window, axis=0, return_window=False)
+        y_time_steps = self.check_window_apply_repeat(x_axis, window, 13, 2)
+        assert y_time_steps.shape == y_axis.shape
+        assert x_axis.shape != y_axis.shape
+        assert_allclose(y_time_steps, y_axis, atol=1e-06)
+
+    @staticmethod
+    def test_apply_window_hanning_2d_stack_axis1():
+        """Test test_apply_widnow_hanning function in 2 dimensions"""
+        y_axis_data = np.arange(32)
+        y_axis_data_two = y_axis_data + 5
+        y_axis_data_three = y_axis_data + 3.3
+        y_axis_control_1 = plot.apply_window(y_axis_data_two, plot.window_hanning)
+        y_axis_control_2 = plot.window_hanning(y_axis_data_three)
+        y_axis_data = np.vstack([y_axis_data_two, y_axis_data_three])
+        y_axis_control = np.vstack([y_axis_control_1, y_axis_control_2])
+        y_axis_data = np.tile(y_axis_data, (20, 1))
+        y_axis_control = np.tile(y_axis_control, (20, 1))
+        result = plot.apply_window(y_axis_data, plot.window_hanning, axis=1,
+                                   return_window=False)
+        assert_allclose(y_axis_control, result, atol=1e-08)
+
+    @staticmethod
+    def test_apply_window_hanning_2d_stack_windows_axis1():
+        """Test for apply_window_hanning in 2 dimensions with stacked windows and axis1"""
+        y_axis_data = np.arange(32)
+        y_axis_data_two = y_axis_data + 5
+        y_axis_data_three = y_axis_data + 3.3
+        y_axis_control_1 = plot.apply_window(y_axis_data_two, plot.window_hanning)
+        y_axis_control_2 = plot.window_hanning(y_axis_data_three)
+        y_axis_data = np.vstack([y_axis_data_two, y_axis_data_three])
+        y_axis_control = np.vstack([y_axis_control_1, y_axis_control_2])
+        y_axis_data = np.tile(y_axis_data, (20, 1))
+        y_axis_control = np.tile(y_axis_control, (20, 1))
+        result = plot.apply_window(y_axis_data, plot.window_hanning, axis=1,
+                                   return_window=False)
+        assert_allclose(y_axis_control, result, atol=1e-08)
+
+    @staticmethod
+    def test_apply_window_hanning_2d_stack_windows_axis1_unflatten():
+        """Test for the apply_window_hanning function in 2 dimensions
+            and stacked windows with 1 axis. """
+        n_time_steps = 32
+        y_axis_data = np.arange(n_time_steps)
+        y_axis_data_1 = y_axis_data + 5
+        y_axis_data_2 = y_axis_data + 3.3
+        y_axis_control_1 = plot.apply_window(y_axis_data_1, plot.window_hanning)
+        y_axis_control_2 = plot.window_hanning(y_axis_data_2)
+        y_axis_data = np.vstack([y_axis_data_1, y_axis_data_2])
+        y_axis_control = np.vstack([y_axis_control_1, y_axis_control_2])
+        y_axis_data = np.tile(y_axis_data, (20, 1))
+        y_axis_control = np.tile(y_axis_control, (20, 1))
+        y_axis_data = y_axis_data.flatten()
+        y_axis_data_1 = plot.stride_windows(y_axis_data, 32, noverlap=0, axis=0)
+        result = plot.apply_window(y_axis_data_1, plot.window_hanning, axis=0,
+                                   return_window=False)
+        assert_allclose(y_axis_control.T, result, atol=1e-08)
