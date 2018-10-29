@@ -183,6 +183,12 @@ class TestDetrend():
 
         self.atol = 1e-08  # pylint: disable=W0201
 
+    def test_detrend_none(self):
+        input = 0.
+        detrend_none = plot.detrend(input, None)
+
+        assert detrend_none == input
+
     @staticmethod
     def test_detrend_none_0dimension_zeros():
         """A 0D zeros shall equal targ. """
