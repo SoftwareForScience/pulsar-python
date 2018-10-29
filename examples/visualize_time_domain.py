@@ -7,28 +7,28 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Initiate RtlSdr
-SDR = RtlSdr()
+sdr = RtlSdr()
 
 # configure device
-SDR.sample_rate = 2.4e6
-SDR.center_freq = 102.2e6
+sdr.sample_rate = 2.4e6
+sdr.center_freq = 102.2e6
 
 # Read samples
-SAMPLES = SDR.read_samples(256*1024)
+samples = sdr.read_samples(256*1024)
 
 # Close RTLSDR device connection
-SDR.close()
+sdr.close()
 
 # Number of samples equals the length of samples
-N = SAMPLES.shape[0]
+sample_length = samples.shape[0]
 
-# T equals N/Fs
-T = N/SDR.sample_rate
+# sample size equals sample length / sample rate
+sample_size = sample_length/sdr.sample_rate
 
 # Define the x axis
-X = np.linspace(0.0, T, N)
+intervals = np.linspace(0.0, sample_size, sample_length)
 
 # Generate the plot
-FIG, AX = plt.subplots()
-AX.plot(X, SAMPLES)
+fig, ax = plt.subplots()
+ax.plot(intervals, samples)
 plt.show()

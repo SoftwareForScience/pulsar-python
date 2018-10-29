@@ -20,6 +20,7 @@ script:
   - coverage run -a tests/test_filterbank.py
   - coverage run -a tests/test_header.py
   - coverage run -a tests/test_fft.py
+  - coverage run -a tests/test_plot.py
 
 after_success:
   - codecov
