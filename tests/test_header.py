@@ -3,7 +3,7 @@
 """
 
 import unittest
-from context import header # pylint: disable-msg=E0611
+from .context import header # pylint: disable-msg=E0611
 
 
 class TestHeader(unittest.TestCase):

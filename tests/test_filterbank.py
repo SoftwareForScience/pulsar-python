@@ -3,7 +3,7 @@
 """
 
 import unittest
-from context import filterbank # pylint: disable-msg=E0611
+from .context import filterbank # pylint: disable-msg=E0611
 
 class TestFilterbank(unittest.TestCase):
     """
