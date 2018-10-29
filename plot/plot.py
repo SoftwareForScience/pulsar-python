@@ -387,7 +387,6 @@ def apply_window(samples, window, axis=0, return_window=None):
     if return_window: # pylint: disable-msg=R1705
         return window_vals_rep * samples, window_vals
     else:
-        print(window_vals)
         return window_vals_rep * samples
 
 def stride_repeat(samples, sample_size, axis=0):
