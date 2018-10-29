@@ -5,7 +5,7 @@
 import unittest
 import numpy as np
 
-from context import fourier # pylint: disable-msg=E0611
+from .context import fourier # pylint: disable-msg=E0611
 
 def fft1(test_input):
     """

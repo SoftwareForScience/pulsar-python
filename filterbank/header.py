@@ -61,7 +61,7 @@ def read_next_header_keyword(file_header):
     """
         Read key-value pair from header
     """
-    n_bytes = np.fromstring(file_header.read(4), dtype='uint32')[0]
+    n_bytes = np.frombuffer(file_header.read(4), dtype='uint32')[0]
 
     if n_bytes > 255:
         n_bytes = 16
@@ -78,7 +78,7 @@ def read_next_header_keyword(file_header):
     if dtype == b'<d':
         val = unpack(dtype, file_header.read(8))[0]
     if dtype == b'str':
-        str_len = np.fromstring(file_header.read(4), dtype='int32')[0]
+        str_len = np.frombuffer(file_header.read(4), dtype='int32')[0]
         val = file_header.read(str_len)
     if dtype == b'angle':
         val = unpack('<d', file_header.read(8))[0]
