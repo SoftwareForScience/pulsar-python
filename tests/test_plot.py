@@ -187,7 +187,7 @@ class TestDetrend():
     def test_detrend_none():
         """Test if a detrend function can have a key of None. """
         input = 0. # pylint: disable=W0622
-        detrend_none = plot.detrend(input, None)
+        detrend_none = plot.detrend(input, 'none')
 
         assert detrend_none == input
 
