@@ -4,8 +4,9 @@
 import unittest
 import numpy as np
 from numpy.testing import assert_array_equal, assert_almost_equal, assert_allclose
-import pytest # pylint: disable-msg=E0401
-from context import plot # pylint: disable-msg=E0611
+import pytest  # pylint: disable-msg=E0401
+from context import plot  # pylint: disable-msg=E0611
+
 
 class TestWindowHanning(unittest.TestCase):
     """
@@ -31,10 +32,12 @@ class TestWindowHanning(unittest.TestCase):
         res = plot.window_hanning(self.sig_ones)
         self.assertAlmostEqual(targ.all(), res.all())
 
-class TestStride():
+
+class TestStride:
     """
         Testclass for testing the stride functions.
     """
+
     @staticmethod
     def get_base(x_axis):
         """Gets base from x_axis"""
@@ -177,9 +180,11 @@ class TestStride():
         y_strided = plot.stride_repeat(y_axis, 33.815)
         assert_array_equal(y_strided, 0.3)
 
+
 # pylint: disable=R0904
 class TestDetrend():
     """Class for testing the detrend function. """
+
     def setup(self):
         """Initial setup for testing. X and Y axis are set accordingly.
         And a proper slope is calculated.  """
@@ -187,29 +192,30 @@ class TestDetrend():
         n_timesteps = 1000
         x_axis = np.linspace(0., 100, n_timesteps)
 
-        self.sig_zeros = np.zeros(n_timesteps) # pylint: disable=W0201
+        self.sig_zeros = np.zeros(n_timesteps)  # pylint: disable=W0201
 
-        self.sig_off = self.sig_zeros + 100. # pylint: disable=W0201
-        self.sig_slope = np.linspace(-10., 90., n_timesteps) # pylint: disable=W0201
+        self.sig_off = self.sig_zeros + 100.  # pylint: disable=W0201
+        self.sig_slope = np.linspace(-10., 90., n_timesteps)  # pylint: disable=W0201
 
-        self.sig_slope_mean = x_axis - x_axis.mean() # pylint: disable=W0201
+        self.sig_slope_mean = x_axis - x_axis.mean()  # pylint: disable=W0201
 
         sig_rand = np.random.standard_normal(n_timesteps)
-        sig_sin = np.sin(x_axis*2*np.pi/(n_timesteps/100))
+        sig_sin = np.sin(x_axis * 2 * np.pi / (n_timesteps / 100))
 
         sig_rand -= sig_rand.mean()
         sig_sin -= sig_sin.mean()
 
-        self.sig_base = sig_rand + sig_sin # pylint: disable=W0201
+        self.sig_base = sig_rand + sig_sin  # pylint: disable=W0201
 
-        self.atol = 1e-08 # pylint: disable=W0201
+        self.atol = 1e-08  # pylint: disable=W0201
 
     @staticmethod
     def test_detrend_none_0dimension_zeros():
         """A 0D zeros shall equal targ. """
-        input = 0. # pylint: disable=W0622
+        input = 0.  # pylint: disable=W0622
         targ = input
         assert input == targ
+
     @staticmethod
     def test_detrend_none_0dimension_zeros_axis1():
         """Test for axis 1 """
@@ -220,14 +226,14 @@ class TestDetrend():
     @staticmethod
     def test_detrend_str_none_0dimension_zeros():
         """Tests for 0D_zeros strings. """
-        input = 0. # pylint: disable=W0622
+        input = 0.  # pylint: disable=W0622
         targ = input
         assert input == targ
 
     @staticmethod
     def test_detrend_detrend_none_0dimension_zeros():
         """Tests for 0D zeros """
-        input = 0. # pylint: disable=W0622
+        input = 0.  # pylint: disable=W0622
         targ = input
         assert input == targ
 
@@ -241,28 +247,28 @@ class TestDetrend():
 
     def test_detrend_none_1dimension_off(self):
         """Tests without 1 dimension"""
-        input = self.sig_off # pylint: disable=W0622
+        input = self.sig_off  # pylint: disable=W0622
         targ = input
         res = plot.detrend_none(input)
         assert_array_equal(res, targ)
 
     def test_detrend_none_1dimension_slope(self):
         """Unit tests for detrend 1 dim_slope. """
-        input = self.sig_slope # pylint: disable=W0622
+        input = self.sig_slope  # pylint: disable=W0622
         targ = input
         res = plot.detrend_none(input)
         assert_array_equal(res, targ)
 
     def test_detrend_none_1dimension_base(self):
         """Unit tests for detrend 1 dim slope. """
-        input = self.sig_base # pylint: disable=W0622
+        input = self.sig_base  # pylint: disable=W0622
         targ = input
         res = plot.detrend_none(input)
         assert_array_equal(res, targ)
 
     def test_detrend_none_1dimension_base_slope_off_list(self):
         """Unit test for detrend 1 dimension base slope off list"""
-        input = self.sig_base + self.sig_slope + self.sig_off # pylint: disable=W0622
+        input = self.sig_base + self.sig_slope + self.sig_off  # pylint: disable=W0622
         targ = input.tolist()
         res = plot.detrend_none(input.tolist())
         assert res == targ
@@ -273,7 +279,7 @@ class TestDetrend():
                 self.sig_base + self.sig_off,
                 self.sig_base + self.sig_slope,
                 self.sig_base + self.sig_off + self.sig_slope]
-        input = np.vstack(arri) # pylint: disable=W0622
+        input = np.vstack(arri)  # pylint: disable=W0622
         targ = input
         res = plot.detrend_none(input)
         assert_array_equal(res, targ)
@@ -284,7 +290,7 @@ class TestDetrend():
                 self.sig_base + self.sig_off,
                 self.sig_base + self.sig_slope,
                 self.sig_base + self.sig_off + self.sig_slope]
-        input = np.vstack(arri) # pylint: disable=W0622
+        input = np.vstack(arri)  # pylint: disable=W0622
         targ = input
         res = plot.detrend_none(input.T)
         assert_array_equal(res.T, targ)
@@ -292,7 +298,7 @@ class TestDetrend():
     @staticmethod
     def test_detrend_mean_0dimension_zeros():
         """Unit test for 0 dimension. """
-        input = 0. # pylint: disable=W0622
+        input = 0.  # pylint: disable=W0622
         targ = 0.
         res = plot.detrend_mean(input)
         assert_almost_equal(res, targ)
@@ -300,7 +306,7 @@ class TestDetrend():
     @staticmethod
     def test_detrend_str_mean_0dimension_zeros():
         """Unit test for test_detrend_str_mean_0dimension_zeros"""
-        input = 0. # pylint: disable=W0622
+        input = 0.  # pylint: disable=W0622
         targ = 0.
         res = plot.detrend(input, key='mean')
         assert_almost_equal(res, targ)
@@ -308,7 +314,7 @@ class TestDetrend():
     @staticmethod
     def test_detrend_detrend_mean_0dimension_zeros():
         """Unit test for test_detrend_detrend_mean_0dimension_zeros"""
-        input = 0. # pylint: disable=W0622
+        input = 0.  # pylint: disable=W0622
         targ = 0.
         res = plot.detrend(input, key=plot.detrend_mean)
         assert_almost_equal(res, targ)
@@ -316,7 +322,7 @@ class TestDetrend():
     @staticmethod
     def test_detrend_mean_0dimension_off():
         """Unit test for test_detrend_mean_0dimension_off"""
-        input = 5.5 # pylint: disable=W0622
+        input = 5.5  # pylint: disable=W0622
         targ = 0.
         res = plot.detrend_mean(input)
         assert_almost_equal(res, targ)
@@ -324,7 +330,7 @@ class TestDetrend():
     @staticmethod
     def test_detrend_str_mean_0dimension_off():
         """Unit test for test_detrend_str_mean_0dimension_off"""
-        input = 5.5 # pylint: disable=W0622
+        input = 5.5  # pylint: disable=W0622
         targ = 0.
         res = plot.detrend(input, key='mean')
         assert_almost_equal(res, targ)
@@ -332,63 +338,63 @@ class TestDetrend():
     @staticmethod
     def test_detrend_detrend_mean_0dimension_off():
         """Unit test for test_detrend_detrend_mean_0dimension_off"""
-        input = 5.5 # pylint: disable=W0622
+        input = 5.5  # pylint: disable=W0622
         targ = 0.
         res = plot.detrend(input, key=plot.detrend_mean)
         assert_almost_equal(res, targ)
 
     def test_detrend_mean_1dimension_zeros(self):
         """Unit test for test_detrend_mean_1dimension_zeros"""
-        input = self.sig_zeros # pylint: disable=W0622
+        input = self.sig_zeros  # pylint: disable=W0622
         targ = self.sig_zeros
         res = plot.detrend_mean(input)
         assert_allclose(res, targ, atol=self.atol)
 
     def test_detrend_mean_1dimension_base(self):
         """Unit test for test_detrend_mean_1dimension_base"""
-        input = self.sig_base # pylint: disable=W0622
+        input = self.sig_base  # pylint: disable=W0622
         targ = self.sig_base
         res = plot.detrend_mean(input)
         assert_allclose(res, targ, atol=self.atol)
 
     def test_detrend_mean_1dimension_base_off(self):
         """Unit test for test_detrend_mean_1dimension_base_off"""
-        input = self.sig_base + self.sig_off # pylint: disable=W0622
+        input = self.sig_base + self.sig_off  # pylint: disable=W0622
         targ = self.sig_base
         res = plot.detrend_mean(input)
         assert_allclose(res, targ, atol=self.atol)
 
     def test_detrend_mean_1dimension_base_slope(self):
         """Unit test for test_detrend_mean_1dimension_base_slope"""
-        input = self.sig_base + self.sig_slope # pylint: disable=W0622
+        input = self.sig_base + self.sig_slope  # pylint: disable=W0622
         targ = self.sig_base + self.sig_slope_mean
         res = plot.detrend_mean(input)
         assert_allclose(res, targ, atol=self.atol)
 
     def test_detrend_mean_1dimension_base_slope_off(self):
         """Unit test for test_detrend_mean_1dimension_base_slope_off"""
-        input = self.sig_base + self.sig_slope + self.sig_off # pylint: disable=W0622
+        input = self.sig_base + self.sig_slope + self.sig_off  # pylint: disable=W0622
         targ = self.sig_base + self.sig_slope_mean
         res = plot.detrend_mean(input)
         assert_allclose(res, targ, atol=1e-08)
 
     def test_detrend_mean_1dimension_base_slope_off_axis0(self):
         """Unit test test_detrend_mean_1dimension_base_slope_off_axis0"""
-        input = self.sig_base + self.sig_slope + self.sig_off # pylint: disable=W0622
+        input = self.sig_base + self.sig_slope + self.sig_off  # pylint: disable=W0622
         targ = self.sig_base + self.sig_slope_mean
         res = plot.detrend_mean(input, axis=0)
         assert_allclose(res, targ, atol=1e-08)
 
     def test_detrend_mean_1dimension_base_slope_off_list(self):
         """Unit test for test_detrend_mean_1dimension_base_slope_off_list"""
-        input = self.sig_base + self.sig_slope + self.sig_off # pylint: disable=W0622
+        input = self.sig_base + self.sig_slope + self.sig_off  # pylint: disable=W0622
         targ = self.sig_base + self.sig_slope_mean
         res = plot.detrend_mean(input.tolist())
         assert_allclose(res, targ, atol=1e-08)
 
     def test_detrend_mean_1dimension_base_slope_off_list_axis0(self):
         """Unit test test_detrend_mean_1dimension_base_slope_off_list_axis0"""
-        input = self.sig_base + self.sig_slope + self.sig_off # pylint: disable=W0622
+        input = self.sig_base + self.sig_slope + self.sig_off  # pylint: disable=W0622
         targ = self.sig_base + self.sig_slope_mean
         res = plot.detrend_mean(input.tolist(), axis=0)
         assert_allclose(res, targ, atol=1e-08)
@@ -399,7 +405,7 @@ class TestDetrend():
                 self.sig_base + self.sig_off]
         arrt = [self.sig_zeros,
                 self.sig_base]
-        input = np.vstack(arri) # pylint: disable=W0622
+        input = np.vstack(arri)  # pylint: disable=W0622
         targ = np.vstack(arrt)
         res = plot.detrend_mean(input)
         assert_allclose(res, targ, atol=1e-08)
@@ -410,7 +416,7 @@ class TestDetrend():
                 self.sig_base + self.sig_off]
         arrt = [self.sig_zeros,
                 self.sig_base]
-        input = np.vstack(arri) # pylint: disable=W0622
+        input = np.vstack(arri)  # pylint: disable=W0622
         targ = np.vstack(arrt)
         res = plot.detrend_mean(input, axis=None)
         assert_allclose(res, targ,
@@ -422,7 +428,7 @@ class TestDetrend():
                 self.sig_base + self.sig_off]
         arrt = [self.sig_zeros,
                 self.sig_base]
-        input = np.vstack(arri).T # pylint: disable=W0622
+        input = np.vstack(arri).T  # pylint: disable=W0622
         targ = np.vstack(arrt)
         res = plot.detrend_mean(input, axis=None)
         assert_allclose(res.T, targ,
@@ -438,7 +444,7 @@ class TestDetrend():
                 self.sig_base,
                 self.sig_base + self.sig_slope_mean,
                 self.sig_base + self.sig_slope_mean]
-        input = np.vstack(arri).T # pylint: disable=W0622
+        input = np.vstack(arri).T  # pylint: disable=W0622
         targ = np.vstack(arrt).T
         res = plot.detrend_mean(input, axis=0)
         assert_allclose(res, targ,
@@ -454,7 +460,7 @@ class TestDetrend():
                 self.sig_base,
                 self.sig_base + self.sig_slope_mean,
                 self.sig_base + self.sig_slope_mean]
-        input = np.vstack(arri) # pylint: disable=W0622
+        input = np.vstack(arri)  # pylint: disable=W0622
         targ = np.vstack(arrt)
         res = plot.detrend_mean(input, axis=1)
         assert_allclose(res, targ,
@@ -470,7 +476,7 @@ class TestDetrend():
                 self.sig_base,
                 self.sig_base + self.sig_slope_mean,
                 self.sig_base + self.sig_slope_mean]
-        input = np.vstack(arri) # pylint: disable=W0622
+        input = np.vstack(arri)  # pylint: disable=W0622
         targ = np.vstack(arrt)
         res = plot.detrend_mean(input, axis=-1)
         assert_allclose(res, targ,
@@ -482,7 +488,7 @@ class TestDetrend():
                 self.sig_base + self.sig_off]
         arrt = [self.sig_zeros,
                 self.sig_base]
-        input = np.vstack(arri) # pylint: disable=W0622
+        input = np.vstack(arri)  # pylint: disable=W0622
         targ = np.vstack(arrt)
         res = plot.detrend(input)
         assert_allclose(res, targ, atol=1e-08)
@@ -493,7 +499,7 @@ class TestDetrend():
                 self.sig_base + self.sig_off]
         arrt = [self.sig_zeros,
                 self.sig_base]
-        input = np.vstack(arri) # pylint: disable=W0622
+        input = np.vstack(arri)  # pylint: disable=W0622
         targ = np.vstack(arrt)
         res = plot.detrend(input, axis=None)
         assert_allclose(res, targ, atol=1e-08)
@@ -508,7 +514,7 @@ class TestDetrend():
                 self.sig_base,
                 self.sig_base + self.sig_slope_mean,
                 self.sig_base + self.sig_slope_mean]
-        input = np.vstack(arri).T # pylint: disable=W0622
+        input = np.vstack(arri).T  # pylint: disable=W0622
         targ = np.vstack(arrt).T
         res = plot.detrend(input, key='mean', axis=0)
         assert_allclose(res, targ,
@@ -520,7 +526,7 @@ class TestDetrend():
                 self.sig_base + self.sig_off]
         arrt = [self.sig_zeros,
                 self.sig_base]
-        input = np.vstack(arri).T # pylint: disable=W0622
+        input = np.vstack(arri).T  # pylint: disable=W0622
         targ = np.vstack(arrt)
         res = plot.detrend(input, key='constant', axis=None)
         assert_allclose(res.T, targ,
@@ -536,7 +542,7 @@ class TestDetrend():
                 self.sig_base,
                 self.sig_base + self.sig_slope_mean,
                 self.sig_base + self.sig_slope_mean]
-        input = np.vstack(arri) # pylint: disable=W0622
+        input = np.vstack(arri)  # pylint: disable=W0622
         targ = np.vstack(arrt)
         res = plot.detrend(input, key='default', axis=1)
         assert_allclose(res, targ,
@@ -552,7 +558,7 @@ class TestDetrend():
                 self.sig_base,
                 self.sig_base + self.sig_slope_mean,
                 self.sig_base + self.sig_slope_mean]
-        input = np.vstack(arri).T # pylint: disable=W0622
+        input = np.vstack(arri).T  # pylint: disable=W0622
         targ = np.vstack(arrt).T
         res = plot.detrend(input, key=plot.detrend_mean, axis=0)
         assert_allclose(res, targ,
@@ -560,46 +566,46 @@ class TestDetrend():
 
     def test_detrend_bad_key_str_value_error(self):
         """Checks if valuerror is thrown when the key is is a str. """
-        input = self.sig_slope[np.newaxis] # pylint: disable=W0622
+        input = self.sig_slope[np.newaxis]  # pylint: disable=W0622
         with pytest.raises(ValueError):
             plot.detrend(input, key='spam')
 
     def test_detrend_bad_key_var_value_error(self):
         """Unit test that checks if a error is thrown when a wrong/bad key value is supplied. """
-        input = self.sig_slope[np.newaxis] # pylint: disable=W0622
+        input = self.sig_slope[np.newaxis]  # pylint: disable=W0622
         with pytest.raises(ValueError):
             plot.detrend(input, key=5)
 
     @staticmethod
     def test_detrend_mean_0d_d0_value_error():
         """Unit test to check if a value error is thrown. """
-        input = 5.5 # pylint: disable=W0622
+        input = 5.5  # pylint: disable=W0622
         with pytest.raises(ValueError):
             plot.detrend_mean(input, axis=0)
 
     @staticmethod
     def test_detrend_0d_d0_value_error():
         """Unit test if a value error is thrown. """
-        input = 5.5 # pylint: disable=W0622
+        input = 5.5  # pylint: disable=W0622
         with pytest.raises(ValueError):
             plot.detrend(input, axis=0)
 
     def test_detrend_mean_1d_d1_value_error(self):
         """Unit test that checks if a value error is thrown when a incorrect value is supplied. """
-        input = self.sig_slope # pylint: disable=W0622
+        input = self.sig_slope  # pylint: disable=W0622
         with pytest.raises(ValueError):
             plot.detrend_mean(input, axis=1)
 
     def test_detrend_1d_d1_value_error(self):
         """Unit test that checks if a value rror is thrown when a incorrect value is supplied. """
-        input = self.sig_slope # pylint: disable=W0622
+        input = self.sig_slope  # pylint: disable=W0622
         with pytest.raises(ValueError):
             plot.detrend(input, axis=1)
 
     @staticmethod
     def test_detrend_linear_0d_zeros():
         """Unit test for linear 0d detrend usage. """
-        input = 0. # pylint: disable=W0622
+        input = 0.  # pylint: disable=W0622
         targ = 0.
         res = plot.detrend_linear(input)
         assert_almost_equal(res, targ)
@@ -607,7 +613,7 @@ class TestDetrend():
     @staticmethod
     def test_detrend_linear_0d_off():
         """Detrend linear unit test.  """
-        input = 5.5 # pylint: disable=W0622
+        input = 5.5  # pylint: disable=W0622
         targ = 0.
         res = plot.detrend_linear(input)
         assert_almost_equal(res, targ)
@@ -615,7 +621,7 @@ class TestDetrend():
     @staticmethod
     def test_detrend_str_linear_0d_off():
         """Unit test for checking str_linear_0d. """
-        input = 5.5 # pylint: disable=W0622
+        input = 5.5  # pylint: disable=W0622
         targ = 0.
         res = plot.detrend(input, key='linear')
         assert_almost_equal(res, targ)
@@ -623,56 +629,56 @@ class TestDetrend():
     @staticmethod
     def test_detrend_detrend_linear_0d_off():
         """Unit test for linear 0d. """
-        input = 5.5 # pylint: disable=W0622
+        input = 5.5  # pylint: disable=W0622
         targ = 0.
         res = plot.detrend(input, key=plot.detrend_linear)
         assert_almost_equal(res, targ)
 
     def test_detrend_linear_1d_off(self):
         """Unit test for linear 1d. """
-        input = self.sig_off # pylint: disable=W0622
+        input = self.sig_off  # pylint: disable=W0622
         targ = self.sig_zeros
         res = plot.detrend_linear(input)
         assert_allclose(res, targ, atol=self.atol)
 
     def test_detrend_linear_1d_slope(self):
         """Unit test for 1d slope. """
-        input = self.sig_slope # pylint: disable=W0622
+        input = self.sig_slope  # pylint: disable=W0622
         targ = self.sig_zeros
         res = plot.detrend_linear(input)
         assert_allclose(res, targ, atol=self.atol)
 
     def test_detrend_linear_1d_slope_off(self):
         """Unit test for 1d slope off. """
-        input = self.sig_slope + self.sig_off # pylint: disable=W0622
+        input = self.sig_slope + self.sig_off  # pylint: disable=W0622
         targ = self.sig_zeros
         res = plot.detrend_linear(input)
         assert_allclose(res, targ, atol=self.atol)
 
     def test_detrend_str_linear_1d_slope_off(self):
         """Unit test for 1d slope off. """
-        input = self.sig_slope + self.sig_off # pylint: disable=W0622
+        input = self.sig_slope + self.sig_off  # pylint: disable=W0622
         targ = self.sig_zeros
         res = plot.detrend(input, key='linear')
         assert_allclose(res, targ, atol=self.atol)
 
     def test_detrend_detrend_linear_1d_slope_off(self):
         """Unit test for linear 1d slope off. """
-        input = self.sig_slope + self.sig_off # pylint: disable=W0622
+        input = self.sig_slope + self.sig_off  # pylint: disable=W0622
         targ = self.sig_zeros
         res = plot.detrend(input, key=plot.detrend_linear)
         assert_allclose(res, targ, atol=self.atol)
 
     def test_detrend_linear_1d_slope_off_list(self):
         """Unit test for 1d slope off list. """
-        input = self.sig_slope + self.sig_off # pylint: disable=W0622
+        input = self.sig_slope + self.sig_off  # pylint: disable=W0622
         targ = self.sig_zeros
         res = plot.detrend_linear(input.tolist())
         assert_allclose(res, targ, atol=self.atol)
 
     def test_detrend_linear_2d_value_error(self):
         """Unit test that checks if a value error is thrown for linear 2d functions.  """
-        input = self.sig_slope[np.newaxis] # pylint: disable=W0622
+        input = self.sig_slope[np.newaxis]  # pylint: disable=W0622
         with pytest.raises(ValueError):
             plot.detrend_linear(input)
 
@@ -684,7 +690,7 @@ class TestDetrend():
         arrt = [self.sig_zeros,
                 self.sig_zeros,
                 self.sig_zeros]
-        input = np.vstack(arri).T # pylint: disable=W0622
+        input = np.vstack(arri).T  # pylint: disable=W0622
         targ = np.vstack(arrt).T
         res = plot.detrend(input, key='linear', axis=0)
         assert_allclose(res, targ, atol=self.atol)
@@ -697,7 +703,7 @@ class TestDetrend():
         arrt = [self.sig_zeros,
                 self.sig_zeros,
                 self.sig_zeros]
-        input = np.vstack(arri).T # pylint: disable=W0622
+        input = np.vstack(arri).T  # pylint: disable=W0622
         targ = np.vstack(arrt).T
         res = plot.detrend(input, key=plot.detrend_linear, axis=0)
         assert_allclose(res, targ, atol=self.atol)
@@ -710,7 +716,7 @@ class TestDetrend():
         arrt = [self.sig_zeros,
                 self.sig_zeros,
                 self.sig_zeros]
-        input = np.vstack(arri) # pylint: disable=W0622
+        input = np.vstack(arri)  # pylint: disable=W0622
         targ = np.vstack(arrt)
         res = plot.detrend(input, key='linear', axis=1)
         assert_allclose(res, targ, atol=self.atol)
@@ -723,10 +729,11 @@ class TestDetrend():
         arrt = [self.sig_zeros,
                 self.sig_zeros,
                 self.sig_zeros]
-        input = np.vstack(arri) # pylint: disable=W0622
+        input = np.vstack(arri)  # pylint: disable=W0622
         targ = np.vstack(arrt)
         res = plot.detrend(input, key=plot.detrend_linear, axis=1)
         assert_allclose(res, targ, atol=self.atol)
+
 
 if __name__ == '__main__':
     unittest.main()
