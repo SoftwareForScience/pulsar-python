@@ -370,8 +370,6 @@ def apply_window(samples, window, axis=0, return_window=None):
     else:
         window_vals = window(np.ones(xshapetarg, dtype=samples.dtype))
 
-    # window_vals = window(np.ones(xshapetarg, dtype=samples.dtype))
-
     if samples.ndim == 1:
         if return_window: # pylint: disable-msg=R1705
             return window_vals * samples, window_vals
