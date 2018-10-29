@@ -4,9 +4,5 @@ __pycache__
 venv
 *.fil
 *.pyc
-<<<<<<< HEAD
 .coverage
 .pytest_cache/
-=======
-.pytest_cache
->>>>>>> 474106de002cd43b8e4b590d6aa4a609c4da4bf9
