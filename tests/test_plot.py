@@ -184,6 +184,14 @@ class TestDetrend():
         self.atol = 1e-08  # pylint: disable=W0201
 
     @staticmethod
+    def test_detrend_none():
+        """Test if a detrend function can have a key of None. """
+        input = 0. # pylint: disable=W0622
+        detrend_none = plot.detrend(input, 'none')
+
+        assert detrend_none == input
+
+    @staticmethod
     def test_detrend_none_0dimension_zeros():
         """A 0D zeros shall equal targ. """
         input = 0.  # pylint: disable=W0622
