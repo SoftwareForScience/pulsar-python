@@ -42,7 +42,7 @@ class TestFft(unittest.TestCase):
 
     def test_fft_buildup(self):
         """
-            Test for FFT_vectorized function with recursive build-up 
+            Test for FFT_vectorized function with recursive build-up
         """
         test_input = np.random.random(1024)
         self.assertAlmostEqual(fft1(test_input).all(), fourier.fft_vectorized(test_input).all())
