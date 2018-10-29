@@ -2,9 +2,9 @@
     plot.py unit tests
 """
 import unittest
-import pytest # pylint: disable-msg=E0401
 import numpy as np
 from numpy.testing import assert_array_equal, assert_almost_equal, assert_allclose
+import pytest # pylint: disable-msg=E0401
 from context import plot # pylint: disable-msg=E0611
 
 class TestWindowHanning(unittest.TestCase):
@@ -18,16 +18,18 @@ class TestWindowHanning(unittest.TestCase):
     sig_ones = np.ones(n)
 
     Fs = 100
-    
+
     def test_window_hanning_rand(self):
+        """ Tests the hanning_window function with random numbers """
         targ = np.hanning(len(self.sig_rand)) * self.sig_rand
         res = plot.window_hanning(self.sig_rand)
-        self.assertAlmostEquals(targ.all(), res.all())
-    
+        self.assertAlmostEqual(targ.all(), res.all())
+
     def test_window_hanning_ones(self):
+        """ Tests the hanning_window function with ones """
         targ = np.hanning(len(self.sig_ones))
         res = plot.window_hanning(self.sig_ones)
-        self.assertAlmostEquals(targ.all(), res.all(), atol=1e-06)
+        self.assertAlmostEqual(targ.all(), res.all())
 
 class TestStride():
     """
