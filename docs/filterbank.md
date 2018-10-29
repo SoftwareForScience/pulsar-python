@@ -25,7 +25,7 @@ Header data contains the following:
 * tsamp
 * nifs
 ```
-freq_range = fch1 + (foff * nchans + fch1)
+freq_range = fch1 + (foff * nchans + fch1)  
 time_range = tstart + (tsamp/24/60/60)
 
 freq_range is a tuple with a frequency start and a frequency stop  
