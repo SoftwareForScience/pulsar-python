@@ -11,6 +11,7 @@ filterbank.header
 ```
 
 Header data contains the following:
+
 | Variable | Description |
 | --- | --- |
 | source_name | name of filterbank file |
@@ -18,11 +19,11 @@ Header data contains the following:
 | DM | dispersion measure of pulsar |
 | machine_id | id of machine used to receive signal data |
 | telescope_id | id of telescope used to receive signal data |
-| data_type | type of file |
+| data_type | type of file `filterbank, time series` |
 | fch1 | center frequency of first filterbank channel (MHz) |
 | foff | filterbank channel bandwidth (MHz) |
 | nchans | number of filterbank channels |
-| nbits | number of bits per time sample |
+| nbits | number of bits per time sample `8, 16 or 32` |
 | tstart | timestamp of first sample (MJD) |
 | nifs | number of seperate IF channels |
 

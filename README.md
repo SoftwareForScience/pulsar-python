@@ -14,7 +14,7 @@ Creating a free and open source framework that contains the generic algorithms a
     * numpy
     * python 3.6
 
-# Documentation
+## Documentation
 1. [Getting started](docs/gettingstarted.md)
     1. [Example filterbank files](docs/gettingstarted.md#11-example-filterbank-files)
     2. [Import](docs/gettingstarted.md#12-import)
