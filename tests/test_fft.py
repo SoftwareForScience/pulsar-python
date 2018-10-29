@@ -40,6 +40,14 @@ class TestFft(unittest.TestCase):
         self.assertAlmostEqual(fft1(test_input).all(), fourier.fft_vectorized(test_input).all())
 
 
+    def test_fft_buildup(self):
+        """
+            Test for FFT_vectorized function with recursive build-up 
+        """
+        test_input = np.random.random(1024)
+        self.assertAlmostEqual(fft1(test_input).all(), fourier.fft_vectorized(test_input).all())
+
+
     def test_wrong_array_size(self):
         """
             Tests for correct input for the FFT_vectorized function.
