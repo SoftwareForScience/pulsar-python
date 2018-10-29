@@ -7,32 +7,6 @@ from numpy.testing import assert_array_equal, assert_almost_equal, assert_allclo
 import pytest  # pylint: disable-msg=E0401
 from .context import plot  # pylint: disable-msg=E0611
 
-
-# class TestWindowHanning(unittest.TestCase):
-#     """
-#         Testclass for testing the plotting functions
-#     """
-#     np.random.seed(0)
-#     n = 1000
-#
-#     sig_rand = np.random.standard_normal(n) + 100.
-#     sig_ones = np.ones(n)
-#
-#     Fs = 100
-#
-#     def test_window_hanning_rand(self):
-#         """ Tests the hanning_window function with random numbers """
-#         targ = np.hanning(len(self.sig_rand)) * self.sig_rand
-#         res = plot.window_hanning(self.sig_rand)
-#         self.assertAlmostEqual(targ.all(), res.all())
-#
-#     def test_window_hanning_ones(self):
-#         """ Tests the hanning_window function with ones """
-#         targ = np.hanning(len(self.sig_ones))
-#         res = plot.window_hanning(self.sig_ones)
-#         self.assertAlmostEqual(targ.all(), res.all())
-
-
 class TestStride:
     """
         Testclass for testing the stride functions.
