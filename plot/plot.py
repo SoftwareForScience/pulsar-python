@@ -362,14 +362,13 @@ def apply_window(samples, window, axis=0, return_window=None):
     xshape = list(samples.shape)
     xshapetarg = xshape.pop(axis)
 
-    # if cbook.iterable(window):
-    #     print("CBOOK MANE")
-    #     if len(window) != xshapetarg:
-    #         raise ValueError('The len(window) must be the same as the shape '
-    #                          'of samples for the chosen axis')
-    #     window_vals = window
-    # else:
-    window_vals = window(np.ones(xshapetarg, dtype=samples.dtype))
+    if isinstance(window, np.ndarray):
+        if len(window) != xshapetarg:
+            raise ValueError('The len(window) must be the same as the shape '
+                             'of x for the chosen axis')
+        window_vals = window
+    else:
+        window_vals = window(np.ones(xshapetarg, dtype=samples.dtype))
 
     if samples.ndim == 1:
         if return_window: # pylint: disable-msg=R1705
