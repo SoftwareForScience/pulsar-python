@@ -20,6 +20,48 @@ def window_hanning(window):
     '''
     return np.hanning(len(window))*window
 
+def next_power_of_2(val):
+    """
+        Return the next integer that is a power of two
+
+        Params
+        ------
+        val : int
+    """
+
+    return int(2**(np.log2(val) + 1))
+
+def npsd(samples, sampling_frequency, center_frequency):
+    """
+        Plot the power spectral density.
+    """
+    ## Define Parameters
+    # Length of signal
+    nsamples = len(samples)
+
+    # Number of FFT points
+    nfft = next_power_of_2(nsamples)
+
+    # Frequency plotting vector
+    freqs = sampling_frequency/2*(np.arange(-1, 1-2/nfft, 2/nfft, dtype=type(center_frequency)))
+    freqs = np.asarray(freqs) + center_frequency
+    ## Analysis
+
+    # analyze spectrum
+    indeces = np.arange(nfft/2, nfft-1, dtype=int)
+    power = np.fft.fftshift(fourier.fft_vectorized(samples, nfft))
+    power = np.abs(power)/np.sqrt(nsamples*sampling_frequency)
+
+    # Convert to dBm/Mz
+    power = 20*np.log10(power) + 30
+
+    freqs = [freqs[i] for i in indeces]
+    freqs = np.asarray(freqs)
+    power = [power[i] for i in indeces]
+
+    return freqs, power
+
+
 def psd(samples, nfft=None, sample_rate=None, window=window_hanning, noverlap=None,
         detrend_func=None, pad_to=None, scale_by_freq=None, sides=None):
     """

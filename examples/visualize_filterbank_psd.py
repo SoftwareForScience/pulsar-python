@@ -12,7 +12,7 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentfra
 PARENT_DIR = os.path.dirname(CURRENT_DIR)
 sys.path.insert(0, PARENT_DIR)
 
-from plot import psd
+from plot import npsd
 from filterbank.header import read_header
 from filterbank.filterbank import Filterbank
 
@@ -32,14 +32,7 @@ header = read_header('examples/pspm32.fil')
 center_freq = header[b'fch1'] + float(header[b'nchans']) * header[b'foff'] / 2.0
 
 # Get the powerlevels and the frequencies
-PXX, freqs = psd(samples, nfft=1024, sample_rate=80,
-                 scale_by_freq=True, sides='twosided')
-
-# Calculate the powerlevel dB's
-power_levels = 10 * np.log10(PXX/(80))
-
-# Add the center frequency to the frequencies so they match the actual frequencies
-freqs = freqs + center_freq
+freqs, power_levels = npsd(samples, sampling_frequency=80, center_frequency=center_freq)
 
 # Plot the PSD
 plt.grid(True)
