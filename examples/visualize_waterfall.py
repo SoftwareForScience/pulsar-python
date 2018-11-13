@@ -2,12 +2,6 @@ import os,sys,inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir)
-
-import matplotlib.animation as animation
-from matplotlib.mlab import psd
-import pylab as pyl
-import numpy as np
-import sys
 from rtlsdr import RtlSdr
 from plot import Waterfall
 
