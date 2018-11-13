@@ -9,6 +9,18 @@ from fourier import fourier
 # pylint: disable-msg=R0912
 
 
+# def psd_helper(samples, sampling_freq, center_freq):
+#     samples = np.asarray(samples)
+
+#     n_x = samples.shape[0]
+#     n_y = samples.shape[1]
+
+#     sample_size = n_x * n_y
+
+#     nx = n_x/2+1
+#     ny = n_y/2+1
+
+
 def window_hanning(window):
     '''
     Return window times the hanning window of len(window).
@@ -29,9 +41,16 @@ def next_power_of_2(val):
         val : int
     """
 
-    return int(2**(np.log2(val) + 1))
+    return int(2**(int(np.log2(val)) + 1))
 
-def npsd(samples, sampling_frequency, center_frequency):
+def is_power_of_2(val):
+    """
+        Checks wheters the value is a power of two
+    """
+    return (val != 0) and ((val & (val -1)) == 0)
+
+
+def psd(samples, sampling_frequency, center_frequency, nfft=None):
     """
         Plot the power spectral density.
     """
@@ -40,7 +59,16 @@ def npsd(samples, sampling_frequency, center_frequency):
     nsamples = len(samples)
 
     # Number of FFT points
-    nfft = next_power_of_2(nsamples)
+    if nfft is None:
+        nfft = next_power_of_2(nsamples)
+
+    if nfft is not is_power_of_2(nfft):
+        print("nfft is not a power of 2, using the next power of 2.")
+        print(next_power_of_2(nfft))
+        nfft = next_power_of_2(nfft)
+
+    if np.ndim(samples) > 1:
+        samples = samples.reshape((samples.shape[0]*samples.shape[1],))
 
     # Frequency plotting vector
     freqs = sampling_frequency/2*(np.arange(-1, 1-2/nfft, 2/nfft, dtype=type(center_frequency)))
@@ -48,22 +76,34 @@ def npsd(samples, sampling_frequency, center_frequency):
     ## Analysis
 
     # analyze spectrum
-    indeces = np.arange(nfft/2, nfft-1, dtype=int)
-    power = np.fft.fftshift(fourier.fft_vectorized(samples, nfft))
+    indeces = np.arange(nfft/2-1, nfft-1, dtype=int)
+    if np.ndim(samples) == 1:
+        power = fourier.fftshift(fourier.fft_vectorized(samples, nfft))
+        power = fourier.fftshift(power)
+    elif np.ndim(samples) == 2:
+        samples = samples.reshape((samples.shape[0]*samples.shape[1],))
+        power = np.asarray(fourier.fft_vectorized(samples))
+        print("pshape:", power.shape)
+        # power = fourier.fftshift(power)
+    else:
+        raise ValueError("Only 1 and 2 dimensional sample arrays are supported right now.")
+
     power = np.abs(power)/np.sqrt(nsamples*sampling_frequency)
 
+
+    print(power.shape)
+    print(indeces.shape)
     # Convert to dBm/Mz
-    power = 20*np.log10(power) + 30
+    power = 10*np.log10(power/center_frequency)
 
     freqs = [freqs[i] for i in indeces]
-    freqs = np.asarray(freqs)
     power = [power[i] for i in indeces]
 
     return freqs, power
 
 
-def psd(samples, nfft=None, sample_rate=None, window=window_hanning, noverlap=None,
-        detrend_func=None, pad_to=None, scale_by_freq=None, sides=None):
+def opsd(samples, nfft=None, sample_rate=None, window=window_hanning, noverlap=None,
+         detrend_func=None, pad_to=None, scale_by_freq=None, sides=None):
     """
         Plot the power spectral density.
     """

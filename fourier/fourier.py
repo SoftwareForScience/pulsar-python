@@ -4,6 +4,16 @@
 
 import numpy as np
 
+def fft2(input_data, nfft=None, axis=-1):
+    """
+    2d fft
+    """
+    input_data = np.asarray(input_data)
+
+    result = [fft_vectorized(row, nfft, axis) for row in input_data]
+
+    return result
+
 
 def dft_slow(input_data):
     """
@@ -55,6 +65,7 @@ def fft_vectorized(input_data, nfft=None, axis=-1):
 
     if nfft is None:
         nfft = input_data.shape[axis]
+
 
     if input_data.shape[axis] != nfft:
         input_shape = list(input_data.shape)
@@ -112,9 +123,9 @@ def fft_freq(window_len, spacing=1.0):
 
     Parameters
     ----------
-    n : int
+    window_len : int
         Window length.
-    d : scalar, optional
+    spacing : scalar, optional
         Sample spacing (inverse of the sampling rate). Defaults to 1.
 
     Returns
@@ -141,3 +152,20 @@ def fft_freq(window_len, spacing=1.0):
     window_p2 = np.arange(-(window_len//2), 0, dtype=int)
     results[window_half:] = window_p2
     return results * val
+
+def fftshift(samples, axes=None):
+    """
+    Shift the zero-frequency component to the center of the spectrum.
+    """
+
+    samples = np.asarray(samples)
+
+    if axes is None:
+        axes = tuple(range(samples.ndim))
+        shift = [dim // 2 for dim in samples.shape]
+    elif isinstance(axes, int):
+        shift = samples.shape[axes] // 2
+    else:
+        shift = [samples.shape[ax] // 2 for ax in axes]
+
+    return np.roll(samples, shift, axes)
