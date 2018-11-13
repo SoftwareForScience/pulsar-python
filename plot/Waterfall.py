@@ -1,13 +1,13 @@
 from __future__ import division
 import matplotlib.animation as animation
-from matplotlib.mlab import psd
+from plot import opsd
 import pylab as pyl
 import numpy as np
 import sys
 from rtlsdr import RtlSdr
 
 class Waterfall(object):
-    NFFT                    = 1024*4
+    NFFT                    = 1024
     num_samples_per_scan    = NFFT*16
     num_buffered_sweeps     = 100
     num_scans_per_sweep     = 1
@@ -15,7 +15,7 @@ class Waterfall(object):
     freq_inc_fine           = 0.1e6
     gain_inc                = 5
     shift_key_down          = False
-    
+    keyboard_buffer         = []
     def __init__(self, sdr=None, fig=None, NFFT=None, num_samples_per_scan=None, num_buffered_sweeps=None, num_scans_per_sweep=None, freq_inc_coarse=None, freq_inc_fine=None, gain_inc=None):
         """
             Setup waterfall class
@@ -69,10 +69,10 @@ class Waterfall(object):
 
             # estimate PSD for one scan
             samples = self.sdr.read_samples(self.num_samples_per_scan)
-            psd_scan, f = psd(samples, NFFT=self.NFFT)
- 
-            self.image_buffer[0, start_ind: start_ind+self.NFFT] = 10*np.log10(psd_scan)
-
+            psd_scan, f, _ = opsd(samples, sample_rate=2, nfft=self.NFFT, sides='twosided')
+            # psd_scan, f = psd(samples, NFFT=self.NFFT)
+            self.image_buffer[0, start_ind: start_ind+self.NFFT] = psd_scan #np.log10(psd_scan)
+            # print(self.image_buffer)
         # plot entire sweep
         self.image.set_array(self.image_buffer)
 
@@ -106,6 +106,7 @@ class Waterfall(object):
             self.update_plot_labels()
         elif event.key == 'enter':
             # see if valid frequency was entered, then change center frequency
+
             try:
                 # join individual key presses into a string
                 input = ''.join(self.keyboard_buffer)
@@ -120,6 +121,7 @@ class Waterfall(object):
                 pass
 
             self.keyboard_buffer = []
+
         else:
             self.keyboard_buffer.append(event.key)
         

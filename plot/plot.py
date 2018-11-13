@@ -63,8 +63,8 @@ def psd(samples, sampling_frequency, center_frequency, nfft=None):
         nfft = next_power_of_2(nsamples)
 
     if nfft is not is_power_of_2(nfft):
-        print("nfft is not a power of 2, using the next power of 2.")
-        print(next_power_of_2(nfft))
+        # print("nfft is not a power of 2, using the next power of 2.")
+        # print(next_power_of_2(nfft))
         nfft = next_power_of_2(nfft)
 
     if np.ndim(samples) > 1:
@@ -79,7 +79,7 @@ def psd(samples, sampling_frequency, center_frequency, nfft=None):
     indeces = np.arange(nfft/2-1, nfft-1, dtype=int)
     if np.ndim(samples) == 1:
         power = fourier.fftshift(fourier.fft_vectorized(samples, nfft))
-        power = fourier.fftshift(power)
+        # power = fourier.fftshift(power)
     elif np.ndim(samples) == 2:
         samples = samples.reshape((samples.shape[0]*samples.shape[1],))
         power = np.asarray(fourier.fft_vectorized(samples))
@@ -147,7 +147,7 @@ def opsd(samples, nfft=None, sample_rate=None, window=window_hanning, noverlap=N
     result, window_vals = apply_window(result, window, axis=0,
                                        return_window=True)
 
-    result = fourier.fft_vectorized(samples)
+    result = fourier.fft_vectorized(samples, nfft=nfft)
     freqs = fourier.fft_freq(pad_to, 1/sample_rate)[:num_freqs]
 
     result = np.conj(result) * result
@@ -166,7 +166,7 @@ def opsd(samples, nfft=None, sample_rate=None, window=window_hanning, noverlap=N
     else:
         result /= np.abs(window_vals).sum()**2
 
-    # time = np.arange(nfft/2, len(samples) - nfft/2 + 1, nfft - noverlap)/sample_rate
+    time = np.arange(nfft/2, len(samples) - nfft/2 + 1, nfft - noverlap)/sample_rate
 
     if sides == 'twosided':
         freqs = np.concatenate((freqs[freqcenter:], freqs[:freqcenter]))
@@ -176,7 +176,10 @@ def opsd(samples, nfft=None, sample_rate=None, window=window_hanning, noverlap=N
     elif not pad_to % 2:
         freqs[-1] *= -1
 
-    return result, freqs #, time
+    result = 10*np.log10(result/freqcenter) + 50
+    # freqs = (freqs + freqcenter)/1e5
+    # print(freqs)
+    return result, freqs, time
 
 
 
