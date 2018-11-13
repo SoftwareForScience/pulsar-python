@@ -90,7 +90,6 @@ def psd(samples, sampling_frequency, center_frequency, nfft=None):
 
     power = np.abs(power)/np.sqrt(nsamples*sampling_frequency)
 
-
     print(power.shape)
     print(indeces.shape)
     # Convert to dBm/Mz
