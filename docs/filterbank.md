@@ -39,7 +39,6 @@ The attributes time_range and freq_range can be passed as parameters to select a
 filterbank = Filterbank(<PATH TO FILTERBANK FILE>, freq_range, time_range, stream)
 ```
 
-
 ## 2.4 Select a range of data from the filterbank file
 The select_data method can be used to retrieve data from the Filterbank object.
 The user has the option to give a `time` and/or `frequency` range to select a subset from the entire dataset.
@@ -50,8 +49,7 @@ The `select_data` method returns an array of all different channels/frequencies 
 
 The matrix contains for each time sample an array which has the intensity per channel/frequency.
 
-## 2.5 Reading filterbank as stream
-
+## 2.5 Read filterbank as stream
 When reading the filterbank file as a stream, the user should set the `stream`-parameter to `True` when initializing the filterbank object.
 
 Each time the user calls the `next_row` method, it will retrieve an array with intensitiy per frequency for a new time sample from the filterbank file.
