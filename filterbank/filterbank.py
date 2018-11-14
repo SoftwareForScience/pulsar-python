@@ -43,30 +43,33 @@ class Filterbank:
         self.fil = open(self.filename, 'rb')
         self.fil.seek(self.idx_data)
         # find possible time range
-        self.ii_start, self.n_ints = self.setup_time(time_range)
+        self.ii_start, self.n_samples = self.setup_time(time_range)
         # search for start of data
         self.fil.seek(int(self.ii_start * self.n_bytes * self.n_ifs * self.n_chans), 1)
         # find possible channels
         self.i_0, self.i_1 = self.setup_chans(freq_range)
         # amount of channels
         self.n_chans_selected = self.freqs.shape[0]
+        print(self.n_chans_selected)
         # read at once
         if not stream:
-            self.read_filterbank(freq_range, time_range)
+            self.read_filterbank()
 
 
-    def read_filterbank(self, freq_range=None, time_range=None):
+    def read_filterbank(self):
         """
             Read filterbank file and transform to tuple of 3 matrices
         """
         # set shape of data
-        self.data = np.zeros((self.n_ints, self.n_ifs, self.n_chans_selected), dtype=self.dd_type)
+        self.data = np.zeros((self.n_samples, self.n_ifs, self.n_chans_selected),
+                             dtype=self.dd_type)
         # read ifs per frequencies
-        for i_i in range(self.n_ints):
+        for i_i in range(self.n_samples):
             for j_j in range(self.n_ifs):
                 self.fil.seek(self.n_bytes * self.i_0, 1)
                 # add to matrix
-                self.data[i_i, j_j] = np.fromfile(self.fil, count=self.n_chans_selected, dtype=self.dd_type)
+                self.data[i_i, j_j] = np.fromfile(self.fil, count=self.n_chans_selected,
+                                                  dtype=self.dd_type)
                 # skip bytes till start of next chunk
                 self.fil.seek(self.n_bytes * (self.n_chans - self.i_1), 1)
 
@@ -119,18 +122,18 @@ class Filterbank:
         t_0 = self.header[b'tstart']
         # calculate amount of bytes in file without header
         n_bytes_data = os.path.getsize(self.filename) - self.idx_data
-        n_ints_data = int(n_bytes_data / (self.n_bytes * self.n_chans * self.n_ifs))
-        ii_start, ii_stop = 0, n_ints_data
+        # calculate sample size
+        ii_start, ii_stop = 0, int(n_bytes_data / (self.n_bytes * self.n_chans * self.n_ifs))
         # time range is specified
         if time_range:
             if time_range[0]:
                 ii_start = time_range[0]
             if time_range[1]:
                 ii_stop = time_range[1]
-        n_ints = ii_stop - ii_start
+        n_samples = ii_stop - ii_start
         # calculate all possible times
-        self.timestamps = np.arange(0, n_ints) * t_delt / 24. / 60. / 60. + t_0
-        return ii_start, n_ints
+        self.timestamps = np.arange(0, n_samples) * t_delt / 24. / 60. / 60. + t_0
+        return ii_start, n_samples
 
 
     def setup_chans(self, freq_range=None):
