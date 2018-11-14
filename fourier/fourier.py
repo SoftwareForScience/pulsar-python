@@ -69,12 +69,11 @@ def fft_vectorized(input_data, nfft=None, axis=-1):
 
     if input_data.shape[axis] != nfft:
         input_shape = list(input_data.shape)
+        index = [slice(None)]*len(input_shape)
         if input_shape[axis] > nfft:
-            index = [slice(None)]*len(input_shape)
             index[axis] = slice(0, nfft)
             input_data = input_data[tuple(index)]
         else:
-            index = [slice(None)]*len(input_shape)
             index[axis] = slice(0, input_shape[axis])
             input_shape[axis] = nfft
             zeroes = np.zeros(input_shape, input_data.dtype.char)

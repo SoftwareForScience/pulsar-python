@@ -63,8 +63,6 @@ def psd(samples, sampling_frequency, center_frequency, nfft=None):
         nfft = next_power_of_2(nsamples)
 
     if nfft is not is_power_of_2(nfft):
-        print("nfft is not a power of 2, using the next power of 2.")
-        print(next_power_of_2(nfft))
         nfft = next_power_of_2(nfft)
 
     if np.ndim(samples) > 1:
@@ -83,15 +81,13 @@ def psd(samples, sampling_frequency, center_frequency, nfft=None):
     elif np.ndim(samples) == 2:
         samples = samples.reshape((samples.shape[0]*samples.shape[1],))
         power = np.asarray(fourier.fft_vectorized(samples))
-        print("pshape:", power.shape)
         # power = fourier.fftshift(power)
     else:
         raise ValueError("Only 1 and 2 dimensional sample arrays are supported right now.")
 
     power = np.abs(power)/np.sqrt(nsamples*sampling_frequency)
 
-    print(power.shape)
-    print(indeces.shape)
+
     # Convert to dBm/Mz
     power = 10*np.log10(power/center_frequency)
 
