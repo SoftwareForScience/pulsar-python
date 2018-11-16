@@ -24,7 +24,6 @@ Creating a free and open source framework that contains the generic algorithms a
     3. [Read filterbank file](docs/filterbank.md#23-read-filterbank-file)
     4. [Select a range of data from the filterbank file](docs/filterbank.md#24-select-a-range-of-data-from-the-filterbank-file)
     5. [Read filterbank file as stream](docs/filterbank.md#25-read-filterbank-file-as-stream)
-
 3. [Fourier transformation tutorial](docs/fourier.md)
     1. [DFT](docs/fourier.md#31-dft)
         1. [Parameters](docs/fourier.md#311-parameters)

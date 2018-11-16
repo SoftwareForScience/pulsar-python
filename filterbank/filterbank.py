@@ -50,7 +50,6 @@ class Filterbank:
         self.i_0, self.i_1 = self.setup_chans(freq_range)
         # amount of channels
         self.n_chans_selected = self.freqs.shape[0]
-        print(self.n_chans_selected)
         # read at once
         if not stream:
             self.read_filterbank()
@@ -58,12 +57,14 @@ class Filterbank:
 
     def read_filterbank(self):
         """
-            Read filterbank file and transform to tuple of 3 matrices
+            Read filterbank file and transform to tuple of 3 matrices:
+            including the sample amount, number of intermediate channels
+            and the amount of selected frequencies/channels
         """
         # set shape of data
         self.data = np.zeros((self.n_samples, self.n_ifs, self.n_chans_selected),
                              dtype=self.dd_type)
-        # read ifs per frequencies
+        # read for each time sample the intensity per frequency
         for i_i in range(self.n_samples):
             for j_j in range(self.n_ifs):
                 self.fil.seek(self.n_bytes * self.i_0, 1)
