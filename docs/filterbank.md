@@ -53,6 +53,7 @@ The matrix contains for each time sample an array which has the intensity per ch
 When reading the filterbank file as a stream, the user should set the `stream`-parameter to `True` when initializing the filterbank object.
 
 Each time the user calls the `next_row` method, it will retrieve an array with intensitiy per frequency for a new time sample from the filterbank file.
+When the last iteration of the filterbank is reached, the new_row method will return `True`
 
 ```
 filterbank.next_row()

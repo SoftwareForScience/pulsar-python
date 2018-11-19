@@ -53,6 +53,8 @@ class Filterbank:
         # read at once
         if not stream:
             self.read_filterbank()
+        else:
+            self.stream_iter = 0
 
 
     def read_filterbank(self):
@@ -78,12 +80,19 @@ class Filterbank:
     def next_row(self):
         """
             Read filterbank file per row
+
+            returns True if EOF
         """
-        self.fil.seek(self.n_bytes * self.i_0, 1)
-        # read row of data
-        data = np.fromfile(self.fil, count=self.n_chans_selected, dtype=self.dd_type)
-        # skip bytes till start of next chunk
-        self.fil.seek(self.n_bytes * (self.n_chans - self.i_1), 1)
+        if self.stream_iter < (self.n_samples * self.n_ifs):
+            self.stream_iter += 1
+            # skip bytes
+            self.fil.seek(self.n_bytes * self.i_0, 1)
+            # read row of data
+            data = np.fromfile(self.fil, count=self.n_chans_selected, dtype=self.dd_type)
+            # skip bytes till start of next chunk
+            self.fil.seek(self.n_bytes * (self.n_chans - self.i_1), 1)
+        else:
+            data = True
         return data
 
 
