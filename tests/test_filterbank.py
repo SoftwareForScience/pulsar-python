@@ -109,7 +109,7 @@ class TestFilterbank(unittest.TestCase):
         filename = './pspm32.fil'
         fil = filterbank.Filterbank(filename)
         # read n rows till method returns Boolean
-        while not isinstance(fil.next_n_rows(n_rows)):
+        while not isinstance(fil.next_n_rows(n_rows), bool):
             pass
         self.assertTrue(fil.next_n_rows(n_rows))
 
