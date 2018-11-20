@@ -4,6 +4,16 @@
 
 import numpy as np
 
+def fft2(input_data, nfft=None, axis=-1):
+    """
+    2d fft
+    """
+    input_data = np.asarray(input_data)
+
+    result = [fft_vectorized(row, nfft, axis) for row in input_data]
+
+    return result
+
 
 def dft_slow(input_data):
     """
@@ -27,7 +37,9 @@ def dft_slow(input_data):
     return np.dot(exp_data, input_data)
 
 
-def fft_vectorized(input_data):
+# pylint: disable=W0511
+# TODO: support multidimensional fft
+def fft_vectorized(input_data, nfft=None, axis=-1):
     """
         A vectorized, non-recursive version of the Cooley-Tukey FFT
 
@@ -36,16 +48,42 @@ def fft_vectorized(input_data):
         input_data : ndarray
             Array of length `n` containing the values to be transformed.
 
+        nfft : int (Optional)
+            Integer describing the number of datapoints in the output. If
+            nfft is larger than the input data size, this input data will be padded with zeroes.
+            If it is smaller, the input data will be cropped to length `nfft`.
+
+        axis : int (Optional, default = -1)
+            Integer describing on what axis of the matrix the fft should be executed.
+            This parameter is not yet fully used, will be in the future.
         Returns
         -------
         ndarray
             Array of length `n` containing the transformed values.
     """
     input_data = np.asarray(input_data)
+
+    if nfft is None:
+        nfft = input_data.shape[axis]
+
+
+    if input_data.shape[axis] != nfft:
+        input_shape = list(input_data.shape)
+        index = [slice(None)]*len(input_shape)
+        if input_shape[axis] > nfft:
+            index[axis] = slice(0, nfft)
+            input_data = input_data[tuple(index)]
+        else:
+            index[axis] = slice(0, input_shape[axis])
+            input_shape[axis] = nfft
+            zeroes = np.zeros(input_shape, input_data.dtype.char)
+            zeroes[tuple(index)] = input_data
+            input_data = zeroes
+
     data_length = input_data.shape[0]
 
     if np.log2(data_length) % 1 > 0:
-        raise ValueError("size of input data must be a power of 2")
+        raise ValueError("Size of input data must be a power of 2")
 
     # N_min here is equivalent to the stopping condition above,
     # and should be a power of 2
@@ -84,9 +122,9 @@ def fft_freq(window_len, spacing=1.0):
 
     Parameters
     ----------
-    n : int
+    window_len : int
         Window length.
-    d : scalar, optional
+    spacing : scalar, optional
         Sample spacing (inverse of the sampling rate). Defaults to 1.
 
     Returns
@@ -113,3 +151,20 @@ def fft_freq(window_len, spacing=1.0):
     window_p2 = np.arange(-(window_len//2), 0, dtype=int)
     results[window_half:] = window_p2
     return results * val
+
+def fftshift(samples, axes=None):
+    """
+    Shift the zero-frequency component to the center of the spectrum.
+    """
+
+    samples = np.asarray(samples)
+
+    if axes is None:
+        axes = tuple(range(samples.ndim))
+        shift = [dim // 2 for dim in samples.shape]
+    elif isinstance(axes, int):
+        shift = samples.shape[axes] // 2
+    else:
+        shift = [samples.shape[ax] // 2 for ax in axes]
+
+    return np.roll(samples, shift, axes)
