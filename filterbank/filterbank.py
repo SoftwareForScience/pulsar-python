@@ -103,7 +103,7 @@ class Filterbank:
         if self.stream_iter < (self.n_samples * self.n_ifs):
             self.stream_iter += n_rows
             # more rows requested than available
-            if self.stream_iter >= (self.n_samples * self.n_ifs):
+            if self.stream_iter > (self.n_samples * self.n_ifs):
                 n_rows = self.stream_iter - self.n_samples * self.n_ifs
             # init array of n rows
             data = np.zeros((n_rows, self.n_chans_selected), dtype=self.dd_type)
