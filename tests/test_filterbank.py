@@ -85,7 +85,7 @@ class TestFilterbank(unittest.TestCase):
         filename = './pspm32.fil'
         fil = filterbank.Filterbank(filename)
         # read rows till method returns Boolean
-        while type(fil.next_row()) != bool:
+        while not isinstance(fil.next_row(), bool):
             pass
         self.assertTrue(fil.next_row())
 
@@ -98,7 +98,7 @@ class TestFilterbank(unittest.TestCase):
         filename = './pspm32.fil'
         fil = filterbank.Filterbank(filename)
         data = fil.next_n_rows(n_rows)
-        self.assertEquals(len(data), n_rows)
+        self.assertEqual(len(data), n_rows)
 
     def test_filterbank_n_rows_empty(self):
         """
@@ -109,7 +109,7 @@ class TestFilterbank(unittest.TestCase):
         filename = './pspm32.fil'
         fil = filterbank.Filterbank(filename)
         # read n rows till method returns Boolean
-        while type(fil.next_n_rows(n_rows)) != bool:
+        while not isinstance(fil.next_n_rows(n_rows)):
             pass
         self.assertTrue(fil.next_n_rows(n_rows))
 
