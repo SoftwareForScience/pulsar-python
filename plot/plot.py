@@ -6,7 +6,6 @@ from fourier import fourier
 
 # pylint: disable-msg=R0913
 # pylint: disable-msg=R0914
-# pylint: disable-msg=R0912
 
 
 # def psd_helper(samples, sampling_freq, center_freq):
@@ -40,7 +39,6 @@ def next_power_of_2(val):
         ------
         val : int
     """
-
     return int(2**(int(np.log2(val)) + 1))
 
 def is_power_of_2(val):
@@ -54,7 +52,6 @@ def psd(samples, sampling_frequency, center_frequency, nfft=None):
     """
         Plot the power spectral density.
     """
-    ## Define Parameters
     # Length of signal
     nsamples = len(samples)
 
@@ -81,12 +78,10 @@ def psd(samples, sampling_frequency, center_frequency, nfft=None):
     elif np.ndim(samples) == 2:
         samples = samples.reshape((samples.shape[0]*samples.shape[1],))
         power = np.asarray(fourier.fft_vectorized(samples))
-        # power = fourier.fftshift(power)
     else:
         raise ValueError("Only 1 and 2 dimensional sample arrays are supported right now.")
 
     power = np.abs(power)/np.sqrt(nsamples*sampling_frequency)
-
 
     # Convert to dBm/Mz
     power = 10*np.log10(power/center_frequency)
@@ -97,26 +92,11 @@ def psd(samples, sampling_frequency, center_frequency, nfft=None):
     return freqs, power
 
 
-def opsd(samples, nfft=None, sample_rate=None, window=window_hanning, noverlap=None,
-         detrend_func=None, pad_to=None, scale_by_freq=None, sides=None):
+def opsd(samples, nfft=256, sample_rate=2, window=window_hanning, noverlap=0,
+         detrend_func=None, pad_to=256, scale_by_freq=True, sides=None):
     """
         Plot the power spectral density.
     """
-    if sample_rate is None:
-        sample_rate = 2
-
-    if nfft is None:
-        nfft = 256
-
-    if pad_to is None:
-        pad_to = nfft
-
-    if noverlap is None:
-        noverlap = 0
-
-    if scale_by_freq is None:
-        scale_by_freq = True
-
     samples = np.asarray(samples)
 
     if len(samples) < nfft:
@@ -126,17 +106,17 @@ def opsd(samples, nfft=None, sample_rate=None, window=window_hanning, noverlap=N
 
     if sides == 'twosided':
         num_freqs = pad_to
+        scaling_factor = 1.
         if pad_to % 2:
             freqcenter = (pad_to - 1)//2 + 1
         else:
             freqcenter = pad_to//2
-        scaling_factor = 1.
     elif sides == 'onesided':
+        scaling_factor = 2.
         if pad_to % 2:
             num_freqs = (pad_to + 1)//2
         else:
             num_freqs = pad_to//2 + 1
-        scaling_factor = 2.
 
     result = stride_windows(samples, nfft, noverlap, axis=0)
     result = detrend(result, detrend_func, axis=0)
@@ -148,11 +128,10 @@ def opsd(samples, nfft=None, sample_rate=None, window=window_hanning, noverlap=N
 
     result = np.conj(result) * result
 
+    slc_stop = None
     if not nfft % 2:
-        slc = slice(1, -1, None)
-
-    else:
-        slc = slice(1, None, None)
+        slc_stop = -1
+    slc = slice(1, slc_stop, None)
 
     result[slc] *= scaling_factor
 
@@ -168,12 +147,10 @@ def opsd(samples, nfft=None, sample_rate=None, window=window_hanning, noverlap=N
         freqs = np.concatenate((freqs[freqcenter:], freqs[:freqcenter]))
         result = np.concatenate((result[freqcenter:],
                                  result[:freqcenter]), 0)
-
     elif not pad_to % 2:
         freqs[-1] *= -1
 
     return result, freqs #, time
-
 
 
 def detrend(samples, key=None, axis=None):
@@ -207,17 +184,16 @@ def detrend(samples, key=None, axis=None):
     :func:`detrend_none`
         :func:`detrend_none` implements the 'none' algorithm.
     '''
-    if key is None or key in ['constant', 'mean', 'default']: # pylint: disable-msg=R1705
+    if key is None or key in ['constant', 'mean', 'default']:
         return detrend(samples, key=detrend_mean, axis=axis)
-    elif key == 'linear':
+    if key == 'linear':
         return detrend(samples, key=detrend_linear, axis=axis)
-    elif key == 'none':
+    if key == 'none':
         return detrend(samples, key=detrend_none, axis=axis)
-    elif isinstance(key, str):
+    if isinstance(key, str):
         raise ValueError("Unknown value for key %s, must be one of: "
                          "'default', 'constant', 'mean', "
                          "'linear', or a function" % key)
-
     if not callable(key):
         raise ValueError("Unknown value for key %s, must be one of: "
                          "'default', 'constant', 'mean', "
@@ -274,10 +250,9 @@ def stride_windows(samples, sample_size, noverlap=None, axis=0):
     if samples.ndim != 1:
         raise ValueError('Only 1-dimensional arrays can be used')
     if sample_size == 1 and noverlap == 0:
-        if axis == 0: # pylint: disable-msg=R1705
+        if axis == 0:
             return samples[np.newaxis]
-        else:
-            return samples[np.newaxis].transpose()
+        return samples[np.newaxis].transpose()
     if sample_size > len(samples):
         raise ValueError('sample_size cannot be greater than the length of samples')
 
@@ -292,6 +267,7 @@ def stride_windows(samples, sample_size, noverlap=None, axis=0):
         shape = ((samples.shape[-1]-noverlap)//step, sample_size)
         strides = (step*samples.strides[0], samples.strides[0])
     return np.lib.stride_tricks.as_strided(samples, shape=shape, strides=strides)
+
 
 def detrend_mean(sequence, axis=None):
     '''
@@ -431,38 +407,39 @@ def apply_window(samples, window, axis=0, return_window=None):
     '''
     samples = np.asarray(samples)
 
-    if samples.ndim < 1 or samples.ndim > 2:
+    if samples.ndim != 1 and samples.ndim != 2:
         raise ValueError('only 1D or 2D arrays can be used')
     if axis+1 > samples.ndim:
         raise ValueError('axis(=%s) out of bounds' % axis)
 
-    xshape = list(samples.shape)
-    xshapetarg = xshape.pop(axis)
+    x_shape = list(samples.shape)
+    x_shape_targ = x_shape.pop(axis)
 
     if isinstance(window, np.ndarray):
-        if len(window) != xshapetarg:
+        if len(window) != x_shape_targ:
             raise ValueError('The len(window) must be the same as the shape '
                              'of x for the chosen axis')
-        window_vals = window
+        else:
+            window_vals = window
     else:
-        window_vals = window(np.ones(xshapetarg, dtype=samples.dtype))
+        window_vals = window(np.ones(x_shape_targ, dtype=samples.dtype))
 
     if samples.ndim == 1:
-        if return_window: # pylint: disable-msg=R1705
+        if return_window:
             return window_vals * samples, window_vals
-        else:
-            return window_vals * samples
+        return window_vals * samples
 
-    xshapeother = xshape.pop()
+    x_shape_other = x_shape.pop()
 
-    otheraxis = (axis+1) % 2
+    other_axis = (axis+1) % 2
 
-    window_vals_rep = stride_repeat(window_vals, xshapeother, axis=otheraxis)
+    window_vals_rep = stride_repeat(window_vals, x_shape_other, axis=other_axis)
 
-    if return_window: # pylint: disable-msg=R1705
+    if return_window:
         return window_vals_rep * samples, window_vals
-    else:
-        return window_vals_rep * samples
+
+    return window_vals_rep * samples
+
 
 def stride_repeat(samples, sample_size, axis=0):
     '''
@@ -498,10 +475,9 @@ def stride_repeat(samples, sample_size, axis=0):
         raise ValueError('only 1-dimensional arrays can be used')
 
     if sample_size == 1:
-        if axis == 0: # pylint: disable-msg=R1705
+        if axis == 0:
             return np.atleast_2d(samples)
-        else:
-            return np.atleast_2d(samples).T
+        return np.atleast_2d(samples).T
     if sample_size < 1:
         raise ValueError('sample_size cannot be less than 1')
 
