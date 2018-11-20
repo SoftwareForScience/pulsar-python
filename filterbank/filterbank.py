@@ -22,10 +22,9 @@ class Filterbank:
                 freq_range, tuple of freq_start and freq_stop in MHz
                 time_range, tuple of time_start and time_stop
         """
-        self.freqs = None
-        self.timestamps = None
         if not os.path.isfile(filename):
             raise FileNotFoundError(filename)
+        self.freqs, self.n_chans_selected = None, None
         self.filename = filename
         self.header = read_header(filename)
         self.idx_data = len_header(filename)
@@ -48,8 +47,6 @@ class Filterbank:
         self.fil.seek(int(self.ii_start * self.n_bytes * self.n_ifs * self.n_chans), 1)
         # find possible channels
         self.i_0, self.i_1 = self.setup_chans(freq_range)
-        # amount of channels
-        self.n_chans_selected = self.freqs.shape[0]
         # read at once
         if not stream:
             self.read_filterbank()
@@ -75,6 +72,8 @@ class Filterbank:
                                                   dtype=self.dd_type)
                 # skip bytes till start of next chunk
                 self.fil.seek(self.n_bytes * (self.n_chans - self.i_1), 1)
+        # release file resources
+        self.fil.close()
 
 
     def next_row(self):
@@ -93,6 +92,7 @@ class Filterbank:
             self.fil.seek(self.n_bytes * (self.n_chans - self.i_1), 1)
         else:
             data = True
+            self.fil.close()
         return data
 
 
@@ -118,6 +118,8 @@ class Filterbank:
             i_vals = np.arange(chan_stop_idx, chan_start_idx)
         # calculate all possible frequencies
         self.freqs = f_delt * i_vals + f_0
+        # amount of channels
+        self.n_chans_selected = self.freqs.shape[0]
         # change channel order if reversed
         if chan_stop_idx < chan_start_idx:
             chan_stop_idx, chan_start_idx = chan_start_idx, chan_stop_idx
