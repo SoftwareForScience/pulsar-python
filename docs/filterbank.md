@@ -34,9 +34,12 @@ freq_range is a tuple with a frequency start and a frequency stop
 The same applies to time_range
 
 ## 2.3 Read filterbank file
-The attributes time_range and freq_range can be passed as parameters to select a specific portion of the filterbank file, and the stream parameter is a boolean for whether to read the data as a stream, for example:  
+The attributes time_range and freq_range can be passed as parameters to select a specific portion of the filterbank file.
+To make the Filterbank object read the filterbank file at once, use the `read_filterbank` method.
 ```
 filterbank = Filterbank(<PATH TO FILTERBANK FILE>, freq_range, time_range, stream)
+
+filterbank.read_filterbank()
 ```
 
 ## 2.4 Select a range of data from the filterbank file
@@ -53,7 +56,8 @@ The matrix contains for each time sample an array which has the intensity per ch
 When reading the filterbank file as a stream, the user should set the `stream`-parameter to `True` when initializing the filterbank object.
 
 Each time the user calls the `next_row` method, it will retrieve an array with intensitiy per frequency for a new time sample from the filterbank file.
-When the last iteration of the filterbank is reached, the new_row method will return `True`
+When the last iteration of the filterbank is reached, the new_row method will return `True`.  
+The same goes for the `next_n_rows` method, where the user is able to define the amount of rows that should be returned.
 
 ```
 filterbank.next_row()

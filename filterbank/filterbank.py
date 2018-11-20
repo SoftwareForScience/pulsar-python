@@ -14,7 +14,7 @@ class Filterbank:
 
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(self, filename, freq_range=None, time_range=None, stream=False):
+    def __init__(self, filename, freq_range=None, time_range=None):
         """
             Initialize Filterbank object
 
@@ -24,7 +24,9 @@ class Filterbank:
         """
         if not os.path.isfile(filename):
             raise FileNotFoundError(filename)
-        self.freqs, self.n_chans_selected = None, None
+        # iterator for stream
+        self.stream_iter = 0
+        self.data, self.freqs, self.n_chans_selected = None, None, None
         self.filename = filename
         self.header = read_header(filename)
         self.idx_data = len_header(filename)
@@ -40,6 +42,7 @@ class Filterbank:
             self.dd_type = b'uint8'
         # open filterbank file
         self.fil = open(self.filename, 'rb')
+        # skip the header bytes
         self.fil.seek(self.idx_data)
         # find possible time range
         self.ii_start, self.n_samples = self.setup_time(time_range)
@@ -47,11 +50,6 @@ class Filterbank:
         self.fil.seek(int(self.ii_start * self.n_bytes * self.n_ifs * self.n_chans), 1)
         # find possible channels
         self.i_0, self.i_1 = self.setup_chans(freq_range)
-        # read at once
-        if not stream:
-            self.read_filterbank()
-        else:
-            self.stream_iter = 0
 
 
     def read_filterbank(self):
@@ -90,6 +88,32 @@ class Filterbank:
             data = np.fromfile(self.fil, count=self.n_chans_selected, dtype=self.dd_type)
             # skip bytes till start of next chunk
             self.fil.seek(self.n_bytes * (self.n_chans - self.i_1), 1)
+        else:
+            data = True
+            self.fil.close()
+        return data
+
+
+    def next_n_rows(self, n_rows):
+        """
+            Read filterbank per n rows
+
+            returns True if EOF
+        """
+        if self.stream_iter < (self.n_samples * self.n_ifs):
+            self.stream_iter += n_rows
+            # more rows requested than available
+            if self.stream_iter >= (self.n_samples * self.n_ifs):
+                n_rows = self.stream_iter - self.n_samples * self.n_ifs
+            # init array of n rows
+            data = np.zeros((n_rows, self.n_chans_selected), dtype=self.dd_type)
+            for row in range(n_rows):
+                # skip bytes
+                self.fil.seek(self.n_bytes * self.i_0, 1)
+                # read row of data
+                data[row] = np.fromfile(self.fil, count=self.n_chans_selected, dtype=self.dd_type)
+                # skip bytes till start of next chunk
+                self.fil.seek(self.n_bytes * (self.n_chans - self.i_1), 1)
         else:
             data = True
             self.fil.close()
