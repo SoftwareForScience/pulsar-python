@@ -101,10 +101,10 @@ class Filterbank:
             returns True if EOF
         """
         if self.stream_iter < (self.n_samples * self.n_ifs):
-            self.stream_iter += n_rows
             # more rows requested than available
-            if self.stream_iter > (self.n_samples * self.n_ifs):
-                n_rows = self.stream_iter - self.n_samples * self.n_ifs
+            if self.stream_iter + n_rows >= self.n_samples * self.n_ifs:
+                n_rows = self.n_samples * self.n_ifs - self.stream_iter
+            self.stream_iter += n_rows
             # init array of n rows
             data = np.zeros((n_rows, self.n_chans_selected), dtype=self.dd_type)
             for row in range(n_rows):
