@@ -13,7 +13,7 @@ sys.path.insert(0, PARENT_DIR)
 from rtlsdr import RtlSdr
 import matplotlib.pyplot as plt
 import numpy as np
-from plot import psd
+from plot import opsd
 
 # Initiate RtlSdr
 sdr = RtlSdr()
@@ -33,7 +33,7 @@ print(samples[1:100])
 sample_length = samples.shape[0]
 
 # Get the powerlevels and the frequencies
-PXX, freqs = psd(samples, nfft=1024, sample_rate=sdr.sample_rate/1e6,
+PXX, freqs, _ = opsd(samples, nfft=1024, sample_rate=sdr.sample_rate/1e6,
                  scale_by_freq=True, sides='twosided')
 
 # Calculate the powerlevel dB's

@@ -6,7 +6,7 @@ from rtlsdr import RtlSdr
 import matplotlib.animation as animation
 from filterbank.header import read_header
 from filterbank.filterbank import Filterbank
-from plot.Waterfall import Waterfall
+from plot import waterfall
 import pylab as pyl
 from plot.plot import next_power_of_2
 
@@ -25,18 +25,8 @@ header = read_header('examples/pspm32bit.fil')
 center_freq = header[b'fch1'] + float(header[b'nchans']) * header[b'foff'] / 2.0
 
 
-sdr = RtlSdr()
-wf = Waterfall(sdr)
+wf = waterfall.Waterfall(samples=samples[0:next_power_of_2(8000)], freqs=freqs, fig=pyl.figure(), center_freq=center_freq)
+img = wf.get_image()
 
-# some defaults
-sdr.rs = 2.4e6
-sdr.fc = 100e6
-sdr.gain = 10
+pyl.show(img)
 
-wf.start()
-
-# # cleanup
-sdr.close()
-
-
-# pyl.show()

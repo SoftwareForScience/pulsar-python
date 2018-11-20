@@ -6,3 +6,5 @@ venv
 *.pyc
 .coverage
 .pytest_cache/
+
+psdding.py

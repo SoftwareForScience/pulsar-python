@@ -176,7 +176,7 @@ def opsd(samples, nfft=None, sample_rate=None, window=window_hanning, noverlap=N
     elif not pad_to % 2:
         freqs[-1] *= -1
 
-    result = 10*np.log10(result/freqcenter) + 50
+    result = 10*np.log10(result/freqcenter)
     # freqs = (freqs + freqcenter)/1e5
     # print(freqs)
     return result, freqs, time

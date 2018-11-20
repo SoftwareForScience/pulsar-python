@@ -7,7 +7,6 @@ import sys
 from rtlsdr import RtlSdr
 
 class Waterfall(object):
-    samples                 = None
     NFFT                    = 1024
     num_samples_per_scan    = NFFT*16
     num_buffered_sweeps     = 100
@@ -17,13 +16,12 @@ class Waterfall(object):
     gain_inc                = 5
     shift_key_down          = False
     keyboard_buffer         = []
-    def __init__(self, sdr=None, fig=None, NFFT=None, num_samples_per_scan=None, num_buffered_sweeps=None, num_scans_per_sweep=None, freq_inc_coarse=None, freq_inc_fine=None, gain_inc=None, samples=None):
+    def __init__(self, sdr=None, fig=None, NFFT=None, num_samples_per_scan=None, num_buffered_sweeps=None, num_scans_per_sweep=None, freq_inc_coarse=None, freq_inc_fine=None, gain_inc=None):
         """
             Setup waterfall class
         """
         self.fig = fig if fig else pyl.figure()
-        if samples is None:
-            self.sdr = sdr if sdr else RtlSdr()
+        self.sdr = sdr if sdr else RtlSdr()
 
         #set constanst
         self.NFFT                   = NFFT if NFFT else self.NFFT
@@ -33,7 +31,6 @@ class Waterfall(object):
         self.freq_inc_coarse        = freq_inc_coarse if freq_inc_coarse else self.freq_inc_coarse
         self.freq_inc_fine          = freq_inc_fine if freq_inc_fine else self.freq_inc_fine
         self.gain_inc               = gain_inc if gain_inc else self.gain_inc
-        self.samples                = samples if samples else self.samples
 
         self.init_plot()
 
