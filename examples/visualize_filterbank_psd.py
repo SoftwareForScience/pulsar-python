@@ -12,36 +12,34 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentfra
 PARENT_DIR = os.path.dirname(CURRENT_DIR)
 sys.path.insert(0, PARENT_DIR)
 
-from plot import psd
+from plot import opsd
 from filterbank.header import read_header
 from filterbank.filterbank import Filterbank
 
 # Instatiate the filterbank reader and point to the filterbank file
-fb = Filterbank(filename='examples/pspm32.fil')
+fb = Filterbank(filename='examples/pspm32bit.fil')
 
 # read filterbank at once
 fb.read_filterbank()
 
 # read the data in the filterbank file
-_, samples = fb.select_data()
-
-# print(samples[1].shape)
-
-# Convert 2D Array to 1D Array
-samples = samples.reshape((samples.shape[0]*samples.shape[1],))
+f, samples = fb.select_data()
 
 # Read the header of the filterbank file
-header = read_header('examples/pspm32.fil')
+header = read_header('examples/pspm32bit.fil')
 
 # Calculate the center frequency with the data in the header
 center_freq = header[b'fch1'] + float(header[b'nchans']) * header[b'foff'] / 2.0
 
+print(samples.shape)
 # Get the powerlevels and the frequencies
-freqs, power_levels = psd(samples, 80, center_freq, nfft=None)
+print(samples[0])
+power_levels, freqs, _ = opsd(samples[0], nfft=128, sample_rate=80, sides='twosided')
+# freqs, power_levels = psd(samples[0], 80, center_freq, nfft=128)
 
 # Plot the PSD
 plt.grid(True)
 plt.xlabel('Frequency (MHz)')
 plt.ylabel('Intensity (arbitrary units)')
-plt.plot(freqs, power_levels)
+plt.plot(f, power_levels)
 plt.show()
