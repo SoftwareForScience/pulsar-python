@@ -8,18 +8,6 @@ from fourier import fourier
 # pylint: disable-msg=R0914
 
 
-# def psd_helper(samples, sampling_freq, center_freq):
-#     samples = np.asarray(samples)
-
-#     n_x = samples.shape[0]
-#     n_y = samples.shape[1]
-
-#     sample_size = n_x * n_y
-
-#     nx = n_x/2+1
-#     ny = n_y/2+1
-
-
 def window_hanning(window):
     '''
     Return window times the hanning window of len(window).
@@ -158,7 +146,7 @@ def opsd(samples, nfft=None, sample_rate=2, window=window_hanning, noverlap=0,
 
     result = 10*np.log10(result/freqcenter)
     # freqs = (freqs + freqcenter)/1e5
-    # print(freqs)
+
     return result, freqs, time
 
 
