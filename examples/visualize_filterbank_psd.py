@@ -19,11 +19,16 @@ from filterbank.filterbank import Filterbank
 # Instatiate the filterbank reader and point to the filterbank file
 fb = Filterbank(filename='examples/pspm32.fil')
 
+# read filterbank at once
+fb.read_filterbank()
+
 # read the data in the filterbank file
 _, samples = fb.select_data()
 
-# Convert 2D Array to 1D Array with complex numbers
-samples = samples[0] + (samples[1] * 1j)
+# print(samples[1].shape)
+
+# Convert 2D Array to 1D Array
+samples = samples.reshape((samples.shape[0]*samples.shape[1],))
 
 # Read the header of the filterbank file
 header = read_header('examples/pspm32.fil')
@@ -32,18 +37,11 @@ header = read_header('examples/pspm32.fil')
 center_freq = header[b'fch1'] + float(header[b'nchans']) * header[b'foff'] / 2.0
 
 # Get the powerlevels and the frequencies
-PXX, freqs = psd(samples, nfft=1024, sample_rate=80,
-                 scale_by_freq=True, sides='twosided')
-
-# Calculate the powerlevel dB's
-power_levels = 10 * np.log10(PXX/(80))
-
-# Add the center frequency to the frequencies so they match the actual frequencies
-freqs = freqs + center_freq
+freqs, power_levels = psd(samples, 80, center_freq, nfft=None)
 
 # Plot the PSD
 plt.grid(True)
 plt.xlabel('Frequency (MHz)')
-plt.ylabel('Intensity (dB)')
+plt.ylabel('Intensity (arbitrary units)')
 plt.plot(freqs, power_levels)
 plt.show()
