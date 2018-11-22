@@ -78,7 +78,7 @@ class Filterbank:
         """
             Read filterbank file per row
 
-            returns True if EOF
+            returns False if EOF
         """
         if self.stream_iter < (self.n_samples * self.n_ifs):
             self.stream_iter += 1
@@ -89,7 +89,7 @@ class Filterbank:
             # skip bytes till start of next chunk
             self.fil.seek(self.n_bytes * (self.n_chans - self.i_1), 1)
         else:
-            data = True
+            data = False
             self.fil.close()
         return data
 
@@ -98,7 +98,7 @@ class Filterbank:
         """
             Read filterbank per n rows
 
-            returns True if EOF
+            returns False if EOF
         """
         if self.stream_iter < (self.n_samples * self.n_ifs):
             # more rows requested than available
@@ -115,7 +115,7 @@ class Filterbank:
                 # skip bytes till start of next chunk
                 self.fil.seek(self.n_bytes * (self.n_chans - self.i_1), 1)
         else:
-            data = True
+            data = False
             self.fil.close()
         return data
 
