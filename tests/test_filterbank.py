@@ -87,7 +87,7 @@ class TestFilterbank(unittest.TestCase):
         # read rows till method returns Boolean
         while not isinstance(fil.next_row(), bool):
             pass
-        self.assertTrue(fil.next_row())
+        self.assertFalse(fil.next_row())
 
     def test_filterbank_n_rows(self):
         """
@@ -111,7 +111,7 @@ class TestFilterbank(unittest.TestCase):
         # read n rows till method returns Boolean
         while not isinstance(fil.next_n_rows(n_rows), bool):
             pass
-        self.assertTrue(fil.next_n_rows(n_rows))
+        self.assertFalse(fil.next_n_rows(n_rows))
 
 if __name__ == '__main__':
     unittest.main()
