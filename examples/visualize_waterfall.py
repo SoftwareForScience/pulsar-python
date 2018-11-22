@@ -1,9 +1,10 @@
 #pylint: disable-all
 
 import os,sys,inspect
-currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(currentdir)
-sys.path.insert(0,parentdir)
+CURRENT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+PARENT_DIR = os.path.dirname(CURRENT_DIR)
+sys.path.insert(0,PARENT_DIR)
+
 from rtlsdr import RtlSdr
 import matplotlib.animation as animation
 from filterbank.header import read_header

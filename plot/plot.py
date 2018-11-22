@@ -79,7 +79,8 @@ def psd(samples, sampling_frequency, center_frequency, nfft=None):
 
     return freqs, power
 
-
+# pylint: disable=R0912
+# All branches are needed
 def opsd(samples, nfft=None, sample_rate=2, window=window_hanning, noverlap=0,
          detrend_func=None, pad_to=None, scale_by_freq=True, sides='twosided'):
     """

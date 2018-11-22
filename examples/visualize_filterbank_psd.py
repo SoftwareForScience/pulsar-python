@@ -25,14 +25,6 @@ fb.read_filterbank()
 # read the data in the filterbank file
 f, samples = fb.select_data()
 
-# print(samples[0])
-
-# samples = np.asarray([ sum(i) for i in samples])
-# print(samples[0:10])
-
-# Convert 2D Array to 1D Array
-# samples = samples.reshape((samples.shape[0]*samples.shape[1],))
-
 # Read the header of the filterbank file
 header = read_header('examples/pspm32bit.fil')
 
