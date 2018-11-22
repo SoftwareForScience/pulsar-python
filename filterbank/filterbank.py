@@ -33,6 +33,8 @@ class Filterbank:
         self.n_bytes = int(self.header[b'nbits'] / 8)
         self.n_chans = self.header[b'nchans']
         self.n_ifs = self.header[b'nifs']
+        self.header['center_freq'] = (self.header[b'fch1'] +
+                                      float(self.header[b'nchans']) * self.header[b'foff'] / 2.0)
         # decide appropriate datatype
         if self.n_bytes == 4:
             self.dd_type = b'float32'
@@ -210,7 +212,4 @@ class Filterbank:
         """
             Return a dictionary of the filterbank header
         """
-        # calculate the center freq
-        self.header['center_freq'] = (self.header[b'fch1'] +
-                                      float(self.header[b'nchans']) * self.header[b'foff'] / 2.0)
         return self.header
