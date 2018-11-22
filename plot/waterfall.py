@@ -3,9 +3,14 @@
 """
 import numpy as np
 from plot import opsd
-from fourier.fourier import fft_vectorized
 
 class Waterfall():
+    """
+        Class for generating waterfall plots.
+    """
+    # pylint: disable=too-many-instance-attributes
+    # All the attributes are needed.
+
     samples = None
     center_freq = None
     sample_freq = None
@@ -24,6 +29,8 @@ class Waterfall():
     image_buffer = None
     iteration = 0
 
+    # pylint: disable=R0913
+    # All these attributes are needed.
     def __init__(self, samples=None, center_freq=None, sample_freq=None, freqs=None,
                  fig=None, samples_per_scan=None,
                  buffered_sweeps=None, scans_per_sweep=None, freq_inc_coarse=None,
@@ -54,6 +61,9 @@ class Waterfall():
         self.init_plot()
 
     def init_plot(self):
+        """
+            Initialize the plot
+        """
         # self.image_buffer = -100*np.ones((self.buffered_sweeps,\
         #                          self.scans_per_sweep*self.nfft))
 
@@ -69,6 +79,9 @@ class Waterfall():
         # self.fig.canvas.mpl_connect('key_release_event', self.on_key_release)
 
     def update_plot_labels(self):
+        """
+            Set the plotlables.
+        """
         center_freq = self.center_freq
         sample_freq = self.sample_freq
         if self.freqs is not None:
@@ -81,24 +94,34 @@ class Waterfall():
         self.fig.canvas.draw_idle()
 
     def get_row(self):
+        """
+            Returns the next row of data.
+        """
         self.iteration += 1
         row, _, _ = opsd(self.samples[self.iteration -1], nfft=128, sides='twosided')
         return row
 
     def get_image(self):
+        """
+            Returns the image of the full dataset, if using a discrete dataset.
+        """
         self.update_plot_labels()
-        i=0
+
+        i = 0
         rows = np.ndarray(self.samples.shape, dtype=float)
         for row in self.samples:
-            rows[i], _, _ = opsd(self.samples[i], nfft=128, sides='twosided')
-            i+=1
+            rows[i], _, _ = opsd(row, nfft=128, sides='twosided')
+            i += 1
 
         self.image.set_array(rows)
         return self.image
 
-    def update(self, *args):
+    def update(self):
+        """
+            Updates the image with the next row of data, when using
+            a continuous datastream.
+        """
         # prepare space in buffer
-        # TODO: use indexing to avoid recreating buffer each time
         self.image_buffer = np.roll(self.image_buffer, 1, axis=0)
 
         # for row in self.samples:
@@ -106,9 +129,12 @@ class Waterfall():
         self.image_buffer[0] = self.get_row()
         self.image.set_array(self.image_buffer)
 
-        return self.image,
+        return self.image
 
     def animated_plotter(self):
+        """
+            Returns the figure and update function for the animation function.
+        """
         self.update_plot_labels()
 
         return(self.fig, self.update, 50, True)
