@@ -121,7 +121,7 @@ class TestFilterbank(unittest.TestCase):
         filename = './pspm32.fil'
         fil = filterbank.Filterbank(filename)
         header = fil.get_header()
-        self.assertIsNotNone(header['center_freq'])
+        self.assertIsNotNone(header[b'center_freq'])
 
 if __name__ == '__main__':
     unittest.main()
