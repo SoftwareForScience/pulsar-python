@@ -113,5 +113,15 @@ class TestFilterbank(unittest.TestCase):
             pass
         self.assertTrue(fil.next_n_rows(n_rows))
 
+    def test_filterbank_header(self):
+        """
+            Retrieve the header for the filterbank
+            and test if the center frequency exists
+        """
+        filename = './pspm32.fil'
+        fil = filterbank.Filterbank(filename)
+        header = fil.get_header()
+        self.assertIsNotNone(header['center_freq'])
+
 if __name__ == '__main__':
     unittest.main()
