@@ -101,25 +101,16 @@ def psd(samples, sampling_frequency, center_frequency, nfft=None):
     return freqs, power
 
 
-def opsd(samples, nfft=None, sample_rate=None, window=window_hanning, noverlap=None,
-         detrend_func=None, pad_to=None, scale_by_freq=None, sides=None):
+def opsd(samples, nfft=None, sample_rate=2, window=window_hanning, noverlap=0,
+         detrend_func=None, pad_to=None, scale_by_freq=True, sides='twosided'):
     """
         Plot the power spectral density.
     """
-    if sample_rate is None:
-        sample_rate = 2
-
     if nfft is None:
-        nfft = 256
+        nfft = len(samples)
 
     if pad_to is None:
         pad_to = nfft
-
-    if noverlap is None:
-        noverlap = 0
-
-    if scale_by_freq is None:
-        scale_by_freq = True
 
     samples = np.asarray(samples)
 
