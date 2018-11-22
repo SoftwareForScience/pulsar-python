@@ -19,6 +19,9 @@ from filterbank.filterbank import Filterbank
 # Instatiate the filterbank reader and point to the filterbank file
 fb = Filterbank(filename='examples/pspm32bit.fil')
 
+# read filterbank at once
+fb.read_filterbank()
+
 # read the data in the filterbank file
 f, samples = fb.select_data()
 
