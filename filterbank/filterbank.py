@@ -117,6 +117,9 @@ class Filterbank:
         else:
             data = True
             self.fil.close()
+        
+        print(data)
+
         return data
 
 
