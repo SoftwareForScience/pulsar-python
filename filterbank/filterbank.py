@@ -33,6 +33,9 @@ class Filterbank:
         self.n_bytes = int(self.header[b'nbits'] / 8)
         self.n_chans = self.header[b'nchans']
         self.n_ifs = self.header[b'nifs']
+        # calculate and add center frequency to header
+        self.header[b'center_freq'] = (self.header[b'fch1'] +
+                                       float(self.header[b'nchans']) * self.header[b'foff'] / 2.0)
         # decide appropriate datatype
         if self.n_bytes == 4:
             self.dd_type = b'float32'
@@ -207,3 +210,10 @@ class Filterbank:
             freq_data = self.freqs[i_1:i_0 + 1]
             fil_data = np.squeeze(self.data[time_start:time_stop, ..., i_1:i_0 + 1])
         return freq_data, fil_data
+
+
+    def get_header(self):
+        """
+            Return a dictionary of the filterbank header
+        """
+        return self.header

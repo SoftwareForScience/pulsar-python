@@ -33,6 +33,8 @@ time_range = tstart + (tsamp/24/60/60)
 freq_range is a tuple with a frequency start and a frequency stop  
 The same applies to time_range
 
+The header data, including the center frequency, can be retrieved using the `get_header` method.
+
 ## 2.3 Read filterbank file
 The attributes time_range and freq_range can be passed as parameters to select a specific portion of the filterbank file.
 To make the Filterbank object read the filterbank file at once, use the `read_filterbank` method.
