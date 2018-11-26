@@ -2,7 +2,7 @@
     Module for plotting a waterfall plot
 """
 import numpy as np
-from plot import opsd
+from .plot import opsd
 
 class Waterfall():
     """
