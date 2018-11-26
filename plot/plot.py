@@ -61,7 +61,7 @@ def psd(samples, sampling_frequency, center_frequency, nfft=None):
     # analyze spectrum
     indeces = np.arange(nfft/2-1, nfft-1, dtype=int)
     if np.ndim(samples) == 1:
-        power = fourier.fftshift(fourier.fft_vectorized(samples, nfft))
+        power = fourier.fft_shift(fourier.fft_vectorized(samples, nfft))
         # power = fourier.fftshift(power)
     elif np.ndim(samples) == 2:
         samples = samples.reshape((samples.shape[0]*samples.shape[1],))
