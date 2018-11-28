@@ -55,14 +55,14 @@ The `select_data` method returns an array of all different channels/frequencies 
 The matrix contains for each time sample an array which has the intensity per channel/frequency.
 
 ## 2.5 Read filterbank as stream
-When reading the filterbank file as a stream, the user should set the `stream`-parameter to `True` when initializing the filterbank object.
-
 Each time the user calls the `next_row` method, it will retrieve an array with intensitiy per frequency for a new time sample from the filterbank file.
-When the last iteration of the filterbank is reached, the new_row method will return `True`.  
+When the last iteration of the filterbank is reached, the new_row method will return `False`.  
 The same goes for the `next_n_rows` method, where the user is able to define the amount of rows that should be returned.
 
 ```
 filterbank.next_row()
+
+filterbank.next_n_rows(n_rows=10)
 ```
 
 [Back to table of contents](../README.md)
