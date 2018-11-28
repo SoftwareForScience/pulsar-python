@@ -53,7 +53,11 @@ def read_header(filename):
                 break
             else:
                 header_dict[keyword] = value
-
+    # calculate center frequency
+    header_dict[b'center_freq'] = (header_dict[b'fch1'] +
+                                   float(header_dict[b'nchans']) * header_dict[b'foff'] / 2.0)
+    # calculate bytes
+    header_dict[b'nbytes'] = int(header_dict[b'nbits'] / 8)
     return header_dict
 
 

@@ -30,12 +30,9 @@ class Filterbank:
         self.filename = filename
         self.header = read_header(filename)
         self.idx_data = len_header(filename)
-        self.n_bytes = int(self.header[b'nbits'] / 8)
+        self.n_bytes = self.header[b'nbytes']
         self.n_chans = self.header[b'nchans']
         self.n_ifs = self.header[b'nifs']
-        # calculate and add center frequency to header
-        self.header[b'center_freq'] = (self.header[b'fch1'] +
-                                       float(self.header[b'nchans']) * self.header[b'foff'] / 2.0)
         # decide appropriate datatype
         if self.n_bytes == 4:
             self.dd_type = b'float32'
