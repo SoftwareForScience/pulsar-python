@@ -36,3 +36,7 @@ Creating a free and open source framework that contains the generic algorithms a
         1. [Parameters](docs/plots.md#411-parameters)
         2. [Returns](docs/plots.md#412-returns)
         1. [Example usage](docs/plots.md#413-example-usage)
+5. [Timeseries](docs/timeseries.md)
+    1. [Initialize timeseries object](docs/timeseries.md#51-initialize-the-timeseries-object)
+    1. [Retrieve timeseries](docs/timeseries.md#521-retrieve-timeseries-object)
+    1. [Downsample timeseries](docs/timeseries.md#53-downsample-the-timeseries)
