@@ -16,7 +16,7 @@ import filterbank.filterbank as Filterbank
 import timeseries.timeseries as Timeseries
 
 # Read the filterbank file from a file. 
-filterbank_obj = Filterbank('./psm32.fil')
+filterbank_obj = Filterbank('./pspm32.fil')
 
 # Read the filterbank as a whole instead of as a stream. 
 filterbank_obj =  filterbank_obj.read_filterbank()
@@ -43,7 +43,7 @@ ts = Timeseries(input_array)
 ```python
 # Assumed that your timeseries object has been initialized. 
 
-timeseries_array =  timeseries.get()
+timeseries_array = timeseries.get()
 
 ```
 
@@ -54,9 +54,8 @@ The first implemented feature for the timeseries object is the downsample/decima
 Called downsample in the current release because no anti-alliasing is used, might be renamed to decimate once more advanced operations (such as antialiasing) are used. 
 
 ```python
-
-    # Downsampled array shall be 3 times smaller than the current timeseries (as initialized) 
-    scale = 3
-    # Returns an array with the downsampled timeseries, can also be retreived lated user timseries.get()
-    downsampled_array = timeseries.downsample(scale)
+# Downsampled array shall be 3 times smaller than the current timeseries (as initialized) 
+scale = 3
+# Returns an array with the downsampled timeseries, can also be retreived lated user timseries.get()
+downsampled_array = timeseries.downsample(scale)
 ```
