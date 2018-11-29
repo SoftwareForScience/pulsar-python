@@ -11,52 +11,63 @@ class Waterfall():
     # pylint: disable=too-many-instance-attributes
     # All the attributes are needed.
 
+    header = None
     samples = None
-    center_freq = None
     sample_freq = None
     freqs = None
     nfft = 1024
     samples_per_scan = nfft*16
     buffered_sweeps = 100
     scans_per_sweep = 1
-    freq_inc_coarse = 1e6
-    freq_inc_fine = 0.1e6
-    gain_inc = 5
-    shift_key_down = False
-    keyboard_buffer = []
     plot = None
     image = None
     image_buffer = None
-    iteration = 0
 
     # pylint: disable=R0913
     # All these attributes are needed.
-    def __init__(self, samples=None, center_freq=None, sample_freq=None, freqs=None,
+    def __init__(self, fb=None, samples=None, center_freq=None, sample_freq=None,
                  fig=None, samples_per_scan=None,
                  buffered_sweeps=None, scans_per_sweep=None, freq_inc_coarse=None,
-                 freq_inc_fine=None, gain_inc=None):
+                 freq_inc_fine=None, gain_inc=None, max_n_rows=1024, mode='stream'):
         """
             Setup waterfall object
         """
+        if fb is None:
+            raise ValueError("A filterbank object input is needed to generate the plot.")
+        else:
+            self.fb = fb
 
         if fig is None:
             raise ValueError("Need figure.")
         else:
             self.fig = fig
 
-        if samples is None:
-            raise ValueError("Expected sample data, but received none")
-        else:
-            self.samples = samples
+        # if samples is None:
+        #     raise ValueError("Expected sample data, but received none")
+        # else:
+        #     self.samples = samples
+
+        self.max_n_rows = max_n_rows
+
         self.sample_freq = sample_freq #if sample_freq else None
         self.center_freq = center_freq #if center_freq else None
         self.samples_per_scan = samples_per_scan if samples_per_scan else self.samples_per_scan
         self.buffered_sweeps = buffered_sweeps if buffered_sweeps else self.buffered_sweeps
         self.scans_per_sweep = scans_per_sweep if scans_per_sweep else self.scans_per_sweep
-        self.freq_inc_coarse = freq_inc_coarse if freq_inc_coarse else self.freq_inc_coarse
-        self.freq_inc_fine = freq_inc_fine if freq_inc_fine else self.freq_inc_fine
-        self.gain_inc = gain_inc if gain_inc else self.gain_inc
+        # self.freq_inc_coarse = freq_inc_coarse if freq_inc_coarse else self.freq_inc_coarse
+        # self.freq_inc_fine = freq_inc_fine if freq_inc_fine else self.freq_inc_fine
+        # self.gain_inc = gain_inc if gain_inc else self.gain_inc
+
+        if mode == "discrete":        
+            fb.read_filterbank()
+            freqs, self.samples = fb.select_data(time_start=0, time_stop=50)
+        else:
+            freqs = fb.get_freqs()
+            self.samples = self.fb.next_n_rows(self.max_n_rows)
+
+
         self.freqs = np.asarray(freqs) #if freqs not None else None
+        self.header = fb.get_header()
 
         self.init_plot()
 
@@ -82,7 +93,7 @@ class Waterfall():
         """
             Set the plotlables.
         """
-        center_freq = self.center_freq
+        center_freq = self.get_center_freq()
         sample_freq = self.sample_freq
         if self.freqs is not None:
             freq_range = self.freqs.min(), self.freqs.max()
@@ -93,13 +104,16 @@ class Waterfall():
         self.image.set_extent(freq_range + (0, 1))
         self.fig.canvas.draw_idle()
 
-    def get_row(self):
-        """
-            Returns the next row of data.
-        """
-        self.iteration += 1
-        row, _, _ = opsd(self.samples[self.iteration -1], nfft=128, sides='twosided')
-        return row
+    def get_next(self):
+        return self.fb.next_row()
+
+    # def get_row(self):
+    #     """
+    #         Returns the next row of data.
+    #     """
+    #     self.iteration += 1
+    #     row, _, _ = opsd(self.samples[self.iteration -1], nfft=128, sides='twosided')
+    #     return row
 
     def get_image(self):
         """
@@ -107,13 +121,20 @@ class Waterfall():
         """
         self.update_plot_labels()
 
-        i = 0
-        rows = np.ndarray(self.samples.shape, dtype=float)
-        for row in self.samples:
-            rows[i], _, _ = opsd(row, nfft=128, sides='twosided')
-            i += 1
+        samples = self.fb.next_n_rows(self.max_n_rows)
 
-        self.image.set_array(rows)
+        # if samples == False:
+        #     raise ValueError("Filterbank object does not have that many rows.")
+
+        self.image.set_array(samples)
+
+        # i = 0
+        # rows = np.ndarray(samples.shape, dtype=float)
+        # for row in self.samples:
+        #     rows[i], _, _ = opsd(row, nfft=128, sides='twosided')
+        #     i += 1
+
+        # self.image.set_array(rows)
         return self.image
 
     def get_raw_image(self):
@@ -134,7 +155,7 @@ class Waterfall():
 
         # for row in self.samples:
         # self.image_buffer[0] = 10*np.log10(self.get_row()/self.center_freq)
-        self.image_buffer[0] = self.get_row()
+        self.image_buffer[0] = self.get_next()
         self.image.set_array(self.image_buffer)
 
         return self.image
@@ -146,3 +167,9 @@ class Waterfall():
         self.update_plot_labels()
 
         return(self.fig, self.update, 50, True)
+
+    def get_center_freq(self):
+        """
+            returns the centerfrequency stored in the file header.
+        """
+        return self.header[b'center_freq']

@@ -120,6 +120,7 @@ class Filterbank:
         else:
             data = False
             self.fil.close()
+
         return data
 
 
@@ -208,6 +209,11 @@ class Filterbank:
             fil_data = np.squeeze(self.data[time_start:time_stop, ..., i_1:i_0 + 1])
         return freq_data, fil_data
 
+    def get_freqs(self):
+        """
+            Returns the frequencies
+        """
+        return self.freqs
 
     def get_header(self):
         """
