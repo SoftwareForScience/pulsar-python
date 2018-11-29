@@ -28,7 +28,7 @@ class Waterfall():
     def __init__(self, fb=None, samples=None, center_freq=None, sample_freq=None,
                  fig=None, samples_per_scan=None,
                  buffered_sweeps=None, scans_per_sweep=None, freq_inc_coarse=None,
-                 freq_inc_fine=None, gain_inc=None, max_n_rows=1024):
+                 freq_inc_fine=None, gain_inc=None, max_n_rows=1024, mode='stream'):
         """
             Setup waterfall object
         """
@@ -57,8 +57,15 @@ class Waterfall():
         # self.freq_inc_coarse = freq_inc_coarse if freq_inc_coarse else self.freq_inc_coarse
         # self.freq_inc_fine = freq_inc_fine if freq_inc_fine else self.freq_inc_fine
         # self.gain_inc = gain_inc if gain_inc else self.gain_inc
-        
-        freqs, _ = fb.select_data(time_start=0, time_stop=50)
+
+        if mode == "discrete":        
+            fb.read_filterbank()
+            freqs, self.samples = fb.select_data(time_start=0, time_stop=50)
+        else:
+            freqs = fb.get_freqs()
+            self.samples = self.fb.next_n_rows(self.max_n_rows)
+
+
         self.freqs = np.asarray(freqs) #if freqs not None else None
         self.header = fb.get_header()
 
@@ -116,8 +123,8 @@ class Waterfall():
 
         samples = self.fb.next_n_rows(self.max_n_rows)
 
-        if samples == False:
-            raise ValueError("Filterbank object does not have that many rows.")
+        # if samples == False:
+        #     raise ValueError("Filterbank object does not have that many rows.")
 
         self.image.set_array(samples)
 
