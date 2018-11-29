@@ -17,10 +17,7 @@ from filterbank.header import read_header
 from filterbank.filterbank import Filterbank
 
 # Instatiate the filterbank reader and point to the filterbank file
-fb = Filterbank(filename='examples/pspm32bit.fil')
-
-# read filterbank at once
-fb.read_filterbank()
+fb = Filterbank(filename='examples/pspm32bit.fil', as_stream=False)
 
 # read the data in the filterbank file
 f, samples = fb.select_data()

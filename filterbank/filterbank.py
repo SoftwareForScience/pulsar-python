@@ -14,13 +14,14 @@ class Filterbank:
 
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(self, filename, freq_range=None, time_range=None):
+    def __init__(self, filename, freq_range=None, time_range=None, as_stream=True):
         """
             Initialize Filterbank object
 
             Args:
                 freq_range, tuple of freq_start and freq_stop in MHz
                 time_range, tuple of time_start and time_stop
+                as_stream, don't read filterbank at once
         """
         if not os.path.isfile(filename):
             raise FileNotFoundError(filename)
@@ -50,6 +51,9 @@ class Filterbank:
         self.fil.seek(int(self.ii_start * self.n_bytes * self.n_ifs * self.n_chans), 1)
         # find possible channels
         self.i_0, self.i_1 = self.setup_chans(freq_range)
+        # read filterbank at once
+        if not as_stream:
+            self.read_filterbank()
 
 
     def read_filterbank(self):
