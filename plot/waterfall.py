@@ -121,7 +121,7 @@ class Waterfall():
             Returns the raw data image of the full dataset, if using a discrete dataset.
         """
         self.update_plot_labels()
-        self.image.set_array(self.samples)
+        self.image.set_array(self.samples.reshape(self.samples.shape[1], self.samples.shape[0]))
         return self.image
 
     def update(self):
