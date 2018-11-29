@@ -13,7 +13,6 @@ class Waterfall():
 
     header = None
     samples = None
-    center_freq = None
     sample_freq = None
     freqs = None
     nfft = 1024
@@ -55,11 +54,11 @@ class Waterfall():
         self.samples_per_scan = samples_per_scan if samples_per_scan else self.samples_per_scan
         self.buffered_sweeps = buffered_sweeps if buffered_sweeps else self.buffered_sweeps
         self.scans_per_sweep = scans_per_sweep if scans_per_sweep else self.scans_per_sweep
-        self.freq_inc_coarse = freq_inc_coarse if freq_inc_coarse else self.freq_inc_coarse
-        self.freq_inc_fine = freq_inc_fine if freq_inc_fine else self.freq_inc_fine
-        self.gain_inc = gain_inc if gain_inc else self.gain_inc
+        # self.freq_inc_coarse = freq_inc_coarse if freq_inc_coarse else self.freq_inc_coarse
+        # self.freq_inc_fine = freq_inc_fine if freq_inc_fine else self.freq_inc_fine
+        # self.gain_inc = gain_inc if gain_inc else self.gain_inc
         
-        freqs, _ = fb.select_data()
+        freqs, _ = fb.select_data(time_start=0, time_stop=50)
         self.freqs = np.asarray(freqs) #if freqs not None else None
         self.header = fb.get_header()
 
@@ -87,7 +86,7 @@ class Waterfall():
         """
             Set the plotlables.
         """
-        center_freq = self.center_freq
+        center_freq = self.get_center_freq()
         sample_freq = self.sample_freq
         if self.freqs is not None:
             freq_range = self.freqs.min(), self.freqs.max()
@@ -153,3 +152,9 @@ class Waterfall():
         self.update_plot_labels()
 
         return(self.fig, self.update, 50, True)
+
+    def get_center_freq(self):
+        """
+            returns the centerfrequency stored in the file header.
+        """
+        return self.header[b'center_freq']
