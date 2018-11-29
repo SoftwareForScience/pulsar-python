@@ -37,7 +37,7 @@ The header data, including the center frequency, can be retrieved using the `get
 
 ## 2.3 Read filterbank file
 The attributes time_range and freq_range can be passed as parameters to select a specific portion of the filterbank file.
-To make the Filterbank object read the filterbank file at once, set the `as_stream` parameter to `True`.
+To make the Filterbank object read the filterbank file at once, set the `as_stream` parameter to `False`.
 ```
 filterbank = Filterbank(<PATH TO FILTERBANK FILE>, freq_range, time_range, as_stream)
 ```
