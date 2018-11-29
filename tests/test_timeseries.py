@@ -18,6 +18,12 @@ class TestTimeseries(unittest.TestCase):
     """
 
     def test_get_timeseries(self):
+        """
+            Tests the standard initialization of the timeseries object from
+            a normal numpy array, also tests the retrieval functionality to retrieve
+            the timeseries as an numpy array.
+        :return:
+        """
         timeseries_array = [-3.4771993, 28.411894, 1.5027914, 12.363131, -9.0473995,
                             13.312918, -8.387265, 2.095158, 9.921608, -1.1714606,
                             10.393141, -7.7038407, 24.99097, -15.776686, 0.53236485,
@@ -42,11 +48,11 @@ class TestTimeseries(unittest.TestCase):
             and cross-validates this with the modules implementation.
         :return:
         """
-        fb = Filterbank("./pspm32.fil")
-        fb.read_filterbank()
+        filter_bank = Filterbank("./pspm32.fil")
+        filter_bank.read_filterbank()
 
-        timeseries = Timeseries().from_filterbank(fb)
-        _, samples = fb.select_data()
+        timeseries = Timeseries().from_filterbank(filter_bank)
+        _, samples = filter_bank.select_data()
 
         timeseries_check = []
 
