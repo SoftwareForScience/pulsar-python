@@ -116,6 +116,14 @@ class Waterfall():
         self.image.set_array(rows)
         return self.image
 
+    def get_raw_image(self):
+        """
+            Returns the raw data image of the full dataset, if using a discrete dataset.
+        """
+        self.update_plot_labels()
+        self.image.set_array(self.samples)
+        return self.image
+
     def update(self):
         """
             Updates the image with the next row of data, when using
