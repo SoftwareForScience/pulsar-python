@@ -63,7 +63,7 @@ class TestFilterbank(unittest.TestCase):
         data = fil.select_data()
         self.assertTrue(all(432.5 < i < 435.4  for i in data[0]))
         self.assertEqual(len(data[1]), time_delt)
-    
+
     def test_filterbank_select_time_range(self):
         """
             Initialize 32 bits filterbank

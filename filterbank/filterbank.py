@@ -4,7 +4,7 @@
 
 import os
 import numpy as np
-from filterbank.header import read_header, len_header
+from .header import read_header, len_header
 
 
 class Filterbank:
