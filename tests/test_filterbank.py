@@ -23,7 +23,7 @@ class TestFilterbank(unittest.TestCase):
             and test if values are in frequency range
         """
         filename = './pspm8.fil'
-        fil = filterbank.Filterbank(filename, as_stream=False)
+        fil = filterbank.Filterbank(filename, read_all=True)
         data = fil.select_data(freq_start=431, freq_stop=432)
         self.assertTrue(all(430.5 < i < 432.4  for i in data[0]))
 
@@ -33,7 +33,7 @@ class TestFilterbank(unittest.TestCase):
             and test if values are in frequency range
         """
         filename = './pspm16.fil'
-        fil = filterbank.Filterbank(filename, as_stream=False)
+        fil = filterbank.Filterbank(filename, read_all=True)
         data = fil.select_data(freq_start=432, freq_stop=431)
         self.assertTrue(all(430.5 < i < 432.4  for i in data[0]))
 
@@ -45,7 +45,7 @@ class TestFilterbank(unittest.TestCase):
         filename = './pspm8.fil'
         time_range = (10, 30)
         time_delt = abs(time_range[0] - time_range[1])
-        fil = filterbank.Filterbank(filename, as_stream=False)
+        fil = filterbank.Filterbank(filename, read_all=True)
         data = fil.select_data(time_start=time_range[0], time_stop=time_range[1])
         self.assertEqual(len(data[1]), time_delt)
 
@@ -59,10 +59,22 @@ class TestFilterbank(unittest.TestCase):
         time_range = (10, 20)
         time_delt = abs(time_range[0] - time_range[1])
         fil = filterbank.Filterbank(filename, freq_range=freq_range, time_range=time_range,
-                                    as_stream=False)
+                                    read_all=True)
         data = fil.select_data()
         self.assertTrue(all(432.5 < i < 435.4  for i in data[0]))
         self.assertEqual(len(data[1]), time_delt)
+    
+    def test_filterbank_select_time_range(self):
+        """
+            Initialize 32 bits filterbank
+            and test selecting a range of time
+        """
+        filename = './pspm32.fil'
+        fil = filterbank.Filterbank(filename, read_all=True)
+        header = fil.get_header()
+        samp_time = header[b'tsamp']
+        data = fil.select_data(time_start=0.02, time_stop=0.03)
+        self.assertAlmostEqual(len(data[1]) / 24. / 60. / 60., 1 / samp_time / 10e6)
 
     def test_filterbank_rows(self):
         """

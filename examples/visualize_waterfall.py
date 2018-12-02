@@ -22,10 +22,10 @@ print(freqs.shape)
 print(samples.shape)
 
 # Read the header of the filterbank file
-header = read_header('examples/pspm32bit.fil')
+header = fb.get_header()
 
 # Calculate the center frequency with the data in the header
-center_freq = header[b'fch1'] + float(header[b'nchans']) * header[b'foff'] / 2.0
+center_freq = header[b'center_freq']
 
 
 sdr = RtlSdr()

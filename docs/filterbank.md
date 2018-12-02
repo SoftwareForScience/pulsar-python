@@ -37,14 +37,15 @@ The header data, including the center frequency, can be retrieved using the `get
 
 ## 2.3 Read filterbank file
 The attributes time_range and freq_range can be passed as parameters to select a specific portion of the filterbank file.
-To make the Filterbank object read the filterbank file at once, set the `as_stream` parameter to `False`.
+To make the Filterbank object read the filterbank file at once, set the `read_all` parameter to `True`.
 ```
-filterbank = Filterbank(<PATH TO FILTERBANK FILE>, freq_range, time_range, as_stream)
+filterbank = Filterbank(<PATH TO FILTERBANK FILE>, freq_range, time_range, read_all)
 ```
 
 ## 2.4 Select a range of data from the filterbank file
 The select_data method can be used to retrieve data from the Filterbank object.
 The user has the option to give a `time` and/or `frequency` range to select a subset from the entire dataset.
+The time-range can either be an index of a sample or a float that is represents a moment in time (in seconds).
 ```
 filterbank.select_data(freq_range, time_range)
 ```
@@ -53,7 +54,7 @@ The `select_data` method returns an array of all different channels/frequencies 
 The matrix contains for each time sample an array which has the intensity per channel/frequency.
 
 ## 2.5 Read filterbank as stream
-When reading the filterbank file as a stream, the user should set the `stream`-parameter to `True` when initializing the filterbank object.
+When reading the filterbank file as a stream, the user should let the `read_all`-parameter stay `False` when initializing the filterbank object.
 
 Each time the user calls the `next_row` method, it will retrieve an array with intensitiy per frequency for a new time sample from the filterbank file.
 When the last iteration of the filterbank is reached, the new_row method will return `True`.  
