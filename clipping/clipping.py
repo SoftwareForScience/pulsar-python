@@ -11,7 +11,9 @@ def clipping(channels, samples):
     """
     samples = filter_samples(samples)
     # select first max 2000 samples
-    samples = filter_channels(samples[:2000])
+    channels, samples = filter_channels(channels, samples[:2000])
+
+    return channels, samples
 
 
 def filter_samples(samples):
@@ -29,7 +31,7 @@ def filter_samples(samples):
             new_samples.append(sample)
     return new_samples
     
-def filter_channels(samples):
+def filter_channels(channels, samples):
     """
         Calculate mean power of all time samples per frequency
         and remove frequencies with significantly high power
@@ -45,4 +47,4 @@ def filter_channels(samples):
         if avg_power_per_chan[i] >= (avg_power * factor):
             bad_channels.append(i)
     # remove bad channels from samples
-    return np.delete(samples, bad_channels)
+    return np.delete(channels, bad_channels), np.delete(samples, bad_channels)
