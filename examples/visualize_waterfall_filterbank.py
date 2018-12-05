@@ -19,11 +19,10 @@ freqs, samples = fb.select_data()
 print(freqs.shape)
 print(samples.shape)
 
-# Read the header of the filterbank file
-header = fb.get_header()
+# Assign the center frequency with the data in the header
+center_freq = fb.header[b'center_freq']
 
-wf = waterfall.Waterfall(samples=samples[0:next_power_of_2(8000)], freqs=freqs, fig=pyl.figure(), center_freq=header[b'center_freq'])
+wf = waterfall.Waterfall(samples=samples[0:next_power_of_2(8000)], freqs=freqs, fig=pyl.figure(), center_freq=center_freq)
 img = wf.get_image()
 
 pyl.show(img)
-

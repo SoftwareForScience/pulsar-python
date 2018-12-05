@@ -22,11 +22,8 @@ fb = Filterbank(filename='examples/pspm32bit.fil', as_stream=False)
 # read the data in the filterbank file
 f, samples = fb.select_data()
 
-# Read the header of the filterbank file
-header = read_header('examples/pspm32bit.fil')
-
-# Calculate the center frequency with the data in the header
-center_freq = header[b'center_freq']
+# Assign the center frequency with the data in the header
+center_freq = fb.header[b'center_freq']
 
 print(samples.shape)
 # Get the powerlevels and the frequencies

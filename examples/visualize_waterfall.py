@@ -21,11 +21,8 @@ freqs, samples = fb.select_data()
 print(freqs.shape)
 print(samples.shape)
 
-# Read the header of the filterbank file
-header = fb.get_header()
-
 # Calculate the center frequency with the data in the header
-center_freq = header[b'center_freq']
+center_freq = fb.header[b'center_freq']
 
 
 sdr = RtlSdr()

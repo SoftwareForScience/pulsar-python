@@ -215,10 +215,3 @@ class Filterbank:
             freq_data = self.freqs[i_1:i_0 + 1]
             fil_data = np.squeeze(self.data[time_start:time_stop, ..., i_1:i_0 + 1])
         return freq_data, fil_data
-
-
-    def get_header(self):
-        """
-            Return a dictionary of the filterbank header
-        """
-        return self.header

@@ -71,8 +71,7 @@ class TestFilterbank(unittest.TestCase):
         """
         filename = './pspm32.fil'
         fil = filterbank.Filterbank(filename, read_all=True)
-        header = fil.get_header()
-        samp_time = header[b'tsamp']
+        samp_time = fil.header[b'tsamp']
         data = fil.select_data(time_start=0.02, time_stop=0.03)
         self.assertAlmostEqual(len(data[1]) / 24. / 60. / 60., 1 / samp_time / 10e6)
 
@@ -121,16 +120,6 @@ class TestFilterbank(unittest.TestCase):
         while not isinstance(fil.next_n_rows(n_rows), bool):
             pass
         self.assertTrue(fil.next_n_rows(n_rows))
-
-    def test_filterbank_header(self):
-        """
-            Retrieve the header for the filterbank
-            and test if the center frequency exists
-        """
-        filename = './pspm32.fil'
-        fil = filterbank.Filterbank(filename)
-        header = fil.get_header()
-        self.assertIsNotNone(header[b'center_freq'])
 
 if __name__ == '__main__':
     unittest.main()
