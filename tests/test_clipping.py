@@ -3,7 +3,6 @@
 """
 
 import unittest
-import numpy as np
 from .context import clipping # pylint: disable-msg=E0611
 
 class TestClipping(unittest.TestCase):
@@ -20,7 +19,7 @@ class TestClipping(unittest.TestCase):
 
     def test_filter_samples(self):
         """
-            When filtering samples all time samples 
+            When filtering samples all time samples
             with a relative high power should be removed
         """
         result = clipping.filter_samples(self.fil_vector)

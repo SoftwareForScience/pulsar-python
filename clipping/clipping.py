@@ -30,7 +30,7 @@ def filter_samples(samples):
         if np.sum(sample) <= (avg_sample * factor):
             new_samples.append(sample)
     return new_samples
-    
+
 def filter_channels(channels, samples):
     """
         Calculate mean power of all time samples per frequency
@@ -43,8 +43,8 @@ def filter_channels(channels, samples):
     # calculate the average power for all channels
     avg_power = sum(avg_power_per_chan)/len(avg_power_per_chan)
     # find channels with significant high power
-    for i in range(len(avg_power_per_chan)):
-        if avg_power_per_chan[i] >= (avg_power * factor):
+    for i, avg_channel in enumerate(avg_power_per_chan):
+        if avg_channel >= (avg_power * factor):
             bad_channels.append(i)
     # remove bad channels from samples
     return np.delete(channels, bad_channels), np.delete(samples, bad_channels)
