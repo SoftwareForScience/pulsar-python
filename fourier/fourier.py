@@ -192,7 +192,7 @@ def ifft(input_data):
     data_sorted = np.arange(min_data)
     data_matrix = data_sorted[:, None]
     exp_data = np.exp(2j * np.pi * data_sorted * data_matrix / min_data)
-    dot_product = 1/input_shape * np.dot(exp_data, dot_product.reshape((min_data, -1)))
+    dot_product = 1/input_shape * np.dot(exp_data, input_data.reshape((min_data, -1)))
 
     while dot_product.shape[0] < input_shape:
         data_even = dot_product[:, :dot_product.shape[1] // 2]
