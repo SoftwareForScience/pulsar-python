@@ -33,20 +33,19 @@ time_range = tstart + (tsamp/24/60/60)
 freq_range is a tuple with a frequency start and a frequency stop  
 The same applies to time_range
 
-The header data, including the center frequency, can be retrieved using the `get_header` method.
+The header data, including the center frequency, can be retrieved by calling the header attribute from the Filterbank object.
 
 ## 2.3 Read filterbank file
 The attributes time_range and freq_range can be passed as parameters to select a specific portion of the filterbank file.
-To make the Filterbank object read the filterbank file at once, use the `read_filterbank` method.
+To make the Filterbank object read the filterbank file at once, set the `read_all` parameter to `True`.
 ```
-filterbank = Filterbank(<PATH TO FILTERBANK FILE>, freq_range, time_range, stream)
-
-filterbank.read_filterbank()
+filterbank = Filterbank(<PATH TO FILTERBANK FILE>, freq_range, time_range, read_all)
 ```
 
 ## 2.4 Select a range of data from the filterbank file
 The select_data method can be used to retrieve data from the Filterbank object.
 The user has the option to give a `time` and/or `frequency` range to select a subset from the entire dataset.
+The time-range can either be an index of a sample or a float that is represents a moment in time (in seconds).
 ```
 filterbank.select_data(freq_range, time_range)
 ```
@@ -55,6 +54,9 @@ The `select_data` method returns an array of all different channels/frequencies 
 The matrix contains for each time sample an array which has the intensity per channel/frequency.
 
 ## 2.5 Read filterbank as stream
+
+When reading the filterbank file as a stream, the user should let the `read_all`-parameter stay `False` when initializing the filterbank object.
+
 Each time the user calls the `next_row` method, it will retrieve an array with intensitiy per frequency for a new time sample from the filterbank file.
 When the last iteration of the filterbank is reached, the new_row method will return `False`.  
 The same goes for the `next_n_rows` method, where the user is able to define the amount of rows that should be returned.
