@@ -182,24 +182,23 @@ def ifft(input_data):
             Array of length `n` containing the transformed values.
     """
     input_data = np.asarray(input_data, dtype=type(input_data[0]))
-    N = input_data.shape[0]
+    input_shape = input_data.shape[0]
 
-    if np.log2(N) % 1 > 0:
+    if np.log2(input_shape) % 1 > 0:
         raise ValueError("Size of input data must be a power of 2")
 
-    N_min = min(N, 32)
+    min_data = min(input_shape, 32)
 
-    n = np.arange(N_min)
-    k = n[:, None]
-    M = np.exp(2j * np.pi * n * k / N_min)
-    X = 1/N * np.dot(M, X.reshape((N_min, -1)))
+    data_sorted = np.arange(min_data)
+    data_matrix = data_sorted[:, None]
+    exp_data = np.exp(2j * np.pi * data_sorted * data_matrix / min_data)
+    dot_product = 1/input_shape * np.dot(exp_data, dot_product.reshape((min_data, -1)))
 
-    while X.shape[0] < N:
-        X_even = X[:, :X.shape[1] // 2]
-        X_odd = X[:, X.shape[1] // 2:]
-        factor = np.exp(1j * np.pi * np.arange(X.shape[0])
-                        / X.shape[0])[:, None]
-        X = np.vstack([X_even + factor * X_odd,
-                       X_even - factor * X_odd])
+    while dot_product.shape[0] < input_shape:
+        data_even = dot_product[:, :dot_product.shape[1] // 2]
+        data_odd = dot_product[:, dot_product.shape[1] // 2:]
+        factor = np.exp(1j * np.pi * np.arange(dot_product.shape[0])
+                        / dot_product.shape[0])[:, None]
+        dot_product = np.vstack([data_even + factor * data_odd, data_even - factor * data_odd])
 
-    return X.ravel()
+    return dot_product.ravel()
