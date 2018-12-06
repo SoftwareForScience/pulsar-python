@@ -9,10 +9,11 @@ def clipping(channels, samples):
     """
         Perform clipping on samples
     """
+    n_samples = 2000
     # remove all rows(samples) with noise
     samples = filter_samples(samples)
-    # remove all columns(channels) with noise, select first max 2000 samples
-    channels, samples = filter_channels(channels, samples[:2000])
+    # remove all columns(channels) with noise, select first max n samples
+    channels, samples = filter_channels(channels, samples[:n_samples])
     # remove all individual cells with noise
     samples = filter_indv_channels(samples)
     return channels, samples
