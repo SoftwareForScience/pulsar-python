@@ -8,26 +8,14 @@ from fourier import fourier
 # pylint: disable-msg=R0914
 
 
-# def psd_helper(samples, sampling_freq, center_freq):
-#     samples = np.asarray(samples)
-
-#     n_x = samples.shape[0]
-#     n_y = samples.shape[1]
-
-#     sample_size = n_x * n_y
-
-#     nx = n_x/2+1
-#     ny = n_y/2+1
-
-
 def window_hanning(window):
     '''
-    Return window times the hanning window of len(window).
+        Return window times the hanning window of len(window).
 
-    See Also
-    --------
-    :func:`window_none`
-        :func:`window_none` is another window algorithm.
+        See Also
+        --------
+        :func:`window_none`
+            :func:`window_none` is another window algorithm.
     '''
     return np.hanning(len(window))*window
 
@@ -73,8 +61,8 @@ def psd(samples, sampling_frequency, center_frequency, nfft=None):
     # analyze spectrum
     indeces = np.arange(nfft/2-1, nfft-1, dtype=int)
     if np.ndim(samples) == 1:
-        power = fourier.fftshift(fourier.fft_vectorized(samples, nfft))
-        power = fourier.fftshift(power)
+        power = fourier.fft_shift(fourier.fft_vectorized(samples, nfft))
+        # power = fourier.fftshift(power)
     elif np.ndim(samples) == 2:
         samples = samples.reshape((samples.shape[0]*samples.shape[1],))
         power = np.asarray(fourier.fft_vectorized(samples))
@@ -91,12 +79,19 @@ def psd(samples, sampling_frequency, center_frequency, nfft=None):
 
     return freqs, power
 
-
-def opsd(samples, nfft=256, sample_rate=2, window=window_hanning, noverlap=0,
-         detrend_func=None, pad_to=256, scale_by_freq=True, sides=None):
+# pylint: disable=R0912
+# All branches are needed
+def opsd(samples, nfft=None, sample_rate=2, window=window_hanning, noverlap=0,
+         detrend_func=None, pad_to=None, scale_by_freq=True, sides='twosided'):
     """
         Plot the power spectral density.
     """
+    if nfft is None:
+        nfft = len(samples)
+
+    if pad_to is None:
+        pad_to = nfft
+
     samples = np.asarray(samples)
 
     if len(samples) < nfft:
@@ -123,7 +118,7 @@ def opsd(samples, nfft=256, sample_rate=2, window=window_hanning, noverlap=0,
     result, window_vals = apply_window(result, window, axis=0,
                                        return_window=True)
 
-    result = fourier.fft_vectorized(samples)
+    result = fourier.fft_vectorized(samples, nfft=nfft)
     freqs = fourier.fft_freq(pad_to, 1/sample_rate)[:num_freqs]
 
     result = np.conj(result) * result
@@ -141,7 +136,7 @@ def opsd(samples, nfft=256, sample_rate=2, window=window_hanning, noverlap=0,
     else:
         result /= np.abs(window_vals).sum()**2
 
-    # time = np.arange(nfft/2, len(samples) - nfft/2 + 1, nfft - noverlap)/sample_rate
+    time = np.arange(nfft/2, len(samples) - nfft/2 + 1, nfft - noverlap)/sample_rate
 
     if sides == 'twosided':
         freqs = np.concatenate((freqs[freqcenter:], freqs[:freqcenter]))
@@ -150,40 +145,43 @@ def opsd(samples, nfft=256, sample_rate=2, window=window_hanning, noverlap=0,
     elif not pad_to % 2:
         freqs[-1] *= -1
 
-    return result, freqs #, time
+    result = 10*np.log10(result/freqcenter)
+    # freqs = (freqs + freqcenter)/1e5
+
+    return result, freqs, time
 
 
 def detrend(samples, key=None, axis=None):
-    '''
-    Return samples with its trend removed.
+    """
+        Return samples with its trend removed.
 
-    Parameters
-    ----------
-    x : array or sequence
-        Array or sequence containing the data.
+        Parameters
+        ----------
+        x : array or sequence
+            Array or sequence containing the data.
 
-    key : [ 'default' | 'constant' | 'mean' | 'linear' | 'none'] or function
-        Specifies the detrend algorithm to use. 'default' is 'mean', which is
-        the same as :func:`detrend_mean`. 'constant' is the same. 'linear' is
-        the same as :func:`detrend_linear`. 'none' is the same as
-        :func:`detrend_none`. The default is 'mean'. See the corresponding
-        functions for more details regarding the algorithms. Can also be a
-        function that carries out the detrend operation.
+        key : [ 'default' | 'constant' | 'mean' | 'linear' | 'none'] or function
+            Specifies the detrend algorithm to use. 'default' is 'mean', which is
+            the same as :func:`detrend_mean`. 'constant' is the same. 'linear' is
+            the same as :func:`detrend_linear`. 'none' is the same as
+            :func:`detrend_none`. The default is 'mean'. See the corresponding
+            functions for more details regarding the algorithms. Can also be a
+            function that carries out the detrend operation.
 
-    axis : integer
-        The axis along which to do the detrending.
+        axis : integer
+            The axis along which to do the detrending.
 
-    See Also
-    --------
-    :func:`detrend_mean`
-        :func:`detrend_mean` implements the 'mean' algorithm.
+        See Also
+        --------
+        :func:`detrend_mean`
+            :func:`detrend_mean` implements the 'mean' algorithm.
 
-    :func:`detrend_linear`
-        :func:`detrend_linear` implements the 'linear' algorithm.
+        :func:`detrend_linear`
+            :func:`detrend_linear` implements the 'linear' algorithm.
 
-    :func:`detrend_none`
-        :func:`detrend_none` implements the 'none' algorithm.
-    '''
+        :func:`detrend_none`
+            :func:`detrend_none` implements the 'none' algorithm.
+    """
     if key is None or key in ['constant', 'mean', 'default']:
         return detrend(samples, key=detrend_mean, axis=axis)
     if key == 'linear':
@@ -216,27 +214,25 @@ def detrend(samples, key=None, axis=None):
 
 
 def stride_windows(samples, sample_size, noverlap=None, axis=0):
-    '''
-    Get all windows of samples with length sample_size as a single array, using strides
-    to avoid data duplication.
+    """
+        Get all windows of samples with length sample_size as a single array, using strides
+        to avoid data duplication.
 
-    Parameters
-    ----------
-    samples : 1D array or sequence
-        Array or sequence containing the data.
+        Parameters
+        ----------
+        samples : 1D array or sequence
+            Array or sequence containing the data.
 
-    sample_size : integer
-        The number of data points in each window.
+        sample_size : integer
+            The number of data points in each window.
 
-    noverlap : integer
-        The overlap between adjacent windows.
-        Default is 0 (no overlap)
+        noverlap : integer
+            The overlap between adjacent windows.
+            Default is 0 (no overlap)
 
-    axis : integer
-        The axis along which the windows will run.
-
-    '''
-
+        axis : integer
+            The axis along which the windows will run.
+    """
     if noverlap is None:
         noverlap = 0
 
@@ -270,34 +266,34 @@ def stride_windows(samples, sample_size, noverlap=None, axis=0):
 
 
 def detrend_mean(sequence, axis=None):
-    '''
-    Return sequence minus the mean(sequence).
+    """
+        Return sequence minus the mean(sequence).
 
-    Parameters
-    ----------
-    sequence : array or sequence
-        Array or sequence containing the data
-        Can have any dimensionality
+        Parameters
+        ----------
+        sequence : array or sequence
+            Array or sequence containing the data
+            Can have any dimensionality
 
-    axis : integer
-        The axis along which to take the mean.  See numpy.mean for a
-        description of this argument.
+        axis : integer
+            The axis along which to take the mean.  See numpy.mean for a
+            description of this argument.
 
-    See Also
-    --------
-    :func:`demean`
-        This function is the same as :func:`demean` except for the default
-        *axis*.
+        See Also
+        --------
+        :func:`demean`
+            This function is the same as :func:`demean` except for the default
+            *axis*.
 
-    :func:`detrend_linear`
+        :func:`detrend_linear`
 
-    :func:`detrend_none`
-        :func:`detrend_linear` and :func:`detrend_none` are other detrend
-        algorithms.
+        :func:`detrend_none`
+            :func:`detrend_linear` and :func:`detrend_none` are other detrend
+            algorithms.
 
-    :func:`detrend`
-        :func:`detrend` is a wrapper around all the detrend algorithms.
-    '''
+        :func:`detrend`
+            :func:`detrend` is a wrapper around all the detrend algorithms.
+    """
     sequence = np.asarray(sequence)
 
     if axis is not None and axis+1 > sequence.ndim:
@@ -307,64 +303,64 @@ def detrend_mean(sequence, axis=None):
 
 
 def detrend_none(samples, axis=None): # pylint: disable-msg=W0613
-    '''
-    Return samples: no detrending.
+    """
+        Return samples: no detrending.
 
-    Parameters
-    ----------
-    samples : any object
-        An object containing the data
+        Parameters
+        ----------
+        samples : any object
+            An object containing the data
 
-    axis : integer
-        This parameter is ignored.
-        It is included for compatibility with detrend_mean
+        axis : integer
+            This parameter is ignored.
+            It is included for compatibility with detrend_mean
 
-    See Also
-    --------
-    :func:`denone`
-        This function is the same as :func:`denone` except for the default
-        *axis*, which has no effect.
+        See Also
+        --------
+        :func:`denone`
+            This function is the same as :func:`denone` except for the default
+            *axis*, which has no effect.
 
-    :func:`detrend_mean`
+        :func:`detrend_mean`
 
-    :func:`detrend_linear`
-        :func:`detrend_mean` and :func:`detrend_linear` are other detrend
-        algorithms.
+        :func:`detrend_linear`
+            :func:`detrend_mean` and :func:`detrend_linear` are other detrend
+            algorithms.
 
-    :func:`detrend`
-        :func:`detrend` is a wrapper around all the detrend algorithms.
-    '''
+        :func:`detrend`
+            :func:`detrend` is a wrapper around all the detrend algorithms.
+    """
     return samples
 
 # pylint: disable-msg=C0103
 def detrend_linear(y):
-    '''
-    Return x minus best fit line; 'linear' detrending.
+    """
+        Return x minus best fit line; 'linear' detrending.
 
-    Parameters
-    ----------
-    y : 0-D or 1-D array or sequence
-        Array or sequence containing the data
+        Parameters
+        ----------
+        y : 0-D or 1-D array or sequence
+            Array or sequence containing the data
 
-    axis : integer
-        The axis along which to take the mean.  See numpy.mean for a
-        description of this argument.
+        axis : integer
+            The axis along which to take the mean.  See numpy.mean for a
+            description of this argument.
 
-    See Also
-    --------
-    :func:`delinear`
-        This function is the same as :func:`delinear` except for the default
-        *axis*.
+        See Also
+        --------
+        :func:`delinear`
+            This function is the same as :func:`delinear` except for the default
+            *axis*.
 
-    :func:`detrend_mean`
+        :func:`detrend_mean`
 
-    :func:`detrend_none`
-        :func:`detrend_mean` and :func:`detrend_none` are other detrend
-        algorithms.
+        :func:`detrend_none`
+            :func:`detrend_mean` and :func:`detrend_none` are other detrend
+            algorithms.
 
-    :func:`detrend`
-        :func:`detrend` is a wrapper around all the detrend algorithms.
-    '''
+        :func:`detrend`
+            :func:`detrend` is a wrapper around all the detrend algorithms.
+    """
     # This is faster than an algorithm based on linalg.lstsq.
     y = np.asarray(y)
 
@@ -386,25 +382,25 @@ def detrend_linear(y):
 # pylint: enable-msg=C0103
 
 def apply_window(samples, window, axis=0, return_window=None):
-    '''
-    Apply the given window to the given 1D or 2D array along the given axis.
+    """
+        Apply the given window to the given 1D or 2D array along the given axis.
 
-    Parameters
-    ----------
-    samples : 1D or 2D array or sequence
-        Array or sequence containing the data.
+        Parameters
+        ----------
+        samples : 1D or 2D array or sequence
+            Array or sequence containing the data.
 
-    window : function or array.
-        Either a function to generate a window or an array with length
-        *samples*.shape[*axis*]
+        window : function or array.
+            Either a function to generate a window or an array with length
+            *samples*.shape[*axis*]
 
-    axis : integer
-        The axis over which to do the repetition.
-        Must be 0 or 1.  The default is 0
+        axis : integer
+            The axis over which to do the repetition.
+            Must be 0 or 1.  The default is 0
 
-    return_window : bool
-        If true, also return the 1D values of the window that was applied
-    '''
+        return_window : bool
+            If true, also return the 1D values of the window that was applied
+    """
     samples = np.asarray(samples)
 
     if samples.ndim != 1 and samples.ndim != 2:
@@ -442,32 +438,32 @@ def apply_window(samples, window, axis=0, return_window=None):
 
 
 def stride_repeat(samples, sample_size, axis=0):
-    '''
-    Repeat the values in an array in a memory-efficient manner.  Array samples is
-    stacked vertically sample_size times.
+    """
+        Repeat the values in an array in a memory-efficient manner.  Array samples is
+        stacked vertically sample_size times.
 
-    .. warning::
+        .. warning::
 
-        It is not safe to write to the output array.  Multiple
-        elements may point to the same piece of memory, so
-        modifying one value may change others.
+            It is not safe to write to the output array.  Multiple
+            elements may point to the same piece of memory, so
+            modifying one value may change others.
 
-    Parameters
-    ----------
-    samples : 1D array or sequence
-        Array or sequence containing the data.
+        Parameters
+        ----------
+        samples : 1D array or sequence
+            Array or sequence containing the data.
 
-    sample_size : integer
-        The number of time to repeat the array.
+        sample_size : integer
+            The number of time to repeat the array.
 
-    axis : integer
-        The axis along which the data will run.
+        axis : integer
+            The axis along which the data will run.
 
-    References
-    ----------
-    `stackoverflow: Repeat NumPy array without replicating data?
-    <http://stackoverflow.com/a/5568169>`_
-    '''
+        References
+        ----------
+        `stackoverflow: Repeat NumPy array without replicating data?
+        <http://stackoverflow.com/a/5568169>`_
+    """
     if axis not in [0, 1]:
         raise ValueError('axis must be 0 or 1')
     samples = np.asarray(samples)

@@ -4,9 +4,9 @@
 
 import numpy as np
 
-def fft2(input_data, nfft=None, axis=-1):
+def fft_matrix(input_data, nfft=None, axis=-1):
     """
-    2d fft
+        Performs FFT for each row in matrix
     """
     input_data = np.asarray(input_data)
 
@@ -66,7 +66,6 @@ def fft_vectorized(input_data, nfft=None, axis=-1):
     if nfft is None:
         nfft = input_data.shape[axis]
 
-
     if input_data.shape[axis] != nfft:
         input_shape = list(input_data.shape)
         index = [slice(None)]*len(input_shape)
@@ -109,40 +108,39 @@ def fft_vectorized(input_data, nfft=None, axis=-1):
 
 def fft_freq(window_len, spacing=1.0):
     """
-    Return the Discrete Fourier Transform sample frequencies.
+        Return the Discrete Fourier Transform sample frequencies.
 
-    The returned float array `f` contains the frequency bin centers in cycles
-    per unit of the sample spacing (with zero at the start).  For instance, if
-    the sample spacing is in seconds, then the frequency unit is cycles/second.
+        The returned float array `f` contains the frequency bin centers in cycles
+        per unit of the sample spacing (with zero at the start).  For instance, if
+        the sample spacing is in seconds, then the frequency unit is cycles/second.
 
-    Given a window length `n` and a sample spacing `d`::
+        Given a window length `n` and a sample spacing `d`::
 
-      f = [0, 1, ...,   n/2-1,     -n/2, ..., -1] / (d*n)   if n is even
-      f = [0, 1, ..., (n-1)/2, -(n-1)/2, ..., -1] / (d*n)   if n is odd
+          f = [0, 1, ...,   n/2-1,     -n/2, ..., -1] / (d*n)   if n is even
+          f = [0, 1, ..., (n-1)/2, -(n-1)/2, ..., -1] / (d*n)   if n is odd
 
-    Parameters
-    ----------
-    window_len : int
-        Window length.
-    spacing : scalar, optional
-        Sample spacing (inverse of the sampling rate). Defaults to 1.
+        Parameters
+        ----------
+        window_len : int
+            Window length.
+        spacing : scalar, optional
+            Sample spacing (inverse of the sampling rate). Defaults to 1.
 
-    Returns
-    -------
-    f : ndarray
-        Array of length `n` containing the sample frequencies.
+        Returns
+        -------
+        f : ndarray
+            Array of length `n` containing the sample frequencies.
 
-    Examples
-    --------
-    >>> signal = np.array([-2, 8, 6, 4, 1, 0, 3, 5], dtype=float)
-    >>> fourier = np.fft.fft(signal)
-    >>> n = signal.size
-    >>> timestep = 0.1
-    >>> freq = np.fft.fftfreq(n, d=timestep)
-    >>> freq
-    array([ 0.  ,  1.25,  2.5 ,  3.75, -5.  , -3.75, -2.5 , -1.25])
+        Examples
+        --------
+        >>> signal = np.array([-2, 8, 6, 4, 1, 0, 3, 5], dtype=float)
+        >>> fourier = np.fft.fft(signal)
+        >>> n = signal.size
+        >>> timestep = 0.1
+        >>> freq = np.fft.fftfreq(n, d=timestep)
+        >>> freq
+        array([ 0.  ,  1.25,  2.5 ,  3.75, -5.  , -3.75, -2.5 , -1.25])
     """
-
     val = 1.0 / (window_len * spacing)
     results = np.empty(window_len, int)
     window_half = (window_len-1)//2 + 1
@@ -152,11 +150,11 @@ def fft_freq(window_len, spacing=1.0):
     results[window_half:] = window_p2
     return results * val
 
-def fftshift(samples, axes=None):
-    """
-    Shift the zero-frequency component to the center of the spectrum.
-    """
 
+def fft_shift(samples, axes=None):
+    """
+        Shift the zero-frequency component to the center of the spectrum.
+    """
     samples = np.asarray(samples)
 
     if axes is None:
