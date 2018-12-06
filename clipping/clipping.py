@@ -9,10 +9,12 @@ def clipping(channels, samples):
     """
         Perform clipping on samples
     """
+    # remove all rows(samples) with noise
     samples = filter_samples(samples)
-    # select first max 2000 samples
+    # remove all columns(channels) with noise, select first max 2000 samples
     channels, samples = filter_channels(channels, samples[:2000])
-
+    # remove all individual cells with noise
+    samples = filter_indv_channels(samples)
     return channels, samples
 
 
@@ -29,7 +31,7 @@ def filter_samples(samples):
     for sample in samples:
         if np.sum(sample) <= (avg_sample * factor):
             new_samples.append(sample)
-    return new_samples
+    return np.array(new_samples)
 
 
 def filter_channels(channels, samples):
@@ -39,15 +41,37 @@ def filter_channels(channels, samples):
     """
     factor = 1.3
     bad_channels = []
-    # calculate the average power per channel
-    avg_power_per_chan = [sum(sample) for sample in zip(*samples)]
-    # calculate the average power for all channels
-    avg_power = sum(avg_power_per_chan)/len(avg_power_per_chan)
+    # calculate the mean power per channel
+    avg_power_chan = samples.mean(axis=0)
+    # calculate the standard deviation per channel
+    sd_power_chan = samples.std(axis=0)
+    # calculate the mean power for all channels
+    avg_power = sum(avg_power_chan)/len(avg_power_chan)
     # find channels with significant high power
-    for i, avg_channel in enumerate(avg_power_per_chan):
-        if avg_channel >= (avg_power * factor):
+    for i, (avg_channel, sd_channel) in enumerate(zip(avg_power_chan, sd_power_chan)):
+        if avg_channel >= (avg_power * factor) or sd_channel >= (avg_power * factor):
             bad_channels.append(i)
     # remove bad channels from samples
     new_channels = np.delete(channels, bad_channels)
     new_samples = np.delete(samples, bad_channels, axis=1)
     return new_channels, new_samples
+
+
+def filter_indv_channels(samples):
+    """
+        Calculate mean power per frequency
+        and remove samples with significantly high power
+    """
+    factor = 1.3
+    new_samples = np.zeros((len(samples), len(samples[0])))
+    # calculate the mean power for each sample per channel
+    avg_power_chan = samples.mean(axis=0)
+    # calculate the median power for each sample per channel
+    med_power_chan = np.median(samples, axis=0)
+    # iterator over columns(channels)
+    for i, channel in enumerate(samples.T):
+        # replace the intensity with the median of the channel,
+        # if the intensity is higher than the average of that channel
+        channel[channel > (avg_power_chan[i] * factor)] = med_power_chan[i]
+        new_samples[:, i] = channel
+    return new_samples
