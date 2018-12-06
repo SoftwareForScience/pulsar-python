@@ -166,3 +166,39 @@ def fft_shift(samples, axes=None):
         shift = [samples.shape[ax] // 2 for ax in axes]
 
     return np.roll(samples, shift, axes)
+
+def ifft(input_data):
+    """
+        Compute the inverse discrete Fourier Transform of the one-dimensional array input_data
+
+        Parameters
+        ----------
+        input_data : ndarray
+            Array of length `n` containing the values to be transformed.
+
+        Returns
+        -------
+        ndarray
+            Array of length `n` containing the transformed values.
+    """
+    input_data = np.asarray(input_data, dtype=type(input_data[0]))
+    input_shape = input_data.shape[0]
+
+    if np.log2(input_shape) % 1 > 0:
+        raise ValueError("Size of input data must be a power of 2")
+
+    min_data = min(input_shape, 32)
+
+    data_sorted = np.arange(min_data)
+    data_matrix = data_sorted[:, None]
+    exp_data = np.exp(2j * np.pi * data_sorted * data_matrix / min_data)
+    dot_product = 1/input_shape * np.dot(exp_data, input_data.reshape((min_data, -1)))
+
+    while dot_product.shape[0] < input_shape:
+        data_even = dot_product[:, :dot_product.shape[1] // 2]
+        data_odd = dot_product[:, dot_product.shape[1] // 2:]
+        factor = np.exp(1j * np.pi * np.arange(dot_product.shape[0])
+                        / dot_product.shape[0])[:, None]
+        dot_product = np.vstack([data_even + factor * data_odd, data_even - factor * data_odd])
+
+    return dot_product.ravel()
