@@ -28,7 +28,7 @@ class Waterfall():
     def __init__(self, fb=None, samples=None, center_freq=None, sample_freq=None,
                  fig=None, samples_per_scan=None,
                  buffered_sweeps=None, scans_per_sweep=None, freq_inc_coarse=None,
-                 freq_inc_fine=None, gain_inc=None, max_n_rows=1024, mode='stream'):
+                 freq_inc_fine=None, gain_inc=None, max_n_rows=1024, mode='stream', t_obs=None):
         """
             Setup waterfall object
         """
@@ -47,6 +47,10 @@ class Waterfall():
         # else:
         #     self.samples = samples
 
+        self.header = fb.get_header()
+        print(self.header)
+        self.t_obs = t_obs if t_obs else 1
+        print(self.t_obs)
         self.max_n_rows = max_n_rows
 
         self.sample_freq = sample_freq #if sample_freq else None
@@ -58,16 +62,20 @@ class Waterfall():
         # self.freq_inc_fine = freq_inc_fine if freq_inc_fine else self.freq_inc_fine
         # self.gain_inc = gain_inc if gain_inc else self.gain_inc
 
+        print(self.header[b'tsamp'])
+        print(self.t_obs)
+        print(self.t_obs / 8e-05)
         if mode == "discrete":        
             fb.read_filterbank()
-            freqs, self.samples = fb.select_data(time_start=0, time_stop=50)
+            freqs, self.samples = fb.select_data(time_start=0, time_stop=int(self.t_obs//self.header[b'tsamp']))
+            print(freqs.shape)
+            print(self.samples.shape)
         else:
             freqs = fb.get_freqs()
             self.samples = self.fb.next_n_rows(self.max_n_rows)
 
 
         self.freqs = np.asarray(freqs) #if freqs not None else None
-        self.header = fb.get_header()
 
         self.init_plot()
 
@@ -79,11 +87,12 @@ class Waterfall():
         #                          self.scans_per_sweep*self.nfft))
 
         self.image_buffer = -100*np.ones(self.samples.shape)
+        print(self.samples.shape)
         self.plot = self.fig.add_subplot(1, 1, 1)
         self.image = self.plot.imshow(self.image_buffer, aspect='auto',\
                                     interpolation='nearest', vmin=-50, vmax=10)
-        self.plot.set_xlabel('Frequency (MHz)')
-        self.plot.get_yaxis().set_visible(False)
+        self.plot.set_ylabel('Frequency (MHz)')
+        # self.plot.get_yaxis().set_visible(True)
 
         # self.fig.canvas.mpl_connect('scroll_event', self.on_scroll)
         # self.fig.canvas.mpl_connect('key_press_event', self.on_key_press)
@@ -100,8 +109,8 @@ class Waterfall():
         else:
             freq_range = ((center_freq - sample_freq/2)/1e6,\
                           (center_freq + sample_freq*(self.scans_per_sweep - 0.5))/1e6)
-        print(self.image)
-        self.image.set_extent(freq_range + (0, 1))
+
+        self.image.set_extent((0, self.t_obs) + freq_range)
         self.fig.canvas.draw_idle()
 
     def get_next(self):
@@ -142,7 +151,8 @@ class Waterfall():
             Returns the raw data image of the full dataset, if using a discrete dataset.
         """
         self.update_plot_labels()
-        self.image.set_array(self.samples.reshape(self.samples.shape[1], self.samples.shape[0]))
+        img = np.rot90(np.flip(self.samples, 0))
+        self.image.set_array(img)
         return self.image
 
     def update(self):
