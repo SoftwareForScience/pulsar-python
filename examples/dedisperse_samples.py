@@ -58,7 +58,15 @@ frequencies, samples = special_pspm.select_data()
 DM = 230
 
 plt.subplot(2,1,1)
-waterfall_plot(samples, frequencies)
+data, extent = waterfall_plot(samples, frequencies)
+# Create the plot
+img = plt.imshow(data.T,
+                 aspect='auto',
+                 origin='lower',
+                 rasterized=True,
+                 interpolation='nearest',
+                 extent=extent,
+                 cmap='cubehelix')
 
 time_series = []
 
@@ -73,7 +81,15 @@ plt.show()
 samples = dedisperse(samples, DM)
 
 plt.subplot(2,1,1)
-waterfall_plot(samples, frequencies)
+data, extent = waterfall_plot(samples, frequencies)
+# Create the plot
+img = plt.imshow(data.T,
+                 aspect='auto',
+                 origin='lower',
+                 rasterized=True,
+                 interpolation='nearest',
+                 extent=extent,
+                 cmap='cubehelix')
 
 
 time_series = []

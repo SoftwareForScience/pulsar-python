@@ -2,7 +2,6 @@
     Plots the data in a waterfall plot
 '''
 # pylint: disable-msg=W0612
-import matplotlib.pyplot as plt
 import numpy as np
 
 def waterfall_plot(data, frequencies):
@@ -28,23 +27,7 @@ def waterfall_plot(data, frequencies):
     plot_t_begin = timestamps[0]
     plot_t_end = timestamps[-1] + (timestamps[1] - timestamps[0])
 
-    plt.ylabel("Frequency [MHz]")
-    plt.xlabel("Time [s]")
-
     # Put axes together into one variable
     extent = (0.0, (plot_t_end-plot_t_begin)*24.*60.*60, plot_f_begin, plot_f_end)
 
-    # Create the plot
-    img = plt.imshow(data.T,
-                     aspect='auto',
-                     origin='lower',
-                     rasterized=True,
-                     interpolation='nearest',
-                     extent=extent,
-                     cmap='cubehelix')
-
-    # Add the sidebar to the plot
-    #plt.colorbar()
-
-    # Show the plot
-    #plt.show(img)
+    return data, extent
