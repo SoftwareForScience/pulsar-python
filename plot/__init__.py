@@ -7,3 +7,5 @@ from .plot import psd, opsd, window_hanning, stride_windows, \
     apply_window, stride_repeat
 
 from .waterfall import Waterfall
+
+from .static_waterfall import waterfall_plot
