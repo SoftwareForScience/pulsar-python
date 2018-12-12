@@ -13,7 +13,7 @@ def dedisperse(samples, dm):
     delays_per_sample = np.round(np.linspace(dm, 0, samples.shape[1])).astype(int)
 
     # Loop over the frequencies
-    for i in range(0, delays_per_sample.size):
+    for i, _ in enumerate(delays_per_sample):
 
         # Temporary array that is used to later delay the frequency
         temporary_samples = []
