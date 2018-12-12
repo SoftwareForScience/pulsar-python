@@ -34,10 +34,7 @@ def print_possible_dm(data):
                         if(i > highest_difference):
                                 
                                 if(data_point > 10):
-                                        print(s, i, " - ", data_point)
-                                        
-                                #if(i > highest_difference):
-                                        #print(s, i, " - ", data_point)
+                                        print(s, i, " - ", data_point)                                        
                                         highest_difference = i
                                 break
 
@@ -59,7 +56,7 @@ DM = 230
 
 plt.subplot(2,1,1)
 data, extent = waterfall_plot(samples, frequencies)
-# Create the plot
+
 img = plt.imshow(data.T,
                  aspect='auto',
                  origin='lower',
@@ -82,7 +79,7 @@ samples = dedisperse(samples, DM)
 
 plt.subplot(2,1,1)
 data, extent = waterfall_plot(samples, frequencies)
-# Create the plot
+
 img = plt.imshow(data.T,
                  aspect='auto',
                  origin='lower',
