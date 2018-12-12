@@ -59,3 +59,5 @@ scale = 3
 # Returns an array with the downsampled timeseries, can also be retreived lated user timseries.get()
 downsampled_array = timeseries.downsample(scale)
 ```
+
+[Back to table of contents](../README.md)

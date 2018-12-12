@@ -45,3 +45,5 @@ replaced with the median of a channel if their intensity is higher than the `ave
 ```
 filter_indv_channels(<TIME_SAMPLES>)
 ```
+
+[Back to table of contents](../README.md)
