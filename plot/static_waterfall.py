@@ -1,7 +1,6 @@
 '''
     Plots the data in a waterfall plot
 '''
-# pylint: disable-msg=W0612
 import numpy as np
 
 def waterfall_plot(data, frequencies):
