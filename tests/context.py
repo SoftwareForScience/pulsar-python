@@ -11,5 +11,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 import plot
 import fourier
 import clipping
+import dedisperse
 import filterbank.header as header
 import filterbank.filterbank as filterbank

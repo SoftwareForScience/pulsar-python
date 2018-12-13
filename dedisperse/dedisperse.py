@@ -8,7 +8,7 @@ def dedisperse(samples, dm):
     '''
     This method performs dedispersion on the filterbank data
     '''
-
+    samples = np.asarray(samples)
     # Distribute the DM over the amount of samples
     delays_per_sample = np.round(np.linspace(dm, 0, samples.shape[1])).astype(int)
 
