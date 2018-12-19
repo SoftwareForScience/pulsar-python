@@ -13,6 +13,8 @@ import dedisperse
 import timeseries.timeseries as timeseries
 import fourier
 import time
+import datetime
+import timeit
 
 class Pipeline():
     """
@@ -37,7 +39,14 @@ class Pipeline():
         """
             Read the filterbank data as stream
         """
+        stopwatch = dict.fromkeys(['time_read', 'time_select', 'time_clipping', 'time_dedisp', 
+                                   'time_t_series', 'time_downsample', 'time_fft_vect', 'time_dft'
+                                   'time_ifft', 'time_fft_freq'])
+        # init filterbank as stream
+        fil = filterbank.Filterbank(filename)
 
+        fil.select_data()
+        
 
     
     def read_static(self, filename, DM, scale):
@@ -47,36 +56,53 @@ class Pipeline():
         stopwatch = dict.fromkeys(['time_read', 'time_select', 'time_clipping', 'time_dedisp', 
                                    'time_t_series', 'time_downsample', 'time_fft_vect', 'time_dft'
                                    'time_ifft', 'time_fft_freq'])
-        time_start = time.time()
+        time_start = datetime.datetime.now()
+
+        a = datetime.datetime.now()
+        b = datetime.datetime.now()
+
+        time_took = b - a
+
+        print(time_took.seconds)
         # init filterbank
         fil = filterbank.Filterbank(filename, read_all=True)
-        stopwatch['time_read'] = time.time() - time_start
+        stopwatch['time_read'] = time_start - datetime.datetime.now()
         # select data
         freqs, fil_data = fil.select_data()
-        stopwatch['time_select'] = time.time() - stopwatch['time_read']
+        time_select = datetime.datetime.now() - stopwatch['time_read']
+        stopwatch['time_read'] = time_select.microsecond
         # clipping
         _, _ = clipping.clipping(freqs, fil_data)
-        stopwatch['time_clipping'] = time.time() - stopwatch['time_select']
+        time_clipping = datetime.datetime.now() - time_select
+        stopwatch['time_clipping'] = time_clipping.microseconds
+        # stopwatch['time_clipping'] = stopwatch['time_clipping'].microseconds
         # dedisperse
         fil_data = dedisperse.dedisperse(fil_data, DM)
-        stopwatch['time_dedisp'] = time.time() - stopwatch['time_clipping']
+        time_dedisp = datetime.datetime.now() - time_clipping
+        stopwatch['time_dedisp'] = time_dedisp.microseconds
         # timeseries
         time_series = timeseries.Timeseries(fil_data)
-        stopwatch['time_t_series'] = time.time() - stopwatch['time_dedisp']
+        time_t_series = datetime.datetime.now() - time_dedisp
+        stopwatch['time_t_series'] = time_t_series.microseconds
         # downsample
         time_series = time_series.downsample(scale)
-        stopwatch['time_downsample'] = time.time()- stopwatch['time_t_series']
+        time_downsample = datetime.datetime.now() - time_t_series
+        stopwatch['time_downsample'] = time_downsample.microseconds
         # fft vect
         fourier.fft_vectorized(time_series)
-        stopwatch['time_fft_vect'] = time.time() - stopwatch['time_downsample']
+        time_fft_vect = datetime.datetime.now() - time_downsample
+        stopwatch['time_fft_vect'] = time_fft_vect.microseconds
         # dft
         fourier.dft_slow(time_series)
-        stopwatch['time_dft'] = time.time() - stopwatch['time_fft_vect']
+        time_dft = datetime.datetime.now() - time_fft_vect
+        stopwatch['time_dft'] = time_dft.microseconds
         # ifft
         fourier.ifft(time_series)
-        stopwatch['time_ifft'] = time.time() - stopwatch['time_dft']
+        time_ifft = datetime.datetime.now() - time_dft
+        stopwatch['time_ifft'] = time_ifft.microseconds
         # fft freq
         fourier.fft_freq(10)
-        stopwatch['time_fft_freq'] = time.time() - stopwatch['time_ifft']
+        time_fft_freq = datetime.datetime.now() - time_ifft
+        stopwatch['time_fft_freq'] = time_fft_freq.microseconds
         print(stopwatch)
 
