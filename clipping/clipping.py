@@ -24,7 +24,7 @@ def filter_samples(samples):
         Calulate mean power of all frequencies per time sample
         and remove samples with significantly high power
     """
-    factor = 1.3
+    factor = 1.01
     new_samples = []
     # calculate mean intensity per sample
     avg_sample = np.sum(samples)/len(samples)
@@ -40,7 +40,7 @@ def filter_channels(channels, samples):
         Calculate mean power of all time samples per frequency
         and remove frequencies with significantly high power
     """
-    factor = 1.3
+    factor = 1.01
     bad_channels = []
     # calculate the mean power per channel
     avg_power_chan = samples.mean(axis=0)
