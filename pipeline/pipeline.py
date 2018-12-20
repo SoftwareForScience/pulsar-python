@@ -25,8 +25,8 @@ class Pipeline():
         The Pipeline combines the functionality of all modules
         in the library.
     """
-    # pylint: disable
-    def __init__(self, filename=None, as_stream=False, DM=230, scale=3, n=None):
+
+    def __init__(self, filename=None, as_stream=False, DM=230, scale=3, n=None, size=None):
         """
             Initialize Pipeline object
 
@@ -36,13 +36,13 @@ class Pipeline():
         if as_stream:
             if n:
                 result = self.read_n_rows(n, filename, DM, scale)
-                file = open("stream_filterbank.txt", "a+")
+                file = open("n_rows_filterbank.txt", "a+")
             else:
                 result = self.read_rows(filename)
-                file = open("row_filterbank.txt", "a+")
+                file = open("rows_filterbank.txt", "a+")
         else:
-            result = self.read_static(filename, DM, scale)
-            file = open("static_filterbank", "a+")
+            result = self.read_static(filename, DM, scale, size)
+            file = open("static_filterbank.txt", "a+")
         file.write(str(result) + ",")
         file.close()
 
@@ -86,7 +86,7 @@ class Pipeline():
         return stopwatch_list
 
 
-    def read_static(self, filename, DM, scale):
+    def read_static(self, filename, DM, scale, size):
         """
             Read the filterbank data at once
             and measure the time per function/class
@@ -96,7 +96,7 @@ class Pipeline():
                                    'time_ifft', 'time_fft_freq'])
         time_start = timer()
         # init filterbank
-        fil = filterbank.Filterbank(filename, read_all=True, time_range=(0, 49150))
+        fil = filterbank.Filterbank(filename, read_all=True, time_range=(0, size))
         stopwatch['time_read'] = timer() - time_start
         # select data
         time_select = timer()
