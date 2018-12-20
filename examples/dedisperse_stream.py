@@ -48,10 +48,10 @@ plt.plot(time_series)
 plt.show()
 
 #clipped_samples = clipping(frequencies, samples)
-samples = dedisperse.dedisperse(samples)
+#samples = dedisperse.dedisperse(samples)
 #samples = dedisperse.find_lowest_pulsar(samples)
 #samples = dedisperse.estimate_dm(samples)
-
+samples = dedisperse.find_initial_line(samples)
 
 plt.subplot(2,1,1)
 data, extent = waterfall_plot(samples, frequencies)
