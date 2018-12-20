@@ -46,7 +46,7 @@ def estimate_dm(samples):
             if(j > last_sample[1]):
                 if(data_point > 10):
                     last_sample = i, j
-                    #print("At Frequency ", i, " found on Time sample ", j, " - ", data_point)
+                    print("At Frequency ", i, " found on Time sample ", j, " - ", data_point)
                     break
 
     highest_difference = 0
@@ -75,19 +75,61 @@ def find_initial_signal(samples):
     for i, frequency in enumerate(samples[1]):
         for j, data_point in enumerate(samples[:, i]):
             if(j < lowest_sample[1]):
-                if(data_point > 1):
-                    print("Initial signal found on freq, sample", i, j)
+                if(data_point > 5):
+                    print("Initial signal found on freq, sample", i, j, data_point)
                     return i, j
                     '''
                     print(lowest_sample, " ", j)
-                    print("At Frequency ", i, " found on Time sample ", j, " - ", data_point)
                     lowest_sample = i, j
                     break
-            if(lowest_sample[1] == 0):
-                print("", lowest_sample)
-                return i, j
                     '''
 
     print("NO INITIAL SIGNAL FOUND")
     return None
     
+
+def find_initial_line(samples):
+    '''
+    This method attempts to find a line to dedisperse
+    '''
+    
+    avg_intensity = find_avg_intensity(samples, 10)
+    max_delay = 8
+    
+    for s, sample in enumerate(samples[:, 1]):
+        if(sample > avg_intensity):
+            previous_sample_index = s
+            print("Attempting to find line on freq,", 1, "sample", s)
+            find_line(samples, previous_sample_index, max_delay, avg_intensity)
+            
+
+    print("NO INITIAL SIGNAL FOUND")
+    return None
+
+
+def find_line(samples, previous_sample_index, max_delay, avg_intensity):
+    for f, frequency in enumerate(samples[1]):
+        for i, intensity in enumerate(samples[:, f][previous_sample_index:previous_sample_index+max_delay]):
+            if(intensity > avg_intensity):
+                print("Continuing to find line on freq,", f, "sample", i, intensity)
+                previous_sample_index = i
+                break
+            else:
+                continue
+                
+ 
+
+def find_avg_intensity(samples, top = 10):
+    '''
+    Finds average intensity for top x intensities
+    '''
+
+    sum_intensities = 0
+    # Looks for the 3 highest intensities in the first 10 samples
+    for sample in samples:
+        #top_samples.append((sorted([(x,i) for (i,x) in enumerate(sample)], reverse=True)[:3] ))
+        sum_intensities += np.sum(sorted(sample, reverse=True)[:top])
+
+    avg_intensity = (sum_intensities) / (samples.shape[0] * top)
+
+    return (avg_intensity)
