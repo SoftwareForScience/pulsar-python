@@ -62,6 +62,7 @@ class Pipeline():
         time_stop = timer() - time_start
         return time_stop
 
+
     def read_n_rows(self, n, filename, DM, scale):
         """
             Read the filterbank data as stream
@@ -95,7 +96,7 @@ class Pipeline():
                                    'time_ifft', 'time_fft_freq'])
         time_start = timer()
         # init filterbank
-        fil = filterbank.Filterbank(filename, read_all=True, time_range=(0, 10000))
+        fil = filterbank.Filterbank(filename, read_all=True, time_range=(0, 49150))
         stopwatch['time_read'] = timer() - time_start
         # select data
         time_select = timer()

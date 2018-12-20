@@ -1,12 +1,12 @@
 """
     Script for running the pipeline
 """
-
+import os
 import pipeline
 
 # read static
-pipeline.Pipeline(filename='pspm32.fil')
+pipeline.Pipeline(filename=os.path.abspath("E:/11100335.320.all.fil"))
 # read stream, row per row
-pipeline.Pipeline(filename='pspm32.fil', as_stream=True)
+# pipeline.Pipeline(filename=os.path.abspath("E:/11100335.320.all.fil"), as_stream=True)
 # read stream, n rows
-pipeline.Pipeline(filename='pspm32.fil', as_stream=True, n=10)
+# pipeline.Pipeline(filename='pspm32.fil', as_stream=True, n=10)
