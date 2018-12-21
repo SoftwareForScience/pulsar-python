@@ -50,15 +50,7 @@ def estimate_dm(samples):
                     break
 
     highest_difference = 0
-    '''
-    for s, samples in enumerate(samples):
-        for i, data_point in enumerate(samples):
-            if(i > highest_difference):                
-                if(data_point > 10):
-                    print(s, i, " - ", data_point)                                        
-                    highest_difference = i
-                break
-    '''
+    
     estimated_dm = last_sample[1] - initial_signal_point[1]
     print("Estimated DM is", estimated_dm)
     return estimated_dm
@@ -78,12 +70,7 @@ def find_initial_signal(samples):
                 if(data_point > 5):
                     print("Initial signal found on freq, sample", i, j, data_point)
                     return i, j
-                    '''
-                    print(lowest_sample, " ", j)
-                    lowest_sample = i, j
-                    break
-                    '''
-
+    
     print("NO INITIAL SIGNAL FOUND")
     return None
     
@@ -101,58 +88,64 @@ def find_initial_line(samples):
             start_sample_index = s
             print("Attempting to find line on freq,", 0, "sample", s)
             line_coordinates = find_line(samples, start_sample_index, max_delay, avg_intensity)
+            
+            # If a line is found, calculate and return the dispersion measure
             if(line_coordinates is not None):
                 dm = line_coordinates[1] - line_coordinates[0]
                 print(dm)
                 return dm
             
-
-    
     return None
 
 
 def find_line(samples, start_sample_index, max_delay, avg_intensity):
-    
-    previous_sample_index = start_sample_index
-    break_freq_loop = True
-    break_samples_loop = False
+    '''
+    This method tries to find a line starting from the sample index given in the parameters
+    it stops if there is no intensity within the max_delay higher than the avg_intensity
+    '''
 
+    previous_sample_index = start_sample_index
+    failed_to_find_line = True
+
+    # Loop through the frequencies
     for f, frequency in enumerate(samples[1]):
+
+        # Loop through previous intensity until the max delay is reached
         for i, intensity in enumerate(samples[:, f][previous_sample_index:previous_sample_index + max_delay]):
+
+            # Skip the first frequency, since that is where the initial sample is we are measuring from
             if(f == 0):
-                break_freq_loop = False
+                failed_to_find_line = False
                 break
-            #print(previous_sample_index, previous_sample_index+max_delay)
+
+            # If the intensity is higher than the avg_intensity, continue finding a signal
             if(intensity > avg_intensity):
                 print("Continuing to find line on freq,", f, "sample", previous_sample_index + i, intensity)
                 previous_sample_index = previous_sample_index + i
-                break_freq_loop = False
-                break_samples_loop = True
+                failed_to_find_line = False
                 break
 
-            if break_freq_loop: 
-                break
-
-        if break_freq_loop: 
-            print("Failed to find line")
+        # If there is no line found, return None
+        if failed_to_find_line: 
             return None
 
-    print("All freqs are looped")
+    # If all frequencies are looped through, a line is found, so we return the start and end index of the line
     return start_sample_index, previous_sample_index
             
- 
 
 def find_avg_intensity(samples, top = 10):
     '''
-    Finds average intensity for top x intensities
+    This method finds the average intensity for top x intensities
+    The avg_intensity is considered a requirement for intensities to be considered a pulsar 
     '''
 
     sum_intensities = 0
-    # Looks for the 3 highest intensities in the first 10 samples
+
+    # Looks for the top x highest intensities in the samples and adds them up together
     for sample in samples:
-        #top_samples.append((sorted([(x,i) for (i,x) in enumerate(sample)], reverse=True)[:3] ))
         sum_intensities += np.sum(sorted(sample, reverse=True)[:top])
 
+    # Calculates the avg_intensity
     avg_intensity = (sum_intensities) / (samples.shape[0] * top)
 
-    return (avg_intensity)
+    return avg_intensity
