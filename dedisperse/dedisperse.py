@@ -11,7 +11,7 @@ def dedisperse(samples, dm=None):
 
     if dm is None:
         print("Finding possible DM's")
-        dm = estimate_dm(samples)
+        dm = find_initial_line(samples)
 
     # Distribute the DM over the amount of samples
     delays_per_sample = np.round(np.linspace(dm, 0, samples.shape[1])).astype(int)
@@ -94,29 +94,52 @@ def find_initial_line(samples):
     '''
     
     avg_intensity = find_avg_intensity(samples, 10)
-    max_delay = 8
+    max_delay = 10
     
-    for s, sample in enumerate(samples[:, 1]):
+    for s, sample in enumerate(samples[:, 0]):
         if(sample > avg_intensity):
-            previous_sample_index = s
-            print("Attempting to find line on freq,", 1, "sample", s)
-            find_line(samples, previous_sample_index, max_delay, avg_intensity)
+            start_sample_index = s
+            print("Attempting to find line on freq,", 0, "sample", s)
+            line_coordinates = find_line(samples, start_sample_index, max_delay, avg_intensity)
+            if(line_coordinates is not None):
+                dm = line_coordinates[1] - line_coordinates[0]
+                print(dm)
+                return dm
             
 
-    print("NO INITIAL SIGNAL FOUND")
+    
     return None
 
 
-def find_line(samples, previous_sample_index, max_delay, avg_intensity):
+def find_line(samples, start_sample_index, max_delay, avg_intensity):
+    
+    previous_sample_index = start_sample_index
+    break_freq_loop = True
+    break_samples_loop = False
+
     for f, frequency in enumerate(samples[1]):
-        for i, intensity in enumerate(samples[:, f][previous_sample_index:previous_sample_index+max_delay]):
-            if(intensity > avg_intensity):
-                print("Continuing to find line on freq,", f, "sample", i, intensity)
-                previous_sample_index = i
+        for i, intensity in enumerate(samples[:, f][previous_sample_index:previous_sample_index + max_delay]):
+            if(f == 0):
+                break_freq_loop = False
                 break
-            else:
-                continue
-                
+            #print(previous_sample_index, previous_sample_index+max_delay)
+            if(intensity > avg_intensity):
+                print("Continuing to find line on freq,", f, "sample", previous_sample_index + i, intensity)
+                previous_sample_index = previous_sample_index + i
+                break_freq_loop = False
+                break_samples_loop = True
+                break
+
+            if break_freq_loop: 
+                break
+
+        if break_freq_loop: 
+            print("Failed to find line")
+            return None
+
+    print("All freqs are looped")
+    return start_sample_index, previous_sample_index
+            
  
 
 def find_avg_intensity(samples, top = 10):
