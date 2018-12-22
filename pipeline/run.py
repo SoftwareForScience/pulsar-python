@@ -4,10 +4,12 @@
 import os
 import pipeline
 
-for i in range(10):
-    # # read static
-    pipeline.Pipeline(filename=os.path.abspath("E:/11100335.320.all.fil"), size=49150)
+fil_name = os.path.abspath("E:/11100335.320.all.fil")
+
+for i in range(1000):
+    # read static
+    pipeline.Pipeline(filename=fil_name, size=49150)
     # read stream, row per row
-    pipeline.Pipeline(filename=os.path.abspath("E:/11100335.320.all.fil"), as_stream=True)
+    pipeline.Pipeline(filename=fil_name, as_stream=True)
     # read stream, n rows
-    pipeline.Pipeline(filename=os.path.abspath("E:/11100335.320.all.fil"), as_stream=True, n=10)
+    pipeline.Pipeline(filename=fil_name, as_stream=True, n=10)
