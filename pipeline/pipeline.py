@@ -1,5 +1,5 @@
 """
-    Pipeline for all modules
+    Pipeline for running all the modules in order
 """
 # pylint: disable=wrong-import-position
 import os
@@ -20,7 +20,7 @@ import fourier
 # pylint: disable=invalid-name
 # pylint: disable=no-self-use
 
-class Pipeline():
+class Pipeline:
     """
         The Pipeline combines the functionality of all modules
         in the library.
