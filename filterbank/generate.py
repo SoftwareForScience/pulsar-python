@@ -1,56 +1,51 @@
+"""
+    Generation of mocking data
+"""
 import numpy as np
 
-"""
-Generate mock data
-"""
 def generate():
-    telescope_id = 1
-    machine_id = 10
-    nchans = 128
-    nbits = 4
+    """
+        Generate mock filterbank data
+    """
+    n_chans = 128
+    # n_bits = 4
     tstart = 50000.0
-    tsamp = 80.0e-6
-    fch1 = 433.968
-    foff = -0.062
-    nifs = 1
+    # t_samp = 80.0e-6
+    f_ch1 = 433.968
+    f_off = -0.062
+    n_ifs = 1
     period = 3.1415927
-    width= 10
-    dm = 30 
-    tobs= 42 
-    nbits = 4
-    nsamples = period / tsamp
+    # d_m = 30
     nsblk = 512
-    pulse = 0
-    rwsum = 0
 
-    ic = nifs*nchans
-    arraysize = nchans*nifs*nsblk
+    i_c = n_ifs*n_chans
+    arraysize = n_chans*n_ifs*nsblk
 
     fblock = np.empty(arraysize, dtype=object)
 
-    for s in range(0, nsblk):
-        for i in range(0, nifs):
-            for c in range(0, nchans):
-                fblock[s*ic+i*nchans+c] = fch1 + c * foff
-            
-    fileStr = "HEADER_START"
-    fileStr += "P:" + str(period) + " ms"
-    fileStr += "DM:" + str(dm)
-    fileStr += "data_type: 1"
-    fileStr += "machine_id:" + str(machine_id)
-    fileStr += "telescope_id:" + str(telescope_id)
-    fileStr += "nchans:" + str(nchans)
-    fileStr += "tstart:" + str(tstart)
-    fileStr += "fch1:" + str(fch1)
-    fileStr += "HEADER_END"
-    fileStr += "SIGNAL_START"
-    fileStr += ''.join(map(str, fblock))
-    fileStr += "SIGNAL_END"
+    for x_val in range(0, nsblk):
+        for i in range(0, n_ifs):
+            for y_val in range(0, n_chans):
+                fblock[x_val*i_c+i*n_chans+y_val] = f_ch1 + y_val * f_off
 
-    file = open("../pspm.fil","w") 
- 
-    file.write(fileStr)
- 
-    file.close() 
+    file_str = "HEADER_START"
+    file_str += "P:" + str(period) + " ms"
+    file_str += "DM: 30"
+    file_str += "data_type: 1"
+    file_str += "machine_id: 10"
+    file_str += "telescope_id: 1"
+    file_str += "nchans:" + str(n_chans)
+    file_str += "tstart:" + str(tstart)
+    file_str += "fch1:" + str(f_ch1)
+    file_str += "HEADER_END"
+    file_str += "SIGNAL_START"
+    file_str += ''.join(map(str, fblock))
+    file_str += "SIGNAL_END"
+
+    file_name = open("../pspm.fil", "w")
+
+    file_name.write(str(file_str.encode()))
+
+    file_name.close()
 
 generate()
