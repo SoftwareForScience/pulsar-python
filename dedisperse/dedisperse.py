@@ -9,9 +9,10 @@ def dedisperse(samples, dm=None):
     This method performs dedispersion on the filterbank data
     '''
 
+    # Check if parameters contain a DM, if not, estimate one
     if dm is None:
         print("Finding possible DM's")
-        dm = find_initial_line(samples)
+        dm = find_dm(samples)
 
     # Distribute the DM over the amount of samples
     delays_per_sample = np.round(np.linspace(dm, 0, samples.shape[1])).astype(int)
@@ -30,64 +31,31 @@ def dedisperse(samples, dm=None):
 
     return samples
 
-
-def estimate_dm(samples):
+def find_dm(samples):
     '''
     This method attempts to find a dispersion measure
     '''
-
-    # Tuple of frequency index and sample index
-    initial_signal_point = find_initial_signal(samples)
-    last_sample = initial_signal_point
-
-    for i, frequency in enumerate(samples[1]):
-        for j, data_point in enumerate(samples[:, i]):
-            #print(samples[:, i][previous_time_sample:].shape[0])
-            if(j > last_sample[1]):
-                if(data_point > 10):
-                    last_sample = i, j
-                    print("At Frequency ", i, " found on Time sample ", j, " - ", data_point)
-                    break
-
-    highest_difference = 0
     
-    estimated_dm = last_sample[1] - initial_signal_point[1]
-    print("Estimated DM is", estimated_dm)
-    return estimated_dm
+    # Estimates the minimum for an intensity to be considered a pulsar
+    pulsar_intensity = find_estimation_intensity(samples)
 
-
-def find_initial_signal(samples):
-    '''
-    This method attempts to find a viable data point to start estimating a dispersion measure from
-    '''
-
-    # Tuple of frequency index and sample index
-    lowest_sample = 0, samples.shape[0]
+    # Determine what the maximum delay between the currently considered pulsar signal
+    # and the next pulsar signal should be
+    max_delay = round(samples.shape[0] / 50)
     
-    for i, frequency in enumerate(samples[1]):
-        for j, data_point in enumerate(samples[:, i]):
-            if(j < lowest_sample[1]):
-                if(data_point > 5):
-                    print("Initial signal found on freq, sample", i, j, data_point)
-                    return i, j
+    print(max_delay)
     
-    print("NO INITIAL SIGNAL FOUND")
-    return None
+    #max_delay = 100
     
-
-def find_initial_line(samples):
-    '''
-    This method attempts to find a line to dedisperse
-    '''
-    
-    avg_intensity = find_avg_intensity(samples, 10)
-    max_delay = 10
-    
+    # Loop through the samples to find
     for s, sample in enumerate(samples[:, 0]):
-        if(sample > avg_intensity):
+
+        # If the sample meets the minimum intensity, attempt to find a line continuing from this intensity
+        if(sample > pulsar_intensity):
             start_sample_index = s
-            print("Attempting to find line on freq,", 0, "sample", s)
-            line_coordinates = find_line(samples, start_sample_index, max_delay, avg_intensity)
+            #print("\n\nAttempting to find line on freq,", 0, "sample", s)
+            # Attempt to find a line, line_coordinates contains the first and last index of the pulsar
+            line_coordinates = find_line(samples, start_sample_index, max_delay, pulsar_intensity)
             
             # If a line is found, calculate and return the dispersion measure
             if(line_coordinates is not None):
@@ -98,14 +66,16 @@ def find_initial_line(samples):
     return None
 
 
-def find_line(samples, start_sample_index, max_delay, avg_intensity):
+def find_line(samples, start_sample_index, max_delay, average_intensity):
     '''
     This method tries to find a line starting from the sample index given in the parameters
-    it stops if there is no intensity within the max_delay higher than the avg_intensity
+    it stops if there is no intensity within the max_delay higher than the average_intensity
     '''
 
     previous_sample_index = start_sample_index
+
     failed_to_find_line = True
+
 
     # Loop through the frequencies
     for f, frequency in enumerate(samples[1]):
@@ -118,34 +88,40 @@ def find_line(samples, start_sample_index, max_delay, avg_intensity):
                 failed_to_find_line = False
                 break
 
-            # If the intensity is higher than the avg_intensity, continue finding a signal
-            if(intensity > avg_intensity):
-                print("Continuing to find line on freq,", f, "sample", previous_sample_index + i, intensity)
+            # If the intensity is higher than the average_intensity, continue finding a signal
+            if(intensity > average_intensity):
+                #print("Continuing to find line on freq,", f, "sample", previous_sample_index + i, intensity)
                 previous_sample_index = previous_sample_index + i
                 failed_to_find_line = False
                 break
 
         # If there is no line found, return None
         if failed_to_find_line: 
+            print(average_intensity)
             return None
 
     # If all frequencies are looped through, a line is found, so we return the start and end index of the line
     return start_sample_index, previous_sample_index
             
 
-def find_avg_intensity(samples, top = 10):
+def find_estimation_intensity(samples):
     '''
     This method finds the average intensity for top x intensities
-    The avg_intensity is considered a requirement for intensities to be considered a pulsar 
+    The average_intensity is considered a requirement for intensities to be considered a pulsar 
     '''
 
+    # Sum of all intensities
     sum_intensities = 0
+
+    # Top x intensities used to estimate 
+    #top = round((samples.shape[0]) / 50)
+    top = 10
 
     # Looks for the top x highest intensities in the samples and adds them up together
     for sample in samples:
         sum_intensities += np.sum(sorted(sample, reverse=True)[:top])
 
-    # Calculates the avg_intensity
-    avg_intensity = (sum_intensities) / (samples.shape[0] * top)
+    # Calculates the average_intensity
+    average_intensity = (sum_intensities) / (samples.shape[0] * top)
 
-    return avg_intensity
+    return average_intensity
