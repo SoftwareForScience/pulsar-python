@@ -11,15 +11,15 @@ from pipeline.pipeline import Pipeline
 # init filterbank filename
 fil_name = "./pspm.fil"
 # init filterbank sample size
-sample_size = 1534
+sample_size = 49152
 # init times the pipeline should run
-n_times = 1000
+n_times = 10
 
 # run the filterbank n times
-for i in range(n):
+for i in range(n_times):
     # read static
     Pipeline(filename=fil_name, size=sample_size)
     # read stream, row per row
     Pipeline(filename=fil_name, as_stream=True)
     # read stream, n rows
-    Pipeline(filename=fil_name, as_stream=True, n=10)
+    Pipeline(filename=fil_name, as_stream=True, n=sample_size)
