@@ -80,7 +80,6 @@ def fft_vectorized(input_data, nfft=None, axis=-1):
             input_data = zeroes
 
     data_length = input_data.shape[0]
-    print(data_length)
 
     if np.log2(data_length) % 1 > 0:
         raise ValueError("Size of input data must be a power of 2")
