@@ -16,24 +16,29 @@ def generate_file(filename, header):
     """
     header_string = generate_header(header)
     signal_data = generate_signal(header)
-    write_fil(filename, signal_data, header_string)
+    write_data(filename, signal_data, header_string)
 
 
-def generate_signal(header, noise_level=20, period=2, t_obs=2):
+def generate_signal(header, noise_level=100, period=.05, t_obs=2, n_pts=20):
     """
         Create a signal using the header values
+
+        Args:
+            noise_level, the max amplitude of the generated noise
+            period, period of the signal
+            t_obs, observation time in s
+            n_pts, intervals between samples
     """
-    n_pts = int(t_obs/header[b'tsamp'])
-    n_samples = int((n_pts-1)*header[b'tsamp'])
+    n_samples = int(t_obs/header[b'tsamp'])
     # create an empty vector for the signals
     signal_data = np.zeros((n_samples, header[b'nchans']))
-    # create an array with right amount of samples
-    sample = np.linspace(0, n_samples, header[b'nchans'])
+    # create array with size equal to the num of channels
+    sample = np.linspace(0, n_pts, header[b'nchans'])
     # create a signal for each sample
     for i in range(n_samples):
         signal = np.sin(2*PI*sample/period)
-        noise = np.random.normal(0, noise_level, n_pts)
-        signal_data[i] = signal
+        noise = np.random.normal(0, noise_level, header[b'nchans'])
+        signal_data[i] = signal + noise
     return signal_data
 
 
@@ -76,9 +81,9 @@ def keyword_to_string(keyword, value=None):
     return keyword_string
 
 
-def write_fil(filename, fil_data, header):
+def write_data(filename, fil_data, header):
     """
-        Write the generated file
+        Write the generated signal and header to filterbank file
     """
     n_bytes = 1
     # open file and write as bytes

@@ -8,11 +8,9 @@ import inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir)
+import matplotlib.pyplot as plt
 from filterbank.filterbank import Filterbank
 from filterbank.generate import generate_file
-
-
-filename = './examples/pspm.fil'
 
 header = {
     b'source_name': b'P: 80.0000 ms, DM: 200.000',
@@ -28,12 +26,17 @@ header = {
     b'nbits': 8
 }
 
+filename = './examples/pspm.fil'
+
 # generate a fake filterbank file
 generate_file(filename, header)
 
 # read fake filterbank file
 fil = Filterbank(filename, read_all=True)
 
-data = fil.select_data()
+# select data from fitlerbank
+_, data = fil.select_data()
 
-print(data)
+# plot one sample
+plt.plot(data[0])
+plt.show()
