@@ -16,7 +16,7 @@ class TestHeader(unittest.TestCase):
             When reading filterbank header
             header.py should return a dictionary
         """
-        filename = './pspm_new.fil'
+        filename = './pspm8.fil'
         header_dict = header.read_header(filename)
         self.assertEqual(header_dict[b'machine_id'], 10)
         self.assertEqual(header_dict[b'telescope_id'], 4)
