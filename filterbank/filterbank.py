@@ -25,8 +25,7 @@ class Filterbank:
         """
         if not os.path.isfile(filename):
             raise FileNotFoundError(filename)
-        # iterator for stream
-        self.stream_iter = 0
+        # header values
         self.data, self.freqs, self.n_chans_selected = None, None, None
         self.filename = filename
         self.header = read_header(filename)
@@ -51,6 +50,8 @@ class Filterbank:
         self.fil.seek(int(self.ii_start * self.n_bytes * self.n_ifs * self.n_chans), 1)
         # find possible channels
         self.i_0, self.i_1 = self.setup_chans(freq_range)
+        # number if stream iterations
+        self.stream_iter = (self.n_samples * self.n_ifs)
         # read filterbank at once
         if read_all:
             self.read_filterbank()
@@ -84,8 +85,8 @@ class Filterbank:
 
             returns False if EOF
         """
-        if self.stream_iter < (self.n_samples * self.n_ifs):
-            self.stream_iter += 1
+        if self.stream_iter > 0:
+            self.stream_iter -= 1
             # skip bytes
             self.fil.seek(self.n_bytes * self.i_0, 1)
             # read row of data
@@ -104,11 +105,8 @@ class Filterbank:
 
             returns False if EOF
         """
-        if self.stream_iter < (self.n_samples * self.n_ifs):
-            # more rows requested than available
-            if self.stream_iter + n_rows >= self.n_samples * self.n_ifs:
-                n_rows = self.n_samples * self.n_ifs - self.stream_iter
-            self.stream_iter += n_rows
+        if self.stream_iter - n_rows > 0:
+            self.stream_iter -= n_rows
             # init array of n rows
             data = np.zeros((n_rows, self.n_chans_selected), dtype=self.dd_type)
             for row in range(n_rows):
