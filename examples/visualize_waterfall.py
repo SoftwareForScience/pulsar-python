@@ -9,12 +9,12 @@ from rtlsdr import RtlSdr
 import matplotlib.animation as animation
 from filterbank.header import read_header
 from filterbank.filterbank import Filterbank
-from plot.Waterfall import Waterfall
+from plot.waterfall import Waterfall
 import pylab as pyl
 from plot.plot import next_power_of_2
 
 
-fb = Filterbank(filename='examples/pspm32bit.fil')
+fb = Filterbank(filename='pspm32.fil')
 
 # read the data in the filterbank file
 freqs, samples = fb.select_data()

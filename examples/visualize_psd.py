@@ -10,6 +10,7 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentfra
 PARENT_DIR = os.path.dirname(CURRENT_DIR)
 sys.path.insert(0, PARENT_DIR)
 
+# Install rtlsdr package from pyrtlsdr
 from rtlsdr import RtlSdr
 import matplotlib.pyplot as plt
 import numpy as np

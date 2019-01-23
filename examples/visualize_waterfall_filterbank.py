@@ -11,7 +11,7 @@ import pylab as pyl
 from plot.plot import next_power_of_2
 
 
-fb = Filterbank(filename='examples/pspm32bit.fil', read_all=True)
+fb = Filterbank(filename='pspm32.fil', read_all=True)
 
 # read the data in the filterbank file
 freqs, samples = fb.select_data()
