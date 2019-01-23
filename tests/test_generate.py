@@ -12,6 +12,7 @@ class TestGenerate(unittest.TestCase):
     """
 
     header_dict = {
+        b'source_name': b'P: 80.0000 ms, DM: 200.000',
         b'telescope_id': 0,
         b'machine_id': 0,
         b'tstart': 0,
