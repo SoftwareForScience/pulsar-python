@@ -1,4 +1,3 @@
-# pylint: disable-all
 import os,sys,inspect
 CURRENT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 PARENT_DIR = os.path.dirname(CURRENT_DIR)
@@ -11,12 +10,12 @@ import pylab as pyl
 from plot.plot import next_power_of_2
 
 
-fb = Filterbank(filename='examples/pspm32bit.fil')
+fb = Filterbank(filename='./pspm32.fil')
 
 # Calculate the center frequency with the data in the header
 center_freq = fb.header[b'center_freq']
 
-wf = waterfall.Waterfall(fb=fb, fig=pyl.figure(), center_freq=center_freq, t_obs=0.01, mode="discrete")
+wf = waterfall.Waterfall(filter_bank=fb, fig=pyl.figure(), center_freq=center_freq, t_obs=0.01, mode="discrete")
 img = wf.get_raw_image()
 
 pyl.show(img)

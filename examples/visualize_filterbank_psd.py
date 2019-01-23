@@ -17,7 +17,7 @@ from filterbank.header import read_header
 from filterbank.filterbank import Filterbank
 
 # Instatiate the filterbank reader and point to the filterbank file
-fb = Filterbank(filename='examples/pspm32bit.fil', as_stream=False)
+fb = Filterbank(filename='./pspm32.fil', read_all=True)
 
 # read the data in the filterbank file
 f, samples = fb.select_data()
@@ -29,7 +29,6 @@ print(samples.shape)
 # Get the powerlevels and the frequencies
 print(samples[0])
 power_levels, freqs, _ = opsd(samples[0], nfft=128, sample_rate=80, sides='twosided')
-# freqs, power_levels = psd(samples[0], 80, center_freq, nfft=128)
 
 # Plot the PSD
 plt.grid(True)

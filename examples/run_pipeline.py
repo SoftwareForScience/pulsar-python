@@ -9,9 +9,9 @@ sys.path.insert(0, PARENT_DIR)
 from pipeline.pipeline import Pipeline
 
 # init filterbank filename
-fil_name = os.path.abspath("filterbank.fil")
+fil_name = os.path.abspath("./pspm32.fil")
 # init filterbank sample size
-sample_size = 49152
+sample_size = 192
 # init times the pipeline should run
 n_times = 10
 
