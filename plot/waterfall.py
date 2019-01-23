@@ -66,7 +66,7 @@ class Waterfall():
         print(self.t_obs)
         print(self.t_obs / 8e-05)
         if mode == "discrete":        
-            fb.read_filterbank()
+            # fb.read_filterbank()
             freqs, self.samples = fb.select_data(time_start=0, time_stop=int(self.t_obs//self.header[b'tsamp']))
             print(freqs.shape)
             print(self.samples.shape)
@@ -126,29 +126,7 @@ class Waterfall():
 
     def get_image(self):
         """
-            Returns the image of the full dataset, if using a discrete dataset.
-        """
-        self.update_plot_labels()
-
-        samples = self.fb.next_n_rows(self.max_n_rows)
-
-        # if samples == False:
-        #     raise ValueError("Filterbank object does not have that many rows.")
-
-        self.image.set_array(samples)
-
-        # i = 0
-        # rows = np.ndarray(samples.shape, dtype=float)
-        # for row in self.samples:
-        #     rows[i], _, _ = opsd(row, nfft=128, sides='twosided')
-        #     i += 1
-
-        # self.image.set_array(rows)
-        return self.image
-
-    def get_raw_image(self):
-        """
-            Returns the raw data image of the full dataset, if using a discrete dataset.
+            Returns the image data of the full dataset, if using a discrete dataset.
         """
         self.update_plot_labels()
         img = np.rot90(np.flip(self.samples, 0))
