@@ -43,7 +43,7 @@ array([10.+0.00000000e+00j, -2.+2.00000000e+00j, -2.-9.79717439e-16j, -2.-2.0000
 ## 3.3 IFFT
 This function computes the inverse of the one-dimensional n-point discrete Fourier transform computed by fft
 
-## 3.3.1 Parameters
+### 3.3.1 Parameters
 | Parameter | Description |
 | --- | --- |
 | input_data | Input array, can be complex.
