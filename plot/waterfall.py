@@ -56,7 +56,8 @@ class Waterfall():
         if mode == "discrete":
             time_start = 0
             time_stop = int(self.t_obs//self.header[b'tsamp'])
-            freqs, self.samples = filter_bank.select_data(time_start=time_start, time_stop=time_stop)
+            freqs, self.samples = filter_bank.select_data(time_start=time_start,
+                                                          time_stop=time_stop)
         else:
             freqs = filter_bank.get_freqs()
             self.samples = self.filer_bank.next_n_rows(self.max_n_rows)
