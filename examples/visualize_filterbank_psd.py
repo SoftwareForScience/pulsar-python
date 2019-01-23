@@ -29,7 +29,6 @@ print(samples.shape)
 # Get the powerlevels and the frequencies
 print(samples[0])
 power_levels, freqs, _ = opsd(samples[0], nfft=128, sample_rate=80, sides='twosided')
-# freqs, power_levels = psd(samples[0], 80, center_freq, nfft=128)
 
 # Plot the PSD
 plt.grid(True)
