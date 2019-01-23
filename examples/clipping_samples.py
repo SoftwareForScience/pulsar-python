@@ -14,6 +14,7 @@ from clipping.clipping import clipping
 
 # init filterbank object
 fil = Filterbank(filename='./pspm32.fil', read_all=True)
+
 # retrieve channels and samples from filterbank
 freqs, samples = fil.select_data()
 
@@ -38,6 +39,7 @@ time_series = Timeseries(new_samples)
 plt.subplot(2,1,2)
 plt.plot(time_series.timeseries)
 plt.show()
+
 # draw waterfall plots
 data, extent = waterfall_plot(samples, freqs)
 
@@ -51,17 +53,16 @@ img = plt.imshow(data.T,
                  extent=extent,
                  cmap='cubehelix')
 
-
 new_data, new_extent = waterfall_plot(new_samples, new_freqs)
 
 plt.subplot(212)
 
 new_img = plt.imshow(new_data.T,
-                 aspect='auto',
-                 origin='lower',
-                 rasterized=True,
-                 interpolation='nearest',
-                 extent=new_extent,
-                 cmap='cubehelix')
+                     aspect='auto',
+                     origin='lower',
+                     rasterized=True,
+                     interpolation='nearest',
+                     extent=new_extent,
+                     cmap='cubehelix')
 
 plt.show()
