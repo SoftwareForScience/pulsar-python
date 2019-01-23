@@ -28,6 +28,7 @@ The header data is passed in a header dict. For a more detailed explanation on t
 ## 8.2 Generate signal
 
 The generate_signal method generates a mock signal based on the following parameters:
+
 | Variable | Description |
 | --- | --- |
 | noise_level | the max amplitude of the generated noise |
