@@ -11,7 +11,7 @@ import pylab as pyl
 from plot.plot import next_power_of_2
 
 
-fb = Filterbank(filename='examples/pspm32bit.fil')
+fb = Filterbank(filename='./pspm32.fil')
 
 wf = waterfall.Waterfall(fb=fb, fig=pyl.figure(), mode="stream")
 
