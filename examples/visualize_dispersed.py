@@ -20,4 +20,3 @@ wf = waterfall.Waterfall(fb=fb, fig=pyl.figure(), center_freq=center_freq, t_obs
 img = wf.get_raw_image()
 
 pyl.show(img)
-
