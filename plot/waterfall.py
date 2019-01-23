@@ -2,7 +2,6 @@
     Module for plotting a waterfall plot
 """
 import numpy as np
-from .plot import opsd
 
 class Waterfall():
     """
@@ -25,57 +24,50 @@ class Waterfall():
 
     # pylint: disable=R0913
     # All these attributes are needed.
-    def __init__(self, fb=None, samples=None, center_freq=None, sample_freq=None,
+    def __init__(self, filer_bank=None, center_freq=None, sample_freq=None,
                  fig=None, samples_per_scan=None,
-                 buffered_sweeps=None, scans_per_sweep=None, freq_inc_coarse=None,
-                 freq_inc_fine=None, gain_inc=None, max_n_rows=1024, mode='stream', t_obs=None):
+                 buffered_sweeps=None, scans_per_sweep=None,
+                 max_n_rows=1024, mode='stream', t_obs=None):
         """
             Setup waterfall object
         """
-        if fb is None:
+        if filer_bank is None:
             raise ValueError("A filterbank object input is needed to generate the plot.")
         else:
-            self.fb = fb
+            self.filer_bank = filer_bank
 
         if fig is None:
             raise ValueError("Need figure.")
         else:
             self.fig = fig
 
-        # if samples is None:
-        #     raise ValueError("Expected sample data, but received none")
-        # else:
-        #     self.samples = samples
-
-        self.header = fb.get_header()
+        self.header = filer_bank.get_header()
         print(self.header)
         self.t_obs = t_obs if t_obs else 1
         print(self.t_obs)
         self.max_n_rows = max_n_rows
 
-        self.sample_freq = sample_freq #if sample_freq else None
-        self.center_freq = center_freq #if center_freq else None
+        self.sample_freq = sample_freq
+        self.center_freq = center_freq
         self.samples_per_scan = samples_per_scan if samples_per_scan else self.samples_per_scan
         self.buffered_sweeps = buffered_sweeps if buffered_sweeps else self.buffered_sweeps
         self.scans_per_sweep = scans_per_sweep if scans_per_sweep else self.scans_per_sweep
-        # self.freq_inc_coarse = freq_inc_coarse if freq_inc_coarse else self.freq_inc_coarse
-        # self.freq_inc_fine = freq_inc_fine if freq_inc_fine else self.freq_inc_fine
-        # self.gain_inc = gain_inc if gain_inc else self.gain_inc
 
         print(self.header[b'tsamp'])
         print(self.t_obs)
         print(self.t_obs / 8e-05)
-        if mode == "discrete":        
-            # fb.read_filterbank()
-            freqs, self.samples = fb.select_data(time_start=0, time_stop=int(self.t_obs//self.header[b'tsamp']))
+        if mode == "discrete":
+            time_start = 0
+            time_stop = int(self.t_obs//self.header[b'tsamp'])
+            freqs, self.samples = filer_bank.select_data(time_start=time_start, time_stop=time_stop)
             print(freqs.shape)
             print(self.samples.shape)
         else:
-            freqs = fb.get_freqs()
-            self.samples = self.fb.next_n_rows(self.max_n_rows)
+            freqs = filer_bank.get_freqs()
+            self.samples = self.filer_bank.next_n_rows(self.max_n_rows)
 
 
-        self.freqs = np.asarray(freqs) #if freqs not None else None
+        self.freqs = np.asarray(freqs)
 
         self.init_plot()
 
@@ -83,20 +75,12 @@ class Waterfall():
         """
             Initialize the plot
         """
-        # self.image_buffer = -100*np.ones((self.buffered_sweeps,\
-        #                          self.scans_per_sweep*self.nfft))
-
         self.image_buffer = -100*np.ones(self.samples.shape)
         print(self.samples.shape)
         self.plot = self.fig.add_subplot(1, 1, 1)
         self.image = self.plot.imshow(self.image_buffer, aspect='auto',\
                                     interpolation='nearest', vmin=-50, vmax=10)
         self.plot.set_ylabel('Frequency (MHz)')
-        # self.plot.get_yaxis().set_visible(True)
-
-        # self.fig.canvas.mpl_connect('scroll_event', self.on_scroll)
-        # self.fig.canvas.mpl_connect('key_press_event', self.on_key_press)
-        # self.fig.canvas.mpl_connect('key_release_event', self.on_key_release)
 
     def update_plot_labels(self):
         """
@@ -114,15 +98,10 @@ class Waterfall():
         self.fig.canvas.draw_idle()
 
     def get_next(self):
-        return self.fb.next_row()
-
-    # def get_row(self):
-    #     """
-    #         Returns the next row of data.
-    #     """
-    #     self.iteration += 1
-    #     row, _, _ = opsd(self.samples[self.iteration -1], nfft=128, sides='twosided')
-    #     return row
+        """
+            Returns the next row of data in the filterbank object.
+        """
+        return self.filer_bank.next_row()
 
     def get_image(self):
         """
