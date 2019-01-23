@@ -89,7 +89,6 @@ class Waterfall():
         else:
             freq_range = ((center_freq - sample_freq/2)/1e6,\
                           (center_freq + sample_freq*(self.scans_per_sweep - 0.5))/1e6)
-        print(self.image)
         self.image.set_extent(freq_range + (0, 1))
         self.fig.canvas.draw_idle()
 

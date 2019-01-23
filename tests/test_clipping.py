@@ -51,12 +51,9 @@ class TestClipping(unittest.TestCase):
             When filtering samples, all channels
             with a relative high power should be removed
         """
-        result_channels, result_samples = clipping.filter_channels(
-            self.fil_chans, np.array(self.fil_vector))
+        result_channels = np.array(clipping.filter_channels(np.array(self.fil_vector)))
         expect_channels = np.delete(self.fil_chans, self.bad_channels)
-        expect_samples = np.delete(self.fil_vector, self.bad_channels, axis=1)
         self.assertEqual(result_channels.all(), expect_channels.all())
-        self.assertEqual(result_samples.all(), expect_samples.all())
 
     def test_filter_indv_channels(self):
         """

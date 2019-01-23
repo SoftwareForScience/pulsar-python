@@ -14,3 +14,4 @@ import clipping
 import dedisperse
 import filterbank.header as header
 import filterbank.filterbank as filterbank
+import pipeline.pipeline as pipeline
