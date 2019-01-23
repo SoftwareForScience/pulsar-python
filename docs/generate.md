@@ -24,3 +24,27 @@ header.generate_file("file_path/file_name", header)
 ```
 
 The header data is passed in a header dict. For a more detailed explanation on the file header, please consult [chapter 2.2](docs/filterbank.md#22-read-the-header-from-filterbank-data). 
+
+## 8.2 Generate signal
+
+The generate_signal method generates a mock signal based on the following parameters:
+| Variable | Description |
+| --- | --- |
+| noise_level | the max amplitude of the generated noise |
+| period | period of the signal |
+| t_obs | observation time in s |
+| n_pts | intervals between samples |
+
+## 8.3 Generate header
+
+The generate_header method generates a header string based on the header dict provided in the example in chapter 8.1. The dict provides keys encoded in bytes and the method converts each keyword to a string using the keyword_to_string method (see below).
+
+## 8.4 Keyword to string
+
+The keyword_to_string method converts a keyword from the header dict to a serialized string.
+
+## 8.5 Write data
+
+Once all the required data is generated to a filterbank file. The data is written to the file as bytes.
+
+[Back to table of contents](../README.md)
