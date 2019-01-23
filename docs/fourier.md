@@ -40,4 +40,19 @@ Returns an array containing the transformed values.
 array([10.+0.00000000e+00j, -2.+2.00000000e+00j, -2.-9.79717439e-16j, -2.-2.00000000e+00j])
 ```
 
+## 3.3 IFFT
+This function computes the inverse of the one-dimensional n-point discrete Fourier transform computed by fft
+
+## 3.3.1 Parameters
+| Parameter | Description |
+| --- | --- |
+| input_data | Input array, can be complex.
+
+### 3.3.2 Example usage
+```python
+>>> from Asteria import fourier
+>>> fourier.ifft([0,4,0,0])
+array([ 1.+0.j,  0.+1.j, -1.+0.j,  0.-1.j])
+```
+
 [Back to table of contents](../README.md)
