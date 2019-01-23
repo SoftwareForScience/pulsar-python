@@ -4,7 +4,7 @@
 
 import os
 import numpy as np
-from filterbank.header import read_header, len_header
+from .header import read_header, len_header
 
 
 class Filterbank:
@@ -14,28 +14,25 @@ class Filterbank:
 
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(self, filename, freq_range=None, time_range=None):
+    def __init__(self, filename, freq_range=None, time_range=None, read_all=False):
         """
             Initialize Filterbank object
 
             Args:
                 freq_range, tuple of freq_start and freq_stop in MHz
                 time_range, tuple of time_start and time_stop
+                read_all, whether to read all data at once
         """
         if not os.path.isfile(filename):
             raise FileNotFoundError(filename)
-        # iterator for stream
-        self.stream_iter = 0
+        # header values
         self.data, self.freqs, self.n_chans_selected = None, None, None
         self.filename = filename
         self.header = read_header(filename)
         self.idx_data = len_header(filename)
-        self.n_bytes = int(self.header[b'nbits'] / 8)
+        self.n_bytes = self.header[b'nbytes']
         self.n_chans = self.header[b'nchans']
         self.n_ifs = self.header[b'nifs']
-        # calculate and add center frequency to header
-        self.header[b'center_freq'] = (self.header[b'fch1'] +
-                                       float(self.header[b'nchans']) * self.header[b'foff'] / 2.0)
         # decide appropriate datatype
         if self.n_bytes == 4:
             self.dd_type = b'float32'
@@ -53,6 +50,11 @@ class Filterbank:
         self.fil.seek(int(self.ii_start * self.n_bytes * self.n_ifs * self.n_chans), 1)
         # find possible channels
         self.i_0, self.i_1 = self.setup_chans(freq_range)
+        # number if stream iterations
+        self.stream_iter = (self.n_samples * self.n_ifs)
+        # read filterbank at once
+        if read_all:
+            self.read_filterbank()
 
 
     def read_filterbank(self):
@@ -83,8 +85,8 @@ class Filterbank:
 
             returns False if EOF
         """
-        if self.stream_iter < (self.n_samples * self.n_ifs):
-            self.stream_iter += 1
+        if self.stream_iter > 0:
+            self.stream_iter -= 1
             # skip bytes
             self.fil.seek(self.n_bytes * self.i_0, 1)
             # read row of data
@@ -103,11 +105,8 @@ class Filterbank:
 
             returns False if EOF
         """
-        if self.stream_iter < (self.n_samples * self.n_ifs):
-            # more rows requested than available
-            if self.stream_iter + n_rows >= self.n_samples * self.n_ifs:
-                n_rows = self.n_samples * self.n_ifs - self.stream_iter
-            self.stream_iter += n_rows
+        if self.stream_iter - n_rows > 0:
+            self.stream_iter -= n_rows
             # init array of n rows
             data = np.zeros((n_rows, self.n_chans_selected), dtype=self.dd_type)
             for row in range(n_rows):
@@ -166,12 +165,12 @@ class Filterbank:
         ii_start, ii_stop = 0, int(n_bytes_data / (self.n_bytes * self.n_chans * self.n_ifs))
         # time range is specified
         if time_range:
-            if time_range[0]:
+            if isinstance(time_range[0], int):
                 ii_start = time_range[0]
-            if time_range[1]:
+            if isinstance(time_range[1], int):
                 ii_stop = time_range[1]
         n_samples = ii_stop - ii_start
-        # calculate all possible times
+        # calculate all possible time stamps
         self.timestamps = np.arange(0, n_samples) * t_delt / 24. / 60. / 60. + t_0
         return ii_start, n_samples
 
@@ -191,13 +190,20 @@ class Filterbank:
     def select_data(self, freq_start=None, freq_stop=None, time_start=None, time_stop=None):
         """
             Select a range of data from the filterbank file
+
+            time_start and time_start, can be a float that represents a sampling interval in s
         """
+        # find indices for sampling interval
+        if isinstance(time_start, float):
+            time_start = np.searchsorted(self.timestamps, (time_start / 1e5) + 50000)
+        if isinstance(time_stop, float):
+            time_stop = np.searchsorted(self.timestamps, (time_stop / 1e5) + 50000)
         # if no frequency range is specified, select all frequencies
         if freq_start is None:
             freq_start = self.freqs[0]
         if freq_stop is None:
             freq_stop = self.freqs[-1]
-        # give index of minimum value
+        # give indices of minimum and maximum frequency
         i_0 = np.argmin(np.abs(self.freqs - freq_start))
         i_1 = np.argmin(np.abs(self.freqs - freq_stop))
         # reverse data if frequencies are reversed

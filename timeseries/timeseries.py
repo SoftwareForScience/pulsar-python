@@ -29,13 +29,13 @@ class Timeseries:
         return self.timeseries
 
 
-
     def get(self):
         """
            Returns the current timeseries object which,
             could have been manipulated using functions below.
         """
         return self.timeseries
+
 
     def from_filterbank(self, filterbank_object):
         """

@@ -11,19 +11,10 @@ import pylab as pyl
 from plot.plot import next_power_of_2
 
 
-fb = Filterbank(filename='examples/pspm32bit.fil')
-
-# read the data in the filterbank file
-# freqs, samples = fb.select_data()
-# print(freqs.shape)
-# print(samples.shape)
+fb = Filterbank(filename='examples/pspm32bit.fil', read_all=True)
 
 # Read the header of the filterbank file
 header = read_header('examples/pspm32bit.fil')
-
-# Calculate the center frequency with the data in the header
-# center_freq = header[b'fch1'] + float(header[b'nchans']) * header[b'foff'] / 2.0
-
 
 wf = waterfall.Waterfall(fb=fb, fig=pyl.figure())
 
@@ -31,4 +22,3 @@ wf = waterfall.Waterfall(fb=fb, fig=pyl.figure())
 img = wf.get_image()
 
 pyl.show(img)
-

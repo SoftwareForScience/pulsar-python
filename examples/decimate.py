@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 
 
 fb = Filterbank("./pspm32.fil")
+fb.read_filterbank()
 
 time_series = Timeseries().from_filterbank(fb)
 
