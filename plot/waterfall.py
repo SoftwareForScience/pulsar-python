@@ -133,16 +133,15 @@ class Waterfall():
         self.image.set_array(img)
         return self.image
 
-    def update(self):
+    def update(self, i):
         """
             Updates the image with the next row of data, when using
             a continuous datastream.
         """
+        print('update:', i)
         # prepare space in buffer
         self.image_buffer = np.roll(self.image_buffer, 1, axis=0)
 
-        # for row in self.samples:
-        # self.image_buffer[0] = 10*np.log10(self.get_row()/self.center_freq)
         self.image_buffer[0] = self.get_next()
         self.image.set_array(self.image_buffer)
 
@@ -154,7 +153,7 @@ class Waterfall():
         """
         self.update_plot_labels()
 
-        return(self.fig, self.update, 50, True)
+        return(self.fig, self.update, 4096, True)
 
     def get_center_freq(self):
         """
