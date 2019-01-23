@@ -13,11 +13,6 @@ from plot.plot import next_power_of_2
 
 fb = Filterbank(filename='examples/pspm32bit.fil')
 
-# read the data in the filterbank file
-# freqs, samples = fb.select_data()
-# print(freqs.shape)
-# print(samples.shape)
-
 # Calculate the center frequency with the data in the header
 center_freq = fb.header[b'center_freq']
 

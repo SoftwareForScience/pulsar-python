@@ -53,15 +53,10 @@ class Waterfall():
         self.buffered_sweeps = buffered_sweeps if buffered_sweeps else self.buffered_sweeps
         self.scans_per_sweep = scans_per_sweep if scans_per_sweep else self.scans_per_sweep
 
-        print(self.header[b'tsamp'])
-        print(self.t_obs)
-        print(self.t_obs / 8e-05)
         if mode == "discrete":
             time_start = 0
             time_stop = int(self.t_obs//self.header[b'tsamp'])
             freqs, self.samples = filer_bank.select_data(time_start=time_start, time_stop=time_stop)
-            print(freqs.shape)
-            print(self.samples.shape)
         else:
             freqs = filer_bank.get_freqs()
             self.samples = self.filer_bank.next_n_rows(self.max_n_rows)
@@ -76,7 +71,6 @@ class Waterfall():
             Initialize the plot
         """
         self.image_buffer = -100*np.ones(self.samples.shape)
-        print(self.samples.shape)
         self.plot = self.fig.add_subplot(1, 1, 1)
         self.image = self.plot.imshow(self.image_buffer, aspect='auto',\
                                     interpolation='nearest', vmin=-50, vmax=10)
