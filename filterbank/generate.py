@@ -10,16 +10,17 @@ from .header import HEADER_KEYWORD_TYPES
 
 PI = 3.14
 
-def generate_file(filename, header):
+def generate_file(filename, header, noise_level=20, t_obs=2, n_pts=10):
     """
         Combines functionality of all functions
     """
+    n_bytes = header[b'nbits']/8
     header_string = generate_header(header)
-    signal_data = generate_signal(header)
-    write_data(filename, signal_data, header_string)
+    signal_data = generate_signal(header, noise_level, t_obs, n_pts)
+    write_data(filename, signal_data, n_bytes, header_string)
 
 
-def generate_signal(header, noise_level=100, period=.05, t_obs=2, n_pts=20):
+def generate_signal(header, noise_level, t_obs, n_pts):
     """
         Create a signal using the header values
 
@@ -36,7 +37,7 @@ def generate_signal(header, noise_level=100, period=.05, t_obs=2, n_pts=20):
     sample = np.linspace(0, n_pts, header[b'nchans'])
     # create a signal for each sample
     for i in range(n_samples):
-        signal = np.sin(2*PI*sample/period)
+        signal = np.sin(2*PI*sample/header[b'period'])
         noise = np.random.normal(0, noise_level, header[b'nchans'])
         signal_data[i] = signal + noise
     return signal_data
@@ -47,7 +48,7 @@ def generate_header(header):
         Creates a header string
     """
     # create start of header
-    header_string = b'' + keyword_to_string(b'HEADER_START')
+    header_string = keyword_to_string(b'HEADER_START')
     # add header dictionary keys and values to string
     for keyword in header.keys():
         header_string += keyword_to_string(keyword, header[keyword])
@@ -81,14 +82,13 @@ def keyword_to_string(keyword, value=None):
     return keyword_string
 
 
-def write_data(filename, fil_data, header):
+def write_data(filename, fil_data, n_bytes, header_str):
     """
         Write the generated signal and header to filterbank file
     """
-    n_bytes = 1
     # open file and write as bytes
     with open(filename, 'wb') as new_file:
-        new_file.write(header)
+        new_file.write(header_str)
         if n_bytes == 1:
             np.int8(fil_data.ravel()).tofile(new_file)
         elif n_bytes == 2:
