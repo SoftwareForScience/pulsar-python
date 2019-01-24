@@ -7,17 +7,6 @@ class Waterfall():
     """
         Class for generating waterfall plots.
     """
-    # pylint: disable=too-many-instance-attributes
-    # All the attributes are needed.
-
-    # header = None
-    # samples = None
-    # sample_freq = None
-    # freqs = None
-    # scans_per_sweep = 1
-    # plot = None
-    # image = None
-    # image_buffer = None
 
     # pylint: disable=R0913
     # All these attributes are needed.
