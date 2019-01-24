@@ -74,7 +74,7 @@ The `plot.waterfall.Waterfall` class can be used to generate waterfall plots.
 | mode | String `{discrete, stream}`. The mode to operate on. Use discrete for discrete datasets, and stream for stream data. Defaults to `stream`. |
 
 ### 4.2.2 Methods
-| Method | Description | Parameters |
+| Method | Description |
 | --- | --- |
 | init_plot(self) | Initialize the plot |
 | update_plot_labes(self) | Generate the plot labels |
