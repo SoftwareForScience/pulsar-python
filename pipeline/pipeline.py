@@ -132,8 +132,6 @@ class Pipeline:
         time_fft_vect = timer()
         fourier.fft_vectorized(time_series)
         stopwatch['time_fft_vect'] = timer() - time_fft_vect
-        print("dft")
-
         # dft
         time_dft = timer()
         fourier.dft_slow(time_series)
