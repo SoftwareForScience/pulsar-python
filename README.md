@@ -48,13 +48,11 @@ Creating a free and open source framework that contains the generic algorithms a
     2. [Filter samples](docs/clipping.md#62-filter-samples)
     3. [Filter channels](docs/clipping.md#63-filter-channels)
     4. [Filter individual channels](docs/clipping.md#64-filter-individual-channels)
-
 7. [Dedispersion](docs/dedispersion.md)
     1. [Dedisperse](docs/dedispersion.md#72-Dedisperse)
     2. [find_dm](docs/dedispersion.md#73-find_dm)
     3. [find_line](docs/dedispersion.md#74-find_line)
     4. [find_estimation_intensity](docs/dedispersion.md#75-find_estimation_intensity)
-
 8. [Pipeline](docs/pipeline.md)
     1. [Introduction](docs/pipeline.md#71-introduction)
     2. [Read rows](docs/pipeline.md#72-read-rows)
