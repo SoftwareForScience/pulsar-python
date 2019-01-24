@@ -60,4 +60,68 @@ plt.plot(freqs, power_levels)
 plt.show()
 ```
 
+## 4.2 Waterfall
+The `plot.waterfall.Waterfall` class can be used to generate waterfall plots. 
+
+### 4.1.1 Construction
+
+| Parameter | Description |
+| --- | --- |
+| filter_bank | A `filterbank` object. |
+| center_freq | The center frequency of the signal in the filterbank object |
+| sample_freq | The sample frequency of the signal in the filterbank object|
+| fig | An imaging object, like `pyplot.figure()` |
+| mode | String `{discrete, stream}`. The mode to operate on. Use discrete for discrete datasets, and stream for stream data. Defaults to `stream`. |
+
+### 4.1.2 Methods
+| Method | Description | Parameters |
+| --- | --- |
+| init_plot(self) | Initialize the plot |
+| update_plot_labes(self) | Generate the plot labels |
+| get_next(self) | Returns the next row of data in the filterbank object |
+| get_image(self) | Returns the image data of the full dataset, if using a discrete dataset. |
+| update(self, i) | Updates the image with the next row of data, when using a continuous datastream. |
+| animated_plotter(self) | Returns the figure and update function for matplotlib animation |
+| get_center_freq(self) | Returns the center frequency stored in the filterbank header |
+
+### 4.1.3 Example Usage
+#### With discrete data
+```python
+import matplotlib.animation as animation
+from filterbank.header import read_header
+from filterbank.filterbank import Filterbank
+from plot import waterfall
+import pylab as pyl
+from plot.plot import next_power_of_2
+
+fb = Filterbank(filename='./pspm32.fil', read_all=True)
+
+wf = waterfall.Waterfall(filter_bank=fb, fig=pyl.figure(), mode="discrete")
+
+img = wf.get_image()
+
+pyl.show(img)
+```
+
+#### With stream data
+```python
+import matplotlib.animation as animation
+from filterbank.header import read_header
+from filterbank.filterbank import Filterbank
+from plot import waterfall
+import pylab as pyl
+from plot.plot import next_power_of_2
+
+
+fb = Filterbank(filename='./pspm32.fil')
+
+wf = waterfall.Waterfall(fb=fb, fig=pyl.figure(), mode="stream")
+
+fig, update, frames, repeat = wf.animated_plotter()
+
+ani = animation.FuncAnimation(fig, update, frames=frames,repeat=repeat)
+pyl.show()
+```
+
+
 [Back to table of contents](../README.md)
