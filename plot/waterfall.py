@@ -24,7 +24,7 @@ class Waterfall():
             self.filter_bank = filter_bank
 
         if fig is None:
-            raise ValueError("Need figure.")
+            raise ValueError("A Matplotlib figure is needed to generate the plot.")
         else:
             self.fig = fig
 
