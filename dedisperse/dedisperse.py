@@ -1,17 +1,21 @@
 '''
-    Dedisperses data
+Dedisperses data
 '''
 # pylint: disable-msg=C0103
 import numpy as np
 
-def dedisperse(samples, dm=None):
+def dedisperse(samples, highest_x=None, max_delay=None, dm=None):
     '''
     This method performs dedispersion on the filterbank data
+    The maximum_delay specifies between the currently considered pulsar signal and the next pulsar signal should be
+    The highest_x specifies the amount of intensities that are used for estimating the minimum pulsar intensity
     '''
 
+    # Check if parameters contain a DM, if not, estimate one
     if dm is None:
-        print("Finding possible DM's")
-        dm = estimate_dm(samples)
+        # Estimates the minimum for an intensity to be considered a pulsar
+        pulsar_intensity = find_estimation_intensity(samples, highest_x)
+        dm = find_dm(samples, pulsar_intensity, max_delay)
 
     # Distribute the DM over the amount of samples
     delays_per_sample = np.round(np.linspace(dm, 0, samples.shape[1])).astype(int)
@@ -30,106 +34,78 @@ def dedisperse(samples, dm=None):
 
     return samples
 
-
-def estimate_dm(samples):
+def find_dm(samples, pulsar_intensity, max_delay):
     '''
     This method attempts to find a dispersion measure
     '''
 
-    # Tuple of frequency index and sample index
-    initial_signal_point = find_initial_signal(samples)
-    last_sample = initial_signal_point
+    # Loop through the samples to find a pulsar intensity to start calculating from
+    for s, sample in enumerate(samples[:, 0]):
 
-    for i, frequency in enumerate(samples[1]):
-        for j, data_point in enumerate(samples[:, i]):
-            #print(samples[:, i][previous_time_sample:].shape[0])
-            if(j > last_sample[1]):
-                if(data_point > 10):
-                    last_sample = i, j
-                    print("At Frequency ", i, " found on Time sample ", j, " - ", data_point)
-                    break
+        # If the sample meets the minimum intensity, attempt to find a line continuing from this intensity
+        if(sample > pulsar_intensity):
+            start_sample_index = s
 
-    highest_difference = 0
-    '''
-    for s, samples in enumerate(samples):
-        for i, data_point in enumerate(samples):
-            if(i > highest_difference):                
-                if(data_point > 10):
-                    print(s, i, " - ", data_point)                                        
-                    highest_difference = i
-                break
-    '''
-    estimated_dm = last_sample[1] - initial_signal_point[1]
-    print("Estimated DM is", estimated_dm)
-    return estimated_dm
+            # Attempt to find a line, line_coordinates contains the first and last index of the pulsar
+            line_coordinates = find_line(samples, start_sample_index, max_delay, pulsar_intensity)
+            
+            # If a line is found, calculate and return the dispersion measure
+            if(line_coordinates is not None):
+                dm = line_coordinates[1] - line_coordinates[0]
+                return dm
 
-
-def find_initial_signal(samples):
-    '''
-    This method attempts to find a viable data point to start estimating a dispersion measure from
-    '''
-
-    # Tuple of frequency index and sample index
-    lowest_sample = 0, samples.shape[0]
-    
-    for i, frequency in enumerate(samples[1]):
-        for j, data_point in enumerate(samples[:, i]):
-            if(j < lowest_sample[1]):
-                if(data_point > 5):
-                    print("Initial signal found on freq, sample", i, j, data_point)
-                    return i, j
-                    '''
-                    print(lowest_sample, " ", j)
-                    lowest_sample = i, j
-                    break
-                    '''
-
-    print("NO INITIAL SIGNAL FOUND")
     return None
-    
 
-def find_initial_line(samples):
+
+def find_line(samples, start_sample_index, max_delay, pulsar_intensity):
     '''
-    This method attempts to find a line to dedisperse
+    This method tries to find a line starting from the sample index given in the parameters
+    it stops if there is no intensity within the max_delay higher than the average_intensity
     '''
-    
-    avg_intensity = find_avg_intensity(samples, 10)
-    max_delay = 8
-    
-    for s, sample in enumerate(samples[:, 1]):
-        if(sample > avg_intensity):
-            previous_sample_index = s
-            print("Attempting to find line on freq,", 1, "sample", s)
-            find_line(samples, previous_sample_index, max_delay, avg_intensity)
+
+    previous_sample_index = start_sample_index
+
+    failed_to_find_line = True
+
+    # Loop through the frequencies
+    for f, frequency in enumerate(samples[1]):
+
+        # Loop through previous intensity until the max delay is reached
+        for i, intensity in enumerate(samples[:, f][previous_sample_index:previous_sample_index + max_delay]):
+
+            # Skip the first frequency, since that is where the initial sample is we are measuring from
+            if(f == 0):
+                failed_to_find_line = False
+                break
+
+            # If the intensity is higher than the pulsar_intensity, continue finding a signal
+            if(intensity > pulsar_intensity):
+                previous_sample_index = previous_sample_index + i
+                failed_to_find_line = False
+                break
+
+        # If there is no line found, return None
+        if failed_to_find_line: 
+            return None
+
+    # If all frequencies are looped through, a line is found, so we return the start and end index of the line
+    return start_sample_index, previous_sample_index
             
 
-    print("NO INITIAL SIGNAL FOUND")
-    return None
-
-
-def find_line(samples, previous_sample_index, max_delay, avg_intensity):
-    for f, frequency in enumerate(samples[1]):
-        for i, intensity in enumerate(samples[:, f][previous_sample_index:previous_sample_index+max_delay]):
-            if(intensity > avg_intensity):
-                print("Continuing to find line on freq,", f, "sample", i, intensity)
-                previous_sample_index = i
-                break
-            else:
-                continue
-                
- 
-
-def find_avg_intensity(samples, top = 10):
+def find_estimation_intensity(samples, highest_x):
     '''
-    Finds average intensity for top x intensities
+    This method finds the average intensity for the highest x intensities
+    The average_intensity is considered a requirement for intensities to be considered a pulsar 
     '''
 
+    # Sum of all intensitiesg
     sum_intensities = 0
-    # Looks for the 3 highest intensities in the first 10 samples
+
+    # Looks for the top x highest intensities in the samples and adds them up together
     for sample in samples:
-        #top_samples.append((sorted([(x,i) for (i,x) in enumerate(sample)], reverse=True)[:3] ))
-        sum_intensities += np.sum(sorted(sample, reverse=True)[:top])
+        sum_intensities += np.sum(sorted(sample, reverse=True)[:highest_x])
 
-    avg_intensity = (sum_intensities) / (samples.shape[0] * top)
+    # Calculates the average_intensity
+    average_intensity = (sum_intensities) / (samples.shape[0] * highest_x)
 
-    return (avg_intensity)
+    return average_intensity

@@ -18,14 +18,33 @@ from timeseries.timeseries import Timeseries
 
 from clipping import clipping
 
-# Read filterbank data
-special_pspm = fb.Filterbank(filename = "../data/my_uber_pspm.fil")
+# Read filterbank data,
+
+# Standard file
+special_pspm = fb.Filterbank(filename = "../data/my_special_pspm.fil")
+highest_x=10
+max_delay=10
+
+# Files with low signal to noise ratio
+# special_pspm = fb.Filterbank(filename = "../data/my_uber_pspm.fil")
+# highest_x=10
+# max_delay=10
+
+# File with 10000 samples
+# special_pspm = fb.Filterbank(filename = "../data/pspm_4_2.fil")
+# highest_x=10
+# max_delay=100
+
+# File with 10000 samples with low signal to noise ratio
+# special_pspm = fb.Filterbank(filename = "../data/pspm_4_1.fil")
+# highest_x=10
+# max_delay=100
 
 special_pspm.read_filterbank()
 
 frequencies, samples = special_pspm.select_data()
 
-
+# Plot the original data
 plt.subplot(2,1,1)
 data, extent = waterfall_plot(samples, frequencies)
 
@@ -36,6 +55,8 @@ img = plt.imshow(data.T,
                  interpolation='nearest',
                  extent=extent,
                  cmap='cubehelix')
+
+plt.colorbar()
 
 time_series = []
 
@@ -47,12 +68,10 @@ plt.subplot(2,1,2)
 plt.plot(time_series)
 plt.show()
 
-#clipped_samples = clipping(frequencies, samples)
-#samples = dedisperse.dedisperse(samples)
-#samples = dedisperse.find_lowest_pulsar(samples)
-#samples = dedisperse.estimate_dm(samples)
-samples = dedisperse.find_initial_line(samples)
+# Dedisperse the samples
+samples = dedisperse.dedisperse(samples, highest_x, max_delay)
 
+# Plot the dedispersed data
 plt.subplot(2,1,1)
 data, extent = waterfall_plot(samples, frequencies)
 
@@ -63,7 +82,6 @@ img = plt.imshow(data.T,
                  interpolation='nearest',
                  extent=extent,
                  cmap='cubehelix')
-plt.colorbar()
 
 time_series = []
 

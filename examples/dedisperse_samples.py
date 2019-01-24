@@ -23,11 +23,8 @@ special_pspm.read_filterbank()
 
 frequencies, samples = special_pspm.select_data()
 
-# Use this if you have your own file with a clear pulsar signal, this method assumes all signals other than the pulsar are lower than 10
-print_possible_dm(samples)
-
 # Dispersion Measure
-DM = 240
+DM = 235
 
 plt.subplot(2,1,1)
 data, extent = waterfall_plot(samples, frequencies)
