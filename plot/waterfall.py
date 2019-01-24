@@ -7,6 +7,8 @@ class Waterfall():
     """
         Class for generating waterfall plots.
     """
+    # pylint: disable=too-many-instance-attributes
+    # All the attributes are needed.
 
     # pylint: disable=R0913
     # All these attributes are needed.
