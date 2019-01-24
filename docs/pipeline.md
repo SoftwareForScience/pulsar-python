@@ -1,6 +1,6 @@
-# 7. Pipeline
+# 8. Pipeline
 
-## 7.1 Introduction
+## 8.1 Introduction
 
 The Pipeline module is used to execute the different modules in a specific order.
 There are currently three different options for running the pipeline.  
@@ -23,7 +23,7 @@ The constructor of the pipeline module will recognize which method is fit for ru
 
 After deciding which method to run for running the filterbank in a pipeline, it will measure the time it takes to run each method using `measure_method`. After running all the different methods, the constructor will append the results (a dictionary) to a txt file.
 
-## 7.2 Read rows
+## 8.2 Read rows
 
 The `read_rows` method reads the Filterbank data row per row. Because it only reads the filterbank per row, it is unable to execute most methods. The alternative for this method is the `read_n_rows` method, which is able to run all methods.
 
@@ -31,7 +31,7 @@ The `read_rows` method reads the Filterbank data row per row. Because it only re
 pipeline.Pipeline(<filterbank_file>, as_stream=True)
 ```
 
-## 7.3 Read n rows
+## 8.3 Read n rows
 
 The `read_n_rows` method first splits all the filterbank data into chunks of n samples. After splitting the filterbank data in chunks, it will run the different modules of the pipeline for each chunk. The remaining data, that which does not fit into the sample size, is currently ignored.
 
@@ -41,7 +41,7 @@ The `n` or sample size should be a power of 2 multiplied with the given scale fo
 pipeline.Pipeline(<filterbank_file>, n=<size> , as_stream=True)
 ```
 
-## 7.4 Read static
+## 8.4 Read static
 
 The `read_static` method reads the entire filterbank at once, and applies each method to the entire dataset. If the filterbank file is too large for running it in-memory, the alternative is using `read_n_rows`.
 
@@ -49,7 +49,7 @@ The `read_static` method reads the entire filterbank at once, and applies each m
 pipeline.Pipeline(<filterbank_file>)
 ```
 
-## 7.5 Measure methods
+## 8.5 Measure methods
 
 The `measure_methods` is ran for each of the above methods, and calculates the time it takes to run each of the different methods. For each method it will create a key using the name of the method, and save the time it took to run the method as a value.
 At the end, it will returns a dictionary with all the keys and values.
