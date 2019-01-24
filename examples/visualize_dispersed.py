@@ -1,22 +1,21 @@
 # pylint: disable-all
+# Disabled all PyLint checking for examples files since this is not required.
 import os,sys,inspect
-CURRENT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-PARENT_DIR = os.path.dirname(CURRENT_DIR)
-sys.path.insert(0,PARENT_DIR)
-import matplotlib.animation as animation
-from filterbank.header import read_header
 from filterbank.filterbank import Filterbank
 from plot import waterfall
 import pylab as pyl
-from plot.plot import next_power_of_2
+
+CURRENT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+PARENT_DIR = os.path.dirname(CURRENT_DIR)
+sys.path.insert(0,PARENT_DIR)
 
 
-fb = Filterbank(filename='examples/pspm32bit.fil')
+filter_bank = Filterbank(filename='./pspm32.fil')
 
 # Calculate the center frequency with the data in the header
-center_freq = fb.header[b'center_freq']
+center_freq = filter_bank.header[b'center_freq']
 
-wf = waterfall.Waterfall(fb=fb, fig=pyl.figure(), center_freq=center_freq, t_obs=0.01, mode="discrete")
+wf = waterfall.Waterfall(filter_bank=filter_bank, fig=pyl.figure(), center_freq=center_freq, t_obs=0.01, mode="discrete")
 img = wf.get_raw_image()
 
 pyl.show(img)

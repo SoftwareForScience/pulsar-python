@@ -14,9 +14,6 @@ class Waterfall():
     samples = None
     sample_freq = None
     freqs = None
-    nfft = 1024
-    samples_per_scan = nfft*16
-    buffered_sweeps = 100
     scans_per_sweep = 1
     plot = None
     image = None
@@ -25,8 +22,12 @@ class Waterfall():
     # pylint: disable=R0913
     # All these attributes are needed.
     def __init__(self, filter_bank=None, center_freq=None, sample_freq=None,
+<<<<<<< HEAD
                  fig=None, samples_per_scan=None,
                  buffered_sweeps=None, scans_per_sweep=None,
+=======
+                 fig=None, scans_per_sweep=None,
+>>>>>>> c328c7b32e9e5e534b1d0288013d12cde6c4d348
                  max_n_rows=1024, mode='stream', t_obs=None):
         """
             Setup waterfall object
@@ -34,7 +35,11 @@ class Waterfall():
         if filter_bank is None:
             raise ValueError("A filterbank object input is needed to generate the plot.")
         else:
+<<<<<<< HEAD
             self.filter_bank = filter_bank
+=======
+            self.filer_bank = filter_bank
+>>>>>>> c328c7b32e9e5e534b1d0288013d12cde6c4d348
 
         if fig is None:
             raise ValueError("Need figure.")
@@ -42,24 +47,33 @@ class Waterfall():
             self.fig = fig
 
         self.header = filter_bank.get_header()
+<<<<<<< HEAD
         print(self.header)
+=======
+>>>>>>> c328c7b32e9e5e534b1d0288013d12cde6c4d348
         self.t_obs = t_obs if t_obs else 1
-        print(self.t_obs)
         self.max_n_rows = max_n_rows
 
         self.sample_freq = sample_freq
         self.center_freq = center_freq
-        self.samples_per_scan = samples_per_scan if samples_per_scan else self.samples_per_scan
-        self.buffered_sweeps = buffered_sweeps if buffered_sweeps else self.buffered_sweeps
+    
         self.scans_per_sweep = scans_per_sweep if scans_per_sweep else self.scans_per_sweep
 
         if mode == "discrete":
             time_start = 0
             time_stop = int(self.t_obs//self.header[b'tsamp'])
+<<<<<<< HEAD
             freqs, self.samples = filter_bank.select_data(time_start=time_start, time_stop=time_stop)
         else:
             freqs = filter_bank.get_freqs()
             self.samples = self.filter_bank.next_n_rows(self.max_n_rows)
+=======
+            freqs, self.samples = filter_bank.select_data(time_start=time_start,
+                                                          time_stop=time_stop)
+        else:
+            freqs = filter_bank.get_freqs()
+            self.samples = self.filer_bank.next_n_rows(self.max_n_rows)
+>>>>>>> c328c7b32e9e5e534b1d0288013d12cde6c4d348
 
 
         self.freqs = np.asarray(freqs)
@@ -111,7 +125,6 @@ class Waterfall():
             Updates the image with the next row of data, when using
             a continuous datastream.
         """
-        print('update:', i)
         # prepare space in buffer
         self.image_buffer = np.roll(self.image_buffer, 1, axis=0)
 
