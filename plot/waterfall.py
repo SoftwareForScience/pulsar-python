@@ -24,24 +24,24 @@ class Waterfall():
 
     # pylint: disable=R0913
     # All these attributes are needed.
-    def __init__(self, filer_bank=None, center_freq=None, sample_freq=None,
+    def __init__(self, filter_bank=None, center_freq=None, sample_freq=None,
                  fig=None, samples_per_scan=None,
                  buffered_sweeps=None, scans_per_sweep=None,
                  max_n_rows=1024, mode='stream', t_obs=None):
         """
             Setup waterfall object
         """
-        if filer_bank is None:
+        if filter_bank is None:
             raise ValueError("A filterbank object input is needed to generate the plot.")
         else:
-            self.filer_bank = filer_bank
+            self.filter_bank = filter_bank
 
         if fig is None:
             raise ValueError("Need figure.")
         else:
             self.fig = fig
 
-        self.header = filer_bank.get_header()
+        self.header = filter_bank.get_header()
         print(self.header)
         self.t_obs = t_obs if t_obs else 1
         print(self.t_obs)
@@ -56,10 +56,10 @@ class Waterfall():
         if mode == "discrete":
             time_start = 0
             time_stop = int(self.t_obs//self.header[b'tsamp'])
-            freqs, self.samples = filer_bank.select_data(time_start=time_start, time_stop=time_stop)
+            freqs, self.samples = filter_bank.select_data(time_start=time_start, time_stop=time_stop)
         else:
-            freqs = filer_bank.get_freqs()
-            self.samples = self.filer_bank.next_n_rows(self.max_n_rows)
+            freqs = filter_bank.get_freqs()
+            self.samples = self.filter_bank.next_n_rows(self.max_n_rows)
 
 
         self.freqs = np.asarray(freqs)
@@ -95,7 +95,7 @@ class Waterfall():
         """
             Returns the next row of data in the filterbank object.
         """
-        return self.filer_bank.next_row()
+        return self.filter_bank.next_row()
 
     def get_image(self):
         """
