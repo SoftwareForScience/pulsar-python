@@ -19,7 +19,7 @@ from clipping import clipping
 # Read filterbank data,
 
 # Standard file
-special_pspm = fb.Filterbank(filename = "../data/my_special_pspm.fil")
+special_pspm = fb.Filterbank(filename = "./my_special_pspm.fil")
 highest_x=10
 max_delay=10
 
