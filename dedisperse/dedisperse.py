@@ -23,7 +23,7 @@ def dedisperse(samples, highest_x=None, max_delay=0, disperion_measure=None):
     delays_per_sample = np.round(np.linspace(disperion_measure, 0, samples.shape[1])).astype(int)
 
     # Loop over the frequencies
-    for i, _ in enumerate(delays_per_sample):
+    for i in range(delays_per_sample.size):
 
         # Temporary array that is used to later delay the frequency
         temporary_samples = []
@@ -71,7 +71,7 @@ def find_line(samples, start_sample_index, max_delay, pulsar_intensity):
     failed_to_find_line = True
 
     # Loop through the frequencies
-    for f, _ in enumerate(samples[1]):
+    for f in range(samples[1].size):
 
         # Loop through previous intensity until the max delay is reached
         for i, intensity in enumerate(samples[:, f][previous_index:previous_index + max_delay]):
