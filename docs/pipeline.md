@@ -74,3 +74,5 @@ Modules that are missing in the pipeline are highlighted using a `*`.
 9. * Phase-fold remaining signals
 10.* Do Transient searches
 ```
+
+[Back to table of contents](../README.md)
