@@ -54,7 +54,7 @@ pipeline.Pipeline(<filterbank_file>)
 The `measure_methods` is ran for each of the above methods, and calculates the time it takes to run each of the different methods. For each method it will create a key using the name of the method, and save the time it took to run the method as a value.
 At the end, it will returns a dictionary with all the keys and values.
 
-## 7.6 Overview of pipeline
+## 8.6 Overview of pipeline
 
 Apart from the different modules described in the previous paragraphs, additional modules are required for this library to make detecting pulsar signals possible.
 However, these additional modules have not been developed yet, and are required to be developed in the future. In this paragraph the additional
