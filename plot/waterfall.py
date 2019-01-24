@@ -14,9 +14,6 @@ class Waterfall():
     samples = None
     sample_freq = None
     freqs = None
-    nfft = 1024
-    samples_per_scan = nfft*16
-    buffered_sweeps = 100
     scans_per_sweep = 1
     plot = None
     image = None
@@ -25,8 +22,7 @@ class Waterfall():
     # pylint: disable=R0913
     # All these attributes are needed.
     def __init__(self, filter_bank=None, center_freq=None, sample_freq=None,
-                 fig=None, samples_per_scan=None,
-                 buffered_sweeps=None, scans_per_sweep=None,
+                 fig=None, scans_per_sweep=None,
                  max_n_rows=1024, mode='stream', t_obs=None):
         """
             Setup waterfall object
@@ -47,8 +43,7 @@ class Waterfall():
 
         self.sample_freq = sample_freq
         self.center_freq = center_freq
-        self.samples_per_scan = samples_per_scan if samples_per_scan else self.samples_per_scan
-        self.buffered_sweeps = buffered_sweeps if buffered_sweeps else self.buffered_sweeps
+    
         self.scans_per_sweep = scans_per_sweep if scans_per_sweep else self.scans_per_sweep
 
         if mode == "discrete":
