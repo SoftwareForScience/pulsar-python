@@ -42,9 +42,7 @@ class Waterfall():
             self.fig = fig
 
         self.header = filter_bank.get_header()
-        print(self.header)
         self.t_obs = t_obs if t_obs else 1
-        print(self.t_obs)
         self.max_n_rows = max_n_rows
 
         self.sample_freq = sample_freq
@@ -112,7 +110,6 @@ class Waterfall():
             Updates the image with the next row of data, when using
             a continuous datastream.
         """
-        print('update:', i)
         # prepare space in buffer
         self.image_buffer = np.roll(self.image_buffer, 1, axis=0)
 
