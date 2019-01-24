@@ -1,6 +1,6 @@
-# 8. Generating mock data
+# 9. Generating mock data
 
-## 8.1 Creating a filterbank file
+## 9.1 Creating a filterbank file
 
 To generate a filterbank file you may use the following example code:
 ```python
@@ -25,7 +25,7 @@ header.generate_file("file_path/file_name", header)
 
 The header data is passed in a header dict. For a more detailed explanation on the file header, please consult [chapter 2.2](docs/filterbank.md#22-read-the-header-from-filterbank-data). 
 
-## 8.2 Generate signal
+## 9.2 Generate signal
 
 The generate_signal method generates a mock signal based on the following parameters:
 
@@ -36,15 +36,15 @@ The generate_signal method generates a mock signal based on the following parame
 | t_obs | observation time in s |
 | n_pts | intervals between samples |
 
-## 8.3 Generate header
+## 9.3 Generate header
 
 The generate_header method generates a header string based on the header dict provided in the example in chapter 8.1. The dict provides keys encoded in bytes and the method converts each keyword to a string using the keyword_to_string method (see below).
 
-## 8.4 Keyword to string
+## 9.4 Keyword to string
 
 The keyword_to_string method converts a keyword from the header dict to a serialized string.
 
-## 8.5 Write data
+## 9.5 Write data
 
 Once all the required data is generated to a filterbank file. The data is written to the file as bytes.
 
