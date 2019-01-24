@@ -50,7 +50,7 @@ class TestFft(unittest.TestCase):
                                fourier.fft_vectorized(test_input).all())
 
 
-    def test_wrong_array_size(self):
+    def test_fft_wrong_array_size(self):
         """
             Tests for correct input for the FFT_vectorized function.
             Fails if the input is not a power of 2.
@@ -58,6 +58,16 @@ class TestFft(unittest.TestCase):
         test_input = np.random.random(30) + 1j * np.random.random(30)
         with self.assertRaises(ValueError):
             fourier.fft_vectorized(test_input)
+
+
+    def test_ifft_wrong_array_size(self):
+        """
+            Tests for correct input for the ifft function.
+            Fails if the input is not a power of 2.
+        """
+        test_input = np.random.random(30) + 1j * np.random.random(30)
+        with self.assertRaises(ValueError):
+            fourier.ifft(test_input)
 
 
     def test_fft_smaller_shape(self):
@@ -136,6 +146,17 @@ class TestFft(unittest.TestCase):
         test_input = range(1, 10)
         test_output = [2, 3, 4, 5, 6, 7, 8, 9, 1]
         self.assertSequenceEqual(fourier.fft_shift(test_input, [0, 0]).tolist(), test_output)
+
+
+    def test_fft_and_ifft(self):
+        """
+            Test the fft and ifft
+            and expect the same outcome and input
+        """
+        test_input = np.random.random(32) + 1j * np.random.random(32)
+        test_input = np.asarray(test_input)
+        self.assertEqual(test_input.all(), fourier.fft_vectorized(fourier.ifft(test_input)).all())
+
 
 if __name__ == '__main__':
     unittest.main()
