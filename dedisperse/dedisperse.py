@@ -4,7 +4,7 @@ Dedisperses data
 # pylint: disable-msg=C0103
 import numpy as np
 
-def dedisperse(samples, highest_x=None, max_delay=0, dm=None):
+def dedisperse(samples, highest_x=None, max_delay=0, disperion_measure=None):
     '''
     This method performs dedispersion on the filterbank data
     The maximum_delay specifies between the currently considered pulsar signal and the next pulsar
@@ -13,14 +13,14 @@ def dedisperse(samples, highest_x=None, max_delay=0, dm=None):
     pulsar intensity
     '''
 
-    # Check if parameters contain a DM, if not, estimate one
-    if dm is None:
+    # Check if parameters contain a Dispersion Measure, if not, estimate one
+    if disperion_measure is None:
         # Estimates the minimum for an intensity to be considered a pulsar
         pulsar_intensity = find_estimation_intensity(samples, highest_x)
-        dm = find_dm(samples, pulsar_intensity, max_delay)
+        disperion_measure = find_dm(samples, pulsar_intensity, max_delay)
 
-    # Distribute the DM over the amount of samples
-    delays_per_sample = (np.round(np.linspace(dm, 0, samples.shape[1]))).astype(int)
+    # Distribute the Dispersion Measure over the amount of samples
+    delays_per_sample = np.round(np.linspace(disperion_measure, 0, samples.shape[1])).astype(int)
 
     # Loop over the frequencies
     for i, _ in enumerate(delays_per_sample):
@@ -54,8 +54,8 @@ def find_dm(samples, pulsar_intensity, max_delay):
 
             # If a line is found, calculate and return the dispersion measure
             if line_coordinates is not None:
-                dm = line_coordinates[1] - line_coordinates[0]
-                return dm
+                disperion_measure = line_coordinates[1] - line_coordinates[0]
+                return disperion_measure
 
     return None
 
