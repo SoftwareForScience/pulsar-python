@@ -51,6 +51,9 @@ Creating a free and open source framework that contains the generic algorithms a
 
 7. [Dedispersion](docs/dedispersion.md)
     1. [Dedisperse](docs/dedispersion.md#72-Dedisperse)
+    2. [find_dm](docs/dedispersion.md#73-find_dm)
+    3. [find_line](docs/dedispersion.md#74-find_line)
+    4. [find_estimation_intensity](docs/dedispersion.md#75-find_estimation_intensity)
 
 8. [Pipeline](docs/pipeline.md)
     1. [Introduction](docs/pipeline.md#71-introduction)
