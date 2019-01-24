@@ -10,10 +10,12 @@ from plot import waterfall
 import pylab as pyl
 from plot.plot import next_power_of_2
 
-fb = Filterbank(filename='./pspm32.fil', read_all=True)
 
-wf = waterfall.Waterfall(filter_bank=fb, fig=pyl.figure(), mode="discrete")
+fb = Filterbank(filename='./pspm32.fil')
 
-img = wf.get_image()
+wf = waterfall.Waterfall(fb=fb, fig=pyl.figure(), mode="stream")
 
-pyl.show(img)
+fig, update, frames, repeat = wf.animated_plotter()
+
+ani = animation.FuncAnimation(fig, update, frames=frames,repeat=repeat)
+pyl.show()
