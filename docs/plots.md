@@ -63,7 +63,7 @@ plt.show()
 ## 4.2 Waterfall
 The `plot.waterfall.Waterfall` class can be used to generate waterfall plots. 
 
-### 4.1.1 Construction
+### 4.2.1 Construction
 
 | Parameter | Description |
 | --- | --- |
@@ -73,7 +73,7 @@ The `plot.waterfall.Waterfall` class can be used to generate waterfall plots.
 | fig | An imaging object, like `pyplot.figure()` |
 | mode | String `{discrete, stream}`. The mode to operate on. Use discrete for discrete datasets, and stream for stream data. Defaults to `stream`. |
 
-### 4.1.2 Methods
+### 4.2.2 Methods
 | Method | Description | Parameters |
 | --- | --- |
 | init_plot(self) | Initialize the plot |
@@ -84,8 +84,8 @@ The `plot.waterfall.Waterfall` class can be used to generate waterfall plots.
 | animated_plotter(self) | Returns the figure and update function for matplotlib animation |
 | get_center_freq(self) | Returns the center frequency stored in the filterbank header |
 
-### 4.1.3 Example Usage
-#### With discrete data
+### 4.2.3 Example Usage
+#### 4.2.3.1 With discrete data
 ```python
 import matplotlib.animation as animation
 from filterbank.header import read_header
@@ -103,7 +103,7 @@ img = wf.get_image()
 pyl.show(img)
 ```
 
-#### With stream data
+#### 4.2.3.2 With stream data
 ```python
 import matplotlib.animation as animation
 from filterbank.header import read_header
