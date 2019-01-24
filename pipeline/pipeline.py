@@ -112,12 +112,13 @@ class Pipeline:
             Run and time all methods/modules
         """
         # clipping
+        
         time_clipping = timer()
         _, _ = clipping.clipping(freqs, fil_data)
         stopwatch['time_clipping'] = timer() - time_clipping
         # dedisperse
         time_dedisp = timer()
-        fil_data = dedisperse.dedisperse(fil_data, DM)
+        fil_data = dedisperse.dedisperse(fil_data, dm=DM)
         stopwatch['time_dedisp'] = timer() - time_dedisp
         # timeseries
         time_t_series = timer()
@@ -131,6 +132,8 @@ class Pipeline:
         time_fft_vect = timer()
         fourier.fft_vectorized(time_series)
         stopwatch['time_fft_vect'] = timer() - time_fft_vect
+        print("dft")
+
         # dft
         time_dft = timer()
         fourier.dft_slow(time_series)

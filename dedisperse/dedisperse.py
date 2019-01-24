@@ -4,7 +4,7 @@ Dedisperses data
 # pylint: disable-msg=C0103
 import numpy as np
 
-def dedisperse(samples, highest_x=None, max_delay=None, dm=None):
+def dedisperse(samples, highest_x=None, max_delay=0, dm=None):
     '''
     This method performs dedispersion on the filterbank data
     The maximum_delay specifies between the currently considered pulsar signal and the next pulsar
@@ -20,7 +20,7 @@ def dedisperse(samples, highest_x=None, max_delay=None, dm=None):
         dm = find_dm(samples, pulsar_intensity, max_delay)
 
     # Distribute the DM over the amount of samples
-    delays_per_sample = np.round(np.linspace(dm, 0, samples.shape[1])).astype(int)
+    delays_per_sample = (np.round(np.linspace(dm, 0, samples.shape[1]))).astype(int)
 
     # Loop over the frequencies
     for i, _ in enumerate(delays_per_sample):
