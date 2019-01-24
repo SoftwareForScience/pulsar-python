@@ -10,14 +10,14 @@ class Waterfall():
     # pylint: disable=too-many-instance-attributes
     # All the attributes are needed.
 
-    header = None
-    samples = None
-    sample_freq = None
-    freqs = None
-    scans_per_sweep = 1
-    plot = None
-    image = None
-    image_buffer = None
+    # header = None
+    # samples = None
+    # sample_freq = None
+    # freqs = None
+    # scans_per_sweep = 1
+    # plot = None
+    # image = None
+    # image_buffer = None
 
     # pylint: disable=R0913
     # All these attributes are needed.
@@ -37,6 +37,8 @@ class Waterfall():
         else:
             self.fig = fig
 
+        self.image_buffer = None
+
         self.header = filter_bank.get_header()
         self.t_obs = t_obs if t_obs else 1
         self.max_n_rows = max_n_rows
@@ -44,7 +46,7 @@ class Waterfall():
         self.sample_freq = sample_freq
         self.center_freq = center_freq
 
-        self.scans_per_sweep = scans_per_sweep if scans_per_sweep else self.scans_per_sweep
+        self.scans_per_sweep = scans_per_sweep
 
         if mode == "discrete":
             time_start = 0
