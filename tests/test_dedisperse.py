@@ -3,6 +3,7 @@
 """
 
 import unittest
+import numpy as np
 
 from .context import dedisperse # pylint: disable-msg=E0611
 
@@ -25,5 +26,5 @@ class TestDedisperse(unittest.TestCase):
             expect moved frequencies per sample
         """
         disp_measure = 6
-        results = dedisperse.dedisperse(self.samples, disp_measure)
+        results = dedisperse.dedisperse(np.array(self.samples), disperion_measure=disp_measure)
         self.assertListEqual(list(results[len(self.samples)-1]), [10]*7)

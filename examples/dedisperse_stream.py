@@ -11,21 +11,23 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import filterbank.filterbank as fb
-import dedisperse.dedisperse as dedisperse
+import dedisperse as dedisperse
 from plot.static_waterfall import waterfall_plot
 
-from timeseries.timeseries import Timeseries
+from clipping import clipping
 
-# Read filterbank data
-special_pspm = fb.Filterbank(filename = "../data/my_special_pspm.fil")
+# Read filterbank data,
+
+# Standard file
+special_pspm = fb.Filterbank(filename = "./my_special_pspm.fil")
+highest_x=10
+max_delay=10
 
 special_pspm.read_filterbank()
 
 frequencies, samples = special_pspm.select_data()
 
-# Dispersion Measure
-DM = 235
-
+# Plot the original data
 plt.subplot(2,1,1)
 data, extent = waterfall_plot(samples, frequencies)
 
@@ -36,6 +38,8 @@ img = plt.imshow(data.T,
                  interpolation='nearest',
                  extent=extent,
                  cmap='cubehelix')
+
+plt.colorbar()
 
 time_series = []
 
@@ -47,8 +51,10 @@ plt.subplot(2,1,2)
 plt.plot(time_series)
 plt.show()
 
-samples = dedisperse(samples, DM)
+# Dedisperse the samples
+samples = dedisperse.dedisperse(samples, highest_x, max_delay)
 
+# Plot the dedispersed data
 plt.subplot(2,1,1)
 data, extent = waterfall_plot(samples, frequencies)
 
@@ -59,7 +65,6 @@ img = plt.imshow(data.T,
                  interpolation='nearest',
                  extent=extent,
                  cmap='cubehelix')
-
 
 time_series = []
 
