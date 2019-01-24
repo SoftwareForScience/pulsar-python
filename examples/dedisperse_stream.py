@@ -18,20 +18,27 @@ from timeseries.timeseries import Timeseries
 
 from clipping import clipping
 
-# Read filterbank data
+# Read filterbank data,
 
 # Standard file
-#special_pspm = fb.Filterbank(filename = "../data/my_special_pspm.fil")
+special_pspm = fb.Filterbank(filename = "../data/my_special_pspm.fil")
+highest_x=10
+max_delay=10
 
 # Files with low signal to noise ratio
-#special_pspm = fb.Filterbank(filename = "../data/new_pspm_2.fil")
-#special_pspm = fb.Filterbank(filename = "../data/my_uber_pspm.fil")
+# special_pspm = fb.Filterbank(filename = "../data/my_uber_pspm.fil")
+# highest_x=10
+# max_delay=10
 
 # File with 10000 samples
-#special_pspm = fb.Filterbank(filename = "../data/pspm_4_2.fil")
+# special_pspm = fb.Filterbank(filename = "../data/pspm_4_2.fil")
+# highest_x=10
+# max_delay=100
 
 # File with 10000 samples with low signal to noise ratio
-#special_pspm = fb.Filterbank(filename = "../data/pspm_4_1.fil")
+# special_pspm = fb.Filterbank(filename = "../data/pspm_4_1.fil")
+# highest_x=10
+# max_delay=100
 
 special_pspm.read_filterbank()
 
@@ -62,7 +69,7 @@ plt.plot(time_series)
 plt.show()
 
 # Dedisperse the samples
-samples = dedisperse.dedisperse(samples)
+samples = dedisperse.dedisperse(samples, highest_x, max_delay)
 
 # Plot the dedispersed data
 plt.subplot(2,1,1)
