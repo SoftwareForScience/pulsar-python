@@ -14,8 +14,6 @@ import filterbank.filterbank as fb
 import dedisperse as dedisperse
 from plot.static_waterfall import waterfall_plot
 
-from timeseries.timeseries import Timeseries
-
 from clipping import clipping
 
 # Read filterbank data,

@@ -4,7 +4,7 @@ Dedisperses data
 # pylint: disable-msg=C0103
 import numpy as np
 
-def dedisperse(samples, highest_x=None, max_delay=None, dm=None):
+def dedisperse(samples, highest_x=None, max_delay=0, dm=None):
     '''
     This method performs dedispersion on the filterbank data
     The maximum_delay specifies between the currently considered pulsar signal and the next pulsar
@@ -19,22 +19,23 @@ def dedisperse(samples, highest_x=None, max_delay=None, dm=None):
         pulsar_intensity = find_estimation_intensity(samples, highest_x)
         dm = find_dm(samples, pulsar_intensity, max_delay)
 
-    # Distribute the DM over the amount of samples
-    delays_per_sample = np.round(np.linspace(dm, 0, samples.shape[1])).astype(int)
+    if dm:
+        # Distribute the DM over the amount of samples
+        delays_per_sample = (np.round(np.linspace(dm, 0, samples.shape[1]))).astype(int)
 
-    # Loop over the frequencies
-    for i, _ in enumerate(delays_per_sample):
+        # Loop over the frequencies
+        for i, _ in enumerate(delays_per_sample):
 
-        # Temporary array that is used to later delay the frequency
-        temporary_samples = []
+            # Temporary array that is used to later delay the frequency
+            temporary_samples = []
 
-        # Select frequency/column 'i' of all samples
-        temporary_samples = samples[:, i]
+            # Select frequency/column 'i' of all samples
+            temporary_samples = samples[:, i]
 
-        # Write back the frequency/column 'i' to the samples, using numpy's roll function
-        samples[:, i] = np.roll(temporary_samples, delays_per_sample[i])
+            # Write back the frequency/column 'i' to the samples, using numpy's roll function
+            samples[:, i] = np.roll(temporary_samples, delays_per_sample[i])
 
-    return samples
+        return samples
 
 def find_dm(samples, pulsar_intensity, max_delay):
     '''
