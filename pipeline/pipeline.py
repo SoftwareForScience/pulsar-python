@@ -112,7 +112,7 @@ class Pipeline:
             Run and time all methods/modules
         """
         # clipping
-        
+
         time_clipping = timer()
         _, _ = clipping.clipping(freqs, fil_data)
         stopwatch['time_clipping'] = timer() - time_clipping

@@ -3,7 +3,7 @@
 """
 
 import unittest
-import numpy as np 
+import numpy as np
 
 from .context import dedisperse # pylint: disable-msg=E0611
 

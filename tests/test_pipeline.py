@@ -16,7 +16,7 @@ class TestPipeline(unittest.TestCase):
             When running the static pipeline,
             expect a file with the time per method
         """
-        filename = './pspm8.fil'
+        filename = './pspm32.fil'
         new_file = './static_filterbank.txt'
         pipeline.Pipeline(filename)
         self.assertTrue(os.path.exists(new_file))
@@ -27,7 +27,7 @@ class TestPipeline(unittest.TestCase):
             When running the pipeline as stream,
             expect a file with the time per method
         """
-        filename = './pspm8.fil'
+        filename = './pspm32.fil'
         new_file = './rows_filterbank.txt'
         pipeline.Pipeline(filename, as_stream=True)
         self.assertTrue(os.path.exists(new_file))
@@ -38,7 +38,7 @@ class TestPipeline(unittest.TestCase):
             When running the pipeline as stream,
             expect a file with the time per method per chunk
         """
-        filename = './pspm8.fil'
+        filename = './pspm32.fil'
         new_file = './n_rows_filterbank.txt'
         pipeline.Pipeline(filename, as_stream=True, n=10)
         self.assertTrue(os.path.exists(new_file))
