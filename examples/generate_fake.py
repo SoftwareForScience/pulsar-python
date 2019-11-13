@@ -26,7 +26,7 @@ header = {
     b'nbits': 8
 }
 
-filename = './examples/pspm.fil'
+filename = './examples/pspm32.fil'
 
 # generate a fake filterbank file
 generate_file(filename, header)

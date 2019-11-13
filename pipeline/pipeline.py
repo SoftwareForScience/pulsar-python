@@ -5,6 +5,7 @@
 import os
 import sys
 import inspect
+
 CURRENT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 PARENT_DIR = os.path.dirname(CURRENT_DIR)
 sys.path.insert(0, PARENT_DIR)
@@ -14,6 +15,7 @@ import timeseries.timeseries
 import clipping
 import dedisperse
 import fourier
+
 
 # pylint: disable=too-many-locals
 # pylint: disable=too-many-arguments
@@ -46,7 +48,6 @@ class Pipeline:
         file.write(str(result) + ",")
         file.close()
 
-
     def read_rows(self, filename):
         """
             Read the filterbank data as stream
@@ -61,7 +62,6 @@ class Pipeline:
                 break
         time_stop = timer() - time_start
         return time_stop
-
 
     def read_n_rows(self, n, filename, DM, scale):
         """
@@ -85,7 +85,6 @@ class Pipeline:
             stopwatch_list.append(stopwatch)
         return stopwatch_list
 
-
     def read_static(self, filename, DM, scale, size):
         """
             Read the filterbank data at once
@@ -105,7 +104,6 @@ class Pipeline:
         # run methods
         stopwatch = self.measure_methods(stopwatch, fil_data, freqs, DM, scale)
         return stopwatch
-
 
     def measure_methods(self, stopwatch, fil_data, freqs, DM, scale):
         """
