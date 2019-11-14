@@ -22,6 +22,7 @@ f.write('data:              \n')
 i = 0
 for data in fb.data:
     f.write(str(i) + ': ' + str(data) + '\n')
+    i += 1
 
 # doesnt work:
 # for iterator in range(len(fb.get_freqs())):
