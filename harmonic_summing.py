@@ -3,7 +3,10 @@
 # TODO: 1. make final addition and subtraction dependent on difference between perfect and recorded harmonics.
 # TODO: 2. make sure that every recorded frequency close to perfect harmonic frequency are affected.
 # TODO: something with the output, maybe a plot or even another filterbank file.
-# TODO: ask if power is being read correctly. (spoiler: probably not)
+# TODO: ask if power is being read correctly with negative values. (spoiler: probably not)
+# TODO: check if frequency.round(3) is allowed and if not, use a trick to make sure DataFrame doesn't truncate column
+#  names, like converting them to strings.
+
 import filterbank.filterbank as filterbank
 import pandas as pd
 import numpy as np
