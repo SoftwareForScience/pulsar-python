@@ -21,7 +21,7 @@ def find_nearest(array, value):
     idx = (np.abs(array - value)).argmin()
     return array[idx]
 
-fb = filterbank.Filterbank(filename='./pspm.fil', read_all=True)
+fb = filterbank.Filterbank(filename='./pspm32.fil', read_all=True)
 # get filertbank data + frequency labels
 fil_data = fb.select_data()
 
