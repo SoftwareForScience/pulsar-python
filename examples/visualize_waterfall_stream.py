@@ -8,14 +8,16 @@ from filterbank.header import read_header
 from filterbank.filterbank import Filterbank
 from plot import waterfall
 import pylab as pyl
+import matplotlib.pyplot as plt
 from plot.plot import next_power_of_2
 
+fb = Filterbank(filename='./pspm8.fil', read_all=True)
+f, samples = fb.select_data()
 
-fb = Filterbank(filename='./pspm32.fil')
-
-wf = waterfall.Waterfall(fb=fb, fig=pyl.figure(), mode="stream")
+wf = waterfall.Waterfall(filter_bank=fb, fig=pyl.figure(), mode='stream', samples=samples)
 
 fig, update, frames, repeat = wf.animated_plotter()
 
 ani = animation.FuncAnimation(fig, update, frames=frames,repeat=repeat)
-pyl.show()
+plt.ion()
+plt.show(block=True)

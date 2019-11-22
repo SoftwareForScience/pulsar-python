@@ -45,4 +45,4 @@ freqs = freqs + sdr.center_freq/1e6
 
 # Plot the PSD
 plt.plot(freqs, power_levels)
-plt.show()
+plt.show(block=True)
