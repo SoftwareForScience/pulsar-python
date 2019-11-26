@@ -26,8 +26,6 @@ def find_nearest(array, value):
 
 
 def apply_harmonic_summing(fil_data):
-
-
     print(type(fil_data))
     # subtract 226 FOR TESTING ONLY
     frequencies = np.array(fil_data[0])
@@ -40,7 +38,9 @@ def apply_harmonic_summing(fil_data):
     print(fil_dataframe)
 
     # find the overall most powerful frequency
+    print(fil_dataframe.sum())
     most_pwrful_freq = fil_dataframe.sum().idxmax(axis=0, skipna=True)
+
     print('Most powerful frequency = ', str(most_pwrful_freq))
     print('Sum amplitude of mpf = ', fil_dataframe.sum().max())
 
@@ -62,7 +62,6 @@ def apply_harmonic_summing(fil_data):
     # calculate the perfect upper harmonic frequencies
     for i in range(len(high_perfect_harms)):
         high_perfect_harms[i] = most_pwrful_freq + (most_pwrful_freq * (i + 1))
-
 
     print(high_perfect_harms)
 
@@ -88,3 +87,4 @@ def apply_harmonic_summing(fil_data):
 
     print(low_harms)
     print(fil_dataframe)
+

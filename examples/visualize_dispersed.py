@@ -10,7 +10,7 @@ PARENT_DIR = os.path.dirname(CURRENT_DIR)
 sys.path.insert(0,PARENT_DIR)
 
 
-filter_bank = Filterbank(filename='./pspm32.fil')
+filter_bank = Filterbank(filename='../data/pspm8.fil')
 
 # Calculate the center frequency with the data in the header
 center_freq = filter_bank.header[b'center_freq']
