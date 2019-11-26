@@ -7,10 +7,9 @@
 # TODO: check if frequency.round(3) is allowed and if not, use a trick to make sure DataFrame doesn't truncate column
 #       names, like converting them to strings.
 
-
 import pandas as pd
 import numpy as np
-
+import matplotlib.pyplot as plt
 # uncomment following options to print dataframes in their entirety
 # pd.set_option('display.max_rows', 1000)
 # pd.set_option('display.max_columns', 1000)
@@ -33,14 +32,12 @@ def apply_harmonic_summing(fil_data):
     frequencies = frequencies.round(3)
 
     # create dataframe with each channel as column (frequencies as column labels)
-    fil_dataframe = pd.DataFrame(fil_data[1], columns=frequencies)
+    fil_dataframe = pd.DataFrame(fil_data[1], columns=frequencies).abs()
 
     print(fil_dataframe)
 
     # find the overall most powerful frequency
-    print(fil_dataframe.sum())
     most_pwrful_freq = fil_dataframe.sum().idxmax(axis=0, skipna=True)
-
     print('Most powerful frequency = ', str(most_pwrful_freq))
     print('Sum amplitude of mpf = ', fil_dataframe.sum().max())
 
@@ -87,4 +84,11 @@ def apply_harmonic_summing(fil_data):
 
     print(low_harms)
     print(fil_dataframe)
+    list_num = [x for x in range(len(fil_data[1]))]
+    print(list_num)
+    fil_dataframe['Sample'] = list_num
+    print(fil_dataframe)
+    # TODO: doesn't plot 1 value for each 'time'
+    fil_dataframe.plot(x='Sample', y=most_pwrful_freq, kind='scatter')
+    plt.show()
 
