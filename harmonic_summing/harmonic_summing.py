@@ -7,9 +7,10 @@
 # TODO: check if frequency.round(3) is allowed and if not, use a trick to make sure DataFrame doesn't truncate column
 #       names, like converting them to strings.
 
+
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
+
 # uncomment following options to print dataframes in their entirety
 # pd.set_option('display.max_rows', 1000)
 # pd.set_option('display.max_columns', 1000)
@@ -23,9 +24,7 @@ def find_nearest(array, value):
     idx = (np.abs(array - value)).argmin()
     return array[idx]
 
-
 def apply_harmonic_summing(freqs, fil_data):
-
     # subtract 226 FOR TESTING ONLY
     frequencies = np.array(freqs)
     frequencies -= 426
@@ -33,6 +32,7 @@ def apply_harmonic_summing(freqs, fil_data):
 
     # create dataframe with each channel as column (frequencies as column labels)
     fil_dataframe = pd.DataFrame(fil_data, columns=frequencies).abs()
+
 
     #print(fil_dataframe)
 
@@ -66,9 +66,9 @@ def apply_harmonic_summing(freqs, fil_data):
     # add each sample of the recorded harmonics to the fundamental frequency's samples. set harmonics' samples to zero.
     for i in range(len(low_perfect_harms)):
         low_harms[i] = find_nearest(frequencies, low_perfect_harms[i])
-        if abs(low_harms[i] - low_perfect_harms[i]) < (low_perfect_harms[i] * 0.01):
+        if abs(low_harms[i] - low_perfect_harms[i]) < (low_perfect_harms[i] * 0.001):
             fil_dataframe[most_pwrful_freq] = fil_dataframe[most_pwrful_freq] + fil_dataframe[low_harms[i]]
-            fil_dataframe[low_harms[i]] = 0
+            # fil_dataframe[low_harms[i]] = 0
         else:
             print('no harmonic close to ' + str(low_perfect_harms[i]))
 
@@ -76,9 +76,9 @@ def apply_harmonic_summing(freqs, fil_data):
     # add each sample of the recorded harmonics to the fundamental frequency's samples. set harmonics' samples to zero.
     for i in range(len(high_perfect_harms)):
         high_harms[i] = find_nearest(frequencies, high_perfect_harms[i])
-        if abs(high_harms[i] - high_perfect_harms[i]) < (high_perfect_harms[i] * 0.01):
+        if abs(high_harms[i] - high_perfect_harms[i]) < (high_perfect_harms[i] * 0.001):
             fil_dataframe[most_pwrful_freq] = fil_dataframe[most_pwrful_freq] + fil_dataframe[high_harms[i]]
-            fil_dataframe[high_harms[i]] = 0
+            # fil_dataframe[high_harms[i]] = 0
         else:
             print('no harmonic close to ' + str(high_perfect_harms[i]))
 
