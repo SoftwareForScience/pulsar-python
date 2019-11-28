@@ -57,5 +57,5 @@ img = plt.imshow(data.T,
                  interpolation='nearest',
                  extent=extent,
                  cmap='cubehelix')
-plt.show(img)
+plt.show()
 
