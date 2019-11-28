@@ -13,9 +13,9 @@ from plot.plot import next_power_of_2
 
 fb = Filterbank(filename='./pspm32.fil')
 
-wf = waterfall.Waterfall(fb=fb, fig=pyl.figure(), mode="stream")
+wf = waterfall.Waterfall(filter_bank=fb, fig=pyl.figure(), mode="stream")
 
 fig, update, frames, repeat = wf.animated_plotter()
 
 ani = animation.FuncAnimation(fig, update, frames=frames,repeat=repeat)
-pyl.show()
+pyl.show(block=True)

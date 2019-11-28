@@ -14,7 +14,7 @@ class Waterfall():
     # All these attributes are needed.
     def __init__(self, filter_bank=None, center_freq=None, sample_freq=None,
                  fig=None, scans_per_sweep=None,
-                 max_n_rows=1024, mode='stream', t_obs=None):
+                 max_n_rows=10, mode='stream', t_obs=None):
         """
             Setup waterfall object
         """
@@ -47,7 +47,7 @@ class Waterfall():
         else:
             freqs = filter_bank.get_freqs()
             self.samples = self.filter_bank.next_n_rows(self.max_n_rows)
-
+            print(self.samples)
 
         self.freqs = np.asarray(freqs)
 
