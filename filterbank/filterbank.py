@@ -4,6 +4,8 @@
 
 import os
 import numpy as np
+import asyncio
+from aiofile import AIOFile, LineReader
 from .header import read_header, len_header
 
 
@@ -53,11 +55,14 @@ class Filterbank:
         # number if stream iterations
         self.stream_iter = (self.n_samples * self.n_ifs)
         # read filterbank at once
-        if read_all:
-            self.read_filterbank()
+        # if read_all:
+        #     self.read_filterbank()
 
+    async def _init(self):
+        print("t")
+        # await self.read_filterbank()
 
-    def read_filterbank(self):
+    async def read_filterbank(self):
         """
             Read filterbank file and transform to tuple of 3 matrices:
             including the sample amount, number of intermediate channels
@@ -79,7 +84,8 @@ class Filterbank:
         self.fil.close()
 
 
-    def next_row(self):
+    async def next_row(self):
+
         """
             Read filterbank file per row
 
@@ -93,13 +99,14 @@ class Filterbank:
             data = np.fromfile(self.fil, count=self.n_chans_selected, dtype=self.dd_type)
             # skip bytes till start of next chunk
             self.fil.seek(self.n_bytes * (self.n_chans - self.i_1), 1)
+            await asyncio.sleep(1)
         else:
             data = False
             self.fil.close()
         return data
 
 
-    def next_n_rows(self, n_rows):
+    async def next_n_rows(self, n_rows):
         """
             Read filterbank per n rows
 
@@ -187,7 +194,7 @@ class Filterbank:
         return i_0, i_1
 
 
-    def select_data(self, freq_start=None, freq_stop=None, time_start=None, time_stop=None):
+    async def select_data(self, freq_start=None, freq_stop=None, time_start=None, time_stop=None):
         """
             Select a range of data from the filterbank file
 
