@@ -56,7 +56,6 @@ class Filterbank:
         if read_all:
             self.read_filterbank()
 
-
     def read_filterbank(self):
         """
             Read filterbank file and transform to tuple of 3 matrices:
@@ -77,7 +76,6 @@ class Filterbank:
                 self.fil.seek(self.n_bytes * (self.n_chans - self.i_1), 1)
         # release file resources
         self.fil.close()
-
 
     def next_row(self):
         """

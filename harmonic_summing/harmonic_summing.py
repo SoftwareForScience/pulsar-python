@@ -24,17 +24,17 @@ def find_nearest(array, value):
     return array[idx]
 
 
-def apply_harmonic_summing(fil_data):
-    print(type(fil_data))
+def apply_harmonic_summing(freqs, fil_data):
+
     # subtract 226 FOR TESTING ONLY
-    frequencies = np.array(fil_data[0])
+    frequencies = np.array(freqs)
     frequencies -= 426
     frequencies = frequencies.round(3)
 
     # create dataframe with each channel as column (frequencies as column labels)
-    fil_dataframe = pd.DataFrame(fil_data[1], columns=frequencies).abs()
+    fil_dataframe = pd.DataFrame(fil_data, columns=frequencies).abs()
 
-    print(fil_dataframe)
+    #print(fil_dataframe)
 
     # find the overall most powerful frequency
     most_pwrful_freq = fil_dataframe.sum().idxmax(axis=0, skipna=True)
@@ -82,13 +82,4 @@ def apply_harmonic_summing(fil_data):
         else:
             print('no harmonic close to ' + str(high_perfect_harms[i]))
 
-    print(low_harms)
-    print(fil_dataframe)
-    list_num = [x for x in range(len(fil_data[1]))]
-    print(list_num)
-    fil_dataframe['Sample'] = list_num
-    print(fil_dataframe)
-    # TODO: doesn't plot 1 value for each 'time'
-    fil_dataframe.plot(x='Sample', y=most_pwrful_freq, kind='scatter')
-    plt.show()
-
+    return frequencies, fil_dataframe.to_numpy()
