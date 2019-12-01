@@ -84,7 +84,7 @@ class Filterbank:
         self.fil.close()
 
 
-    async def next_row(self):
+    def next_row(self):
 
         """
             Read filterbank file per row
@@ -99,7 +99,6 @@ class Filterbank:
             data = np.fromfile(self.fil, count=self.n_chans_selected, dtype=self.dd_type)
             # skip bytes till start of next chunk
             self.fil.seek(self.n_bytes * (self.n_chans - self.i_1), 1)
-            await asyncio.sleep(1)
         else:
             data = False
             self.fil.close()
@@ -123,6 +122,7 @@ class Filterbank:
                 data[row] = np.fromfile(self.fil, count=self.n_chans_selected, dtype=self.dd_type)
                 # skip bytes till start of next chunk
                 self.fil.seek(self.n_bytes * (self.n_chans - self.i_1), 1)
+                # await asyncio.sleep(0.1)
         else:
             data = False
             self.fil.close()
