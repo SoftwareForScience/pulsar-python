@@ -31,8 +31,6 @@ async def create_filterbank(test_async=None):
         print(test_async)
     else:
         print("1")
-
-
     # await filterbank._init()
 
     return filterbank
@@ -43,8 +41,10 @@ async def main():
     wf1, wf2 = await asyncio.gather(create_waterfall(fb1), create_waterfall(fb2))
 
     fig, update, frames, repeat = wf1.animated_plotter()
-
     ani = animation.FuncAnimation(fig, update, frames=frames,repeat=repeat)
+
+    fig2, update2, frames2, repeat2 = wf2.animated_plotter()
+    ani2 = animation.FuncAnimation(fig2, update2, frames=frames2, repeat=repeat2)
     plt.show(block=True)
 
 if __name__ == "__main__":
