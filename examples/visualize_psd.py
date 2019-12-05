@@ -41,7 +41,7 @@ PXX, freqs, _ = opsd(samples, nfft=1024, sample_rate=sdr.sample_rate/1e6,
 power_levels = 10 * np.log10(PXX/(sdr.sample_rate/1e6))
 
 # Add the center frequency to the frequencies so it matches the actual frequencies
-freqs = freqs + sdr.center_freq/1e6
+freqs = freqs + sdr.center_freq/1e62
 
 # Plot the PSD
 plt.plot(freqs, power_levels)

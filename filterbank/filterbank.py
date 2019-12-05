@@ -56,7 +56,6 @@ class Filterbank:
         if read_all:
             self.read_filterbank()
 
-
     def read_filterbank(self):
         """
             Read filterbank file and transform to tuple of 3 matrices:
@@ -70,14 +69,13 @@ class Filterbank:
         for i_i in range(self.n_samples):
             for j_j in range(self.n_ifs):
                 self.fil.seek(self.n_bytes * self.i_0, 1)
-                # add to matrix
+                # add to matrixº
                 self.data[i_i, j_j] = np.fromfile(self.fil, count=self.n_chans_selected,
                                                   dtype=self.dd_type)
                 # skip bytes till start of next chunk
                 self.fil.seek(self.n_bytes * (self.n_chans - self.i_1), 1)
         # release file resources
         self.fil.close()
-
 
     def next_row(self):
         """
