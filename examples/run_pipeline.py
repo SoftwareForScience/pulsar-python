@@ -11,7 +11,7 @@ from pipeline.pipeline import Pipeline
 # init filterbank filename
 fil_name = os.path.abspath("./pspm32.fil")
 # init filterbank sample size
-sample_size = 192
+sample_size = 512
 # init times the pipeline should run
 n_times = 10
 

@@ -110,7 +110,6 @@ class Pipeline:
             Run and time all methods/modules
         """
         # clipping
-
         time_clipping = timer()
         _, _ = clipping.clipping(freqs, fil_data)
         stopwatch['time_clipping'] = timer() - time_clipping
@@ -120,7 +119,8 @@ class Pipeline:
         stopwatch['time_dedisp'] = timer() - time_dedisp
         # timeseries
         time_t_series = timer()
-        time_series = timeseries.Timeseries(fil_data)
+        time_series = timeseries.Timeseries()
+        time_series = time_series.from_filterbank_data(fil_data)
         stopwatch['time_t_series'] = timer() - time_t_series
         # downsample
         time_downsamp = timer()

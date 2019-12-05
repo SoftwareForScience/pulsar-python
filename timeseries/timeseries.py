@@ -54,3 +54,19 @@ class Timeseries:
         self.timeseries = time_series
 
         return Timeseries(time_series)
+
+    def from_filterbank_data(self, filterbank_data):
+        """
+               Initializes timeseries object from filterbank data,
+               while on the fly converting all 'combined' channels into
+               one summed intensity plot.
+        """
+        time_series = []
+
+        for sample_set in filterbank_data:
+            summed_sample = np.sum(sample_set)
+            time_series.append(summed_sample)
+
+        self.timeseries = time_series
+
+        return Timeseries(time_series)
