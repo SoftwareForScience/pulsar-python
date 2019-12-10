@@ -9,7 +9,7 @@ from aiofile import AIOFile, LineReader
 from .header import read_header, len_header
 
 
-class Filterbank:
+class AsyncFilterbank:
     """
         Processing .fil files
     """
@@ -56,10 +56,10 @@ class Filterbank:
         self.stream_iter = (self.n_samples * self.n_ifs)
         # read filterbank at once
         if read_all:
-            # doesn't keep file open
+            #doesn't keep file open
             self.read_filterbank()
 
-    def read_filterbank(self):
+    async def read_filterbank(self):
         """
             Read filterbank file and transform to tuple of 3 matrices:
             including the sample amount, number of intermediate channels
@@ -102,7 +102,7 @@ class Filterbank:
         return data
 
 
-    def next_n_rows(self, n_rows):
+    async def next_n_rows(self, n_rows):
         """
             Read filterbank per n rows
 
@@ -191,7 +191,7 @@ class Filterbank:
         return i_0, i_1
 
 
-    def select_data(self, freq_start=None, freq_stop=None, time_start=None, time_stop=None):
+    async def select_data(self, freq_start=None, freq_stop=None, time_start=None, time_stop=None):
         """
             Select a range of data from the filterbank file
 

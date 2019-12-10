@@ -7,35 +7,61 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentfra
 PARENT_DIR = os.path.dirname(CURRENT_DIR)
 sys.path.insert(0,PARENT_DIR)
 import matplotlib.animation as animation
-from filterbank.header import read_header
-from filterbank.filterbank import Filterbank
+from filterbank.async_filterbank import AsyncFilterbank
 from plot import waterfall
 import pylab as pyl
 import matplotlib.pyplot as plt
-from plot.plot import next_power_of_2
 import asyncio
-import time
+
 
 async def create_waterfall(fb):
-    wf = waterfall.Waterfall(filter_bank=fb, fig=pyl.figure(), mode='stream')
+    '''
+    creates an asynchronous waterfall object which needs a filterbank object where it initializes a plot and returns
+    this object
+
+    @param fb: A filterbank file for the plot
+    @type fb: Filterbank
+    @return: a waterplot object
+    @rtype: Waterfall
+
+    '''
+
+    wf = waterfall.Waterfall(filter_bank=fb, fig=pyl.figure(), mode='stream', sync=False)
     await wf._init()
     wf.init_plot()
     return wf
 
 async def create_filterbank(test_async=None):
-    filterbank = Filterbank(filename='./pspm32.fil')
+
+    '''
+    creates an asyncronous Filterbank file. Also it checks if the the function is actually asynchronous.
+    @param test_async: checks to so if the method is asynchronous.
+
+    @type test_async: String
+    @return: A filterbank object
+    @rtype: Filterbank
+    '''
+
+    filterbank = AsyncFilterbank(filename='./pspm32.fil')
 
     # just a async test to see if it works
     if test_async is not None:
+        # if the following line is commented out then it will first create fb1 and then fb2. See main() for the comment.
         await asyncio.sleep(1)
         print(test_async)
     else:
         print("1")
-    # await filterbank._init()
 
     return filterbank
 
 async def main():
+    '''
+    creates streaming waterfall plot by getting a filterbank file as an input.
+
+    @return: shows streaming plot. You can use "ipython" (search it on Google or go to:
+    https://ipython.org/install.html) to get an animated plot
+    '''
+
     # creates fb2 first and then fb1, because of sleep delay in create_filterbank method
     fb1, fb2 = await asyncio.gather(create_filterbank("2"), create_filterbank())
     wf1, wf2 = await asyncio.gather(create_waterfall(fb1), create_waterfall(fb2))

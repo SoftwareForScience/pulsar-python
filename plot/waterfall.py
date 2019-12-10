@@ -12,9 +12,9 @@ class Waterfall():
 
     # pylint: disable=R0913
     # All these attributes are needed.
-    def __init__(self, filter_bank=None, center_freq=None, sample_freq=None,
-                 fig=None, scans_per_sweep=None,
-                 max_n_rows=128, mode='stream', t_obs=None):
+    def __init__(self, filter_bank: object = None, center_freq: object = None, sample_freq: object = None,
+                 fig: object = None, scans_per_sweep: object = None,
+                 max_n_rows: object = 128, mode: object = 'stream', t_obs: object = None, sync: object = True) -> object:
         """
             Setup waterfall object
         """
@@ -38,21 +38,23 @@ class Waterfall():
         self.center_freq = center_freq
 
         self.scans_per_sweep = scans_per_sweep
-
+        # freqs = None
         if mode == "discrete":
             time_start = 0
             time_stop = int(self.t_obs//self.header[b'tsamp'])
             freqs, self.samples = filter_bank.select_data(time_start=time_start,
                                                           time_stop=time_stop)
         else:
+            if sync is not False:
+                self.filter_bank.next_n_rows(self.max_n_rows)
+
             freqs = filter_bank.get_freqs()
 
-
         self.freqs = np.asarray(freqs)
+        if sync is not False:
+            self.init_plot()
 
-        # self.init_plot()
-
-    async def _init(self):
+    async def _init(self) -> object:
         self.samples = await self.filter_bank.next_n_rows(self.max_n_rows)
 
     def init_plot(self):
