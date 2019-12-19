@@ -9,9 +9,10 @@ sys.path.insert(0, PARENT_DIR)
 from pipeline.pipeline import Pipeline
 
 # init filterbank filename
+#fil_name = os.path.abspath("../fake_fil_data_32.fil")
 fil_name = os.path.abspath("./pspm32.fil")
-# init filterbank sample size
-sample_size = 512
+# init filterbank sample size. WARNING: must be power of 2 for vectorized fft
+sample_size = 192
 # init times the pipeline should run
 n_times = 10
 
