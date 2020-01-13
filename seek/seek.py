@@ -1,6 +1,7 @@
 from clipping import clipping
 from dedisperse import dedisperse
 from dedisperse.dedisperse import find_estimation_intensity
+from plot import waterfall_plot
 
 from timeseries.timeseries import Timeseries
 import filterbank.filterbank as filterbank
@@ -10,10 +11,9 @@ from timeseries.timeseries import Timeseries
 from pandas import DataFrame
 import pandas as pd
 size = 512
-fb = filterbank.Filterbank(filename='./pspm32.fil', read_all=True)
+fb = filterbank.Filterbank(filename='./fake_pulsar_C32_snr1_4.fil', read_all=True)
 # get filertbank data + frequency labels
 print(fb.get_header())
-
 freqs, fil_data = fb.select_data()
 
 # Transform filterbank data into dataframe
@@ -111,25 +111,54 @@ signal = columnsData.to_numpy()
 time_series4 = Timeseries(signal)
 
 # plot filterbank data without changes
-# plt.subplot(2,1,2)
-# plt.plot(time_series3.timeseries)
-# plt.show()
+plt.subplot(2,1,2)
+plt.plot(time_series3.timeseries)
+plt.xlabel('time', fontsize=12)
+plt.ylabel('Intensity', fontsize=12)
+plt.show()
+# waterfall filterbank data after harmonic summing
+data, extent = waterfall_plot(fil_data2, freqs2)
+img = plt.imshow(data.T,
+                 aspect='auto',
+                 origin='lower',
+                 rasterized=True,
+                 interpolation='nearest',
+                 extent=extent,
+                 cmap='cubehelix')
+plt.show()
 
 # plot filterbank data after harmonic summing
-# plt.subplot(2,1,2)
-# plt.plot(time_series2.timeseries)
-# plt.show()
+plt.subplot(2,1,2)
+plt.plot(time_series2.timeseries)
+plt.xlabel('time', fontsize=12)
+plt.ylabel('Intensity', fontsize=12)
+plt.show()
+
+# waterfall filterbank data after harmonic summing
+data, extent = waterfall_plot(samples2, freqs2)
+img = plt.imshow(data.T,
+                 aspect='auto',
+                 origin='lower',
+                 rasterized=True,
+                 interpolation='nearest',
+                 extent=extent,
+                 cmap='cubehelix')
+plt.show()
 
 # plot signal with most intensity isolated from filterbank data after
 # harmonic summing
 ax = plt.gca()
 fil_dataframe3.plot(kind='line',x='Sample',y=most_pwrful_freq,ax=ax)
+plt.xlabel('time', fontsize=12)
+plt.ylabel('Intensity', fontsize=12)
 plt.show()
 
 # plot timeseries of signal with most intensity isolated from filterbank data after
 # harmonic summing
 plt.subplot(2,1,2)
 plt.plot(time_series4.timeseries)
+plt.xlabel('time (s)', fontsize=12)
+plt.ylabel('Intensity', fontsize=12)
 plt.show()
 # plt.subplot(2,1,2)
 # plt.plot(time_series.timeseries)
